@@ -1,6 +1,7 @@
 import React from "react";
 import Meta from "./../components/Meta";
 import HeroSection from "./../components/HeroSection";
+import CaseTable from "./../components/CaseTable"
 
 function StatePage(props) {
   return (
@@ -17,6 +18,7 @@ function StatePage(props) {
         buttonColor="primary"
         buttonPath="/demo"
       />
+      <CaseTable />
     </>
   );
 }
