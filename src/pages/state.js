@@ -12,7 +12,7 @@ function StatePage(props) {
         bgImage=""
         bgImageOpacity={1}
         title="State"
-        subtitle="This landing page is perfect for showing off your awesome product and driving people to sign up for a paid plan."
+        subtitle="This is simple state surveillance system"
         buttonText="Back"
         buttonColor="primary"
         buttonPath="/demo"

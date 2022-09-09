@@ -3,9 +3,11 @@ import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
-import ChatIcon from "@material-ui/icons/Chat";
-import VideogameAssetIcon from "@material-ui/icons/VideogameAsset";
-import PetsIcon from "@material-ui/icons/Pets";
+import IconButton from "@material-ui/core/IconButton";
+import Replay from "@material-ui/icons/Replay"
+import Looks1 from "@material-ui/icons/LooksOneRounded"
+import Looks2 from "@material-ui/icons/LooksTwoRounded"
+import Looks3 from "@material-ui/icons/Looks3Rounded"
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "./Section";
 
@@ -33,30 +35,37 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function FeaturesSection(props) {
+function DemoFeaturesSection(props) {
   const classes = useStyles();
 
   const items = [
     {
-      title: "Chat",
+      title: "Reset",
       description:
-        "Imagine a world where you can chat with your friends without having to see their dumb faces.",
-      icon: ChatIcon,
+        "Reset the demo",
+      icon: Replay,
       iconColor: "primary.main",
     },
     {
-      title: "Play",
+      title: "Enter and publish",
       description:
-        "We embedded a bunch free flash games inside our app. What we lack in quality we make up in quantity.",
-      icon: VideogameAssetIcon,
-      iconColor: "secondary.main",
+        "At the state, we can publish ",
+      icon: Looks1,
+      iconColor: "primary.main",
     },
     {
-      title: "Cats",
+      title: "Look at the feed",
       description:
-        "Our market research told us people like cats so we put some cat icons on our website.",
-      icon: PetsIcon,
-      iconColor: "#00d1b2",
+        "Look the Atom feed using standard tools",
+      icon: Looks2,
+      iconColor: "primary.main",
+    },
+    {
+      title: "Look at the receiver",
+      description:
+        "At the receiver, look at the recieved table",
+      icon: Looks3,
+      iconColor: "primary.main",
     },
   ];
 
@@ -95,7 +104,11 @@ function FeaturesSection(props) {
                     width={70}
                     height={70}
                   >
-                    <item.icon fontSize="inherit" />
+                    <IconButton
+                      color="primary.main"
+                    >
+                      <item.icon fontSize="large" />
+                    </IconButton>
                   </Box>
                 </Grid>
                 <Grid item={true} xs={true}>
@@ -115,4 +128,4 @@ function FeaturesSection(props) {
   );
 }
 
-export default FeaturesSection;
+export default DemoFeaturesSection;

@@ -4,7 +4,6 @@ import IndexPage from "./index";
 import AboutPage from "./about";
 import FaqPage from "./faq";
 import DemoPage from "./demo";
-import Demo2Page from "./demo2";
 import StatePage from "./state"
 import FeedPage from "./feed"
 import CdcPage from "./cdc"
@@ -25,21 +24,19 @@ function App(props) {
           />
 
           <Switch>
-          <Route exact path="/" component={IndexPage} />
+            <Route exact path="/" component={IndexPage} />
 
-          <Route exact path="/about" component={AboutPage} />
+            <Route exact path="/about" component={AboutPage} />
 
-          <Route exact path="/faq" component={FaqPage} />
+            <Route exact path="/faq" component={FaqPage} />
 
-          <Route exact path="/demo" component={DemoPage} />
+            <Route exact path="/demo" component={DemoPage} />
 
-          <Route exact path="/state" component={StatePage} />
+            <Route exact path="/state" component={StatePage} />
 
-          <Route exact path="/feed" component={FeedPage} />
+            <Route exact path="/feed" component={FeedPage} />
 
-          <Route exact path="/cdc" component={CdcPage} />
-
-          <Route exact path="/demo2" component={Demo2Page} />
+            <Route exact path="/cdc" component={CdcPage} />
 
             <Route component={NotFoundPage} />
           </Switch>
