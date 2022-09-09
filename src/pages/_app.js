@@ -4,6 +4,10 @@ import IndexPage from "./index";
 import AboutPage from "./about";
 import FaqPage from "./faq";
 import DemoPage from "./demo";
+import Demo2Page from "./demo2";
+import StatePage from "./state"
+import FeedPage from "./feed"
+import CdcPage from "./cdc"
 import { Switch, Route, Router } from "./../util/router";
 import NotFoundPage from "./404";
 import Footer from "./../components/Footer";
@@ -21,13 +25,21 @@ function App(props) {
           />
 
           <Switch>
-            <Route exact path="/" component={IndexPage} />
+          <Route exact path="/" component={IndexPage} />
 
-            <Route exact path="/about" component={AboutPage} />
+          <Route exact path="/about" component={AboutPage} />
 
-            <Route exact path="/faq" component={FaqPage} />
+          <Route exact path="/faq" component={FaqPage} />
 
-            <Route exact path="/demo" component={DemoPage} />
+          <Route exact path="/demo" component={DemoPage} />
+
+          <Route exact path="/state" component={StatePage} />
+
+          <Route exact path="/feed" component={FeedPage} />
+
+          <Route exact path="/cdc" component={CdcPage} />
+
+          <Route exact path="/demo2" component={Demo2Page} />
 
             <Route component={NotFoundPage} />
           </Switch>
