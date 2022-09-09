@@ -16,8 +16,8 @@ function App(props) {
         <>
           <Navbar
             color="default"
-            logo="https://uploads.divjoy.com/logo.svg"
-            logoInverted="https://uploads.divjoy.com/logo-white.svg"
+            logo="transmitter.svg"
+            logoInverted="transmitter.svg"
           />
 
           <Switch>
@@ -37,9 +37,9 @@ function App(props) {
             size="medium"
             bgImage=""
             bgImageOpacity={1}
-            copyright={`© ${new Date().getFullYear()} Company`}
-            logo="https://uploads.divjoy.com/logo.svg"
-            logoInverted="https://uploads.divjoy.com/logo-white.svg"
+            copyright={`© ${new Date().getFullYear()} Rick Hawes`}
+            logo="transmitter.svg"
+            logoInverted="transmitter.svg"
             sticky={true}
           />
         </>

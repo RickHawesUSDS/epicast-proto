@@ -10,8 +10,7 @@ import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
-import NightsStayIcon from "@material-ui/icons/NightsStay";
-import WbSunnyIcon from "@material-ui/icons/WbSunny";
+import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "./Section";
 import { Link } from "./../util/router";
@@ -60,6 +59,9 @@ function Navbar(props) {
             <Link to="/">
               <img src={logo} alt="Logo" className={classes.logo} />
             </Link>
+            <Typography variant="h5" gutterBottom="false">
+              EpiCast
+            </Typography>
             <div className={classes.spacer} />
             <Hidden mdUp={true} implementation="css">
               <IconButton
@@ -95,38 +97,7 @@ function Navbar(props) {
             <ListItemText>About</ListItemText>
           </ListItem>
           <ListItem component={Link} to="/faq" button={true}>
-            <ListItemText>Pricing</ListItemText>
-          </ListItem>
-          <ListItem component={Link} to="/about" button={true}>
             <ListItemText>FAQ</ListItemText>
-          </ListItem>
-          <ListItem
-            button={true}
-            component="a"
-            href="https://app.mysite.com/auth/signin"
-          >
-            <ListItemText>Sign in</ListItemText>
-          </ListItem>
-          <ListItem>
-            <Button
-              variant="contained"
-              color="primary"
-              component="a"
-              href="https://app.mysite.com/auth/signup"
-            >
-              Sign up
-            </Button>
-          </ListItem>
-          <ListItem>
-            <IconButton
-              color="inherit"
-              onClick={darkMode.toggle}
-              style={{ opacity: 0.6 }}
-            >
-              {darkMode.value && <NightsStayIcon />}
-
-              {!darkMode.value && <WbSunnyIcon />}
-            </IconButton>
           </ListItem>
         </List>
       </Drawer>

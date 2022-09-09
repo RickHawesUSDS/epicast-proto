@@ -11,8 +11,8 @@ function IndexPage(props) {
         size="medium"
         bgImage=""
         bgImageOpacity={1}
-        title="Your landing page title here"
-        subtitle="This landing page is perfect for showing off your awesome product and driving people to sign up for a paid plan."
+        title="EpiCast Demonstration"
+        subtitle="EpiCast is new way from states to transmit case data to the CDC"
         buttonText="Start Demo"
         buttonColor="primary"
         buttonPath="/demo"
