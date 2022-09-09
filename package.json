@@ -1,5 +1,5 @@
 {
-  "name": "my-divjoy-project",
+  "name": "epicast-demo",
   "version": "0.1.0",
   "private": true,
   "keywords": [
@@ -45,5 +45,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:8080"
+  "proxy": "http://localhost:8080",
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.3"
+  }
 }

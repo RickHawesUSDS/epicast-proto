@@ -119,7 +119,7 @@ const useDarkModeStorage = createLocalStorageStateHook("isDarkMode");
 
 export const ThemeProvider = (props) => {
   // Get system dark mode preference
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: light)", {
+  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)", {
     noSsr: true,
   });
 

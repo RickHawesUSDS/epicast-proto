@@ -1,4 +1,5 @@
 import React from "react";
+import Button from "@material-ui/core/Button"
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
@@ -9,6 +10,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "./Section";
 import SectionHeader from "./SectionHeader";
+import { Link } from "../util/router";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -26,21 +28,27 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function TeamBiosSection(props) {
+function DemoSection(props) {
   const classes = useStyles();
 
   const items = [
     {
-      avatar: "https://uploads.divjoy.com/pravatar-150x-68.jpeg",
-      name: "John Smith",
-      role: "Software Engineer",
-      bio: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum consequatur numquam aliquam tenetur ad amet inventore hic beatae, quas accusantium perferendis sapiente explicabo.",
+      avatar: "school.svg",
+      name: "State",
+      role: "Enter and publish cases",
+      bio: ""
     },
     {
-      avatar: "https://uploads.divjoy.com/pravatar-150x-35.jpeg",
-      name: "Lisa Zinn",
-      role: "Software Engineer",
-      bio: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum consequatur numquam aliquam tenetur ad amet inventore hic beatae, quas accusantium perferendis sapiente explicabo, corporis totam! Labore reprehenderit beatae magnam animi!",
+      avatar: "rss.svg",
+      name: "Feed",
+      role: "Examine the publish feed",
+      bio: ""
+    },
+    {
+      avatar: "office-building.svg",
+      name: "CDC",
+      role: "Examine the resultant table",
+      bio: "",
     },
   ];
 
@@ -67,6 +75,7 @@ function TeamBiosSection(props) {
                     <Avatar
                       src={item.avatar}
                       alt={item.name}
+                      variant="square"
                       className={classes.avatar}
                     />
                   </Box>
@@ -87,6 +96,17 @@ function TeamBiosSection(props) {
                       </Typography>
                     </Box>
                   </Box>
+                  <Box textAlign="center" pt={3}>
+                    <Button
+                      component={Link}
+                      to=""
+                      variant="contained"
+                      size="large"
+                      color="primary"
+                    >
+                      Hello
+                    </Button>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
@@ -97,4 +117,4 @@ function TeamBiosSection(props) {
   );
 }
 
-export default TeamBiosSection;
+export default DemoSection;

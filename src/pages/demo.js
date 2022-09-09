@@ -1,12 +1,12 @@
 import React from "react";
 import Meta from "./../components/Meta";
-import TeamBiosSection from "./../components/TeamBiosSection";
+import DemoSection from "../components/DemoSection";
 
 function DemoPage(props) {
   return (
     <>
       <Meta title="Demo" />
-      <TeamBiosSection
+      <DemoSection
         bgColor="default"
         size="medium"
         bgImage=""
