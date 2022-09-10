@@ -1,20 +1,11 @@
 import React from "react";
 import Meta from "../components/Meta";
 import DemoFeaturesSection from "../components/DemoFeaturesSection";
-import HeroSection2 from "../components/HeroSection2";
 
-function Demo2Page(props) {
+function DemoPage(props) {
   return (
     <>
-      <Meta title="Demo2" />
-      <HeroSection2
-        bgColor="default"
-        size="medium"
-        bgImage=""
-        bgImageOpacity={1}
-        title="Demo"
-        subtitle="This demonstration will take you through a scenarios"
-      />
+      <Meta title="Demo" />
       <DemoFeaturesSection
         bgColor="default"
         size="medium"
@@ -26,4 +17,4 @@ function Demo2Page(props) {
   );
 }
 
-export default Demo2Page;
+export default DemoPage;

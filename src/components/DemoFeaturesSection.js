@@ -2,6 +2,7 @@ import React from "react";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
+import { Link } from "react-router-dom"
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import Replay from "@material-ui/icons/Replay"
@@ -45,27 +46,31 @@ function DemoFeaturesSection(props) {
         "Reset the demo",
       icon: Replay,
       iconColor: "primary.main",
+      to: "demo"
     },
     {
-      title: "Enter and publish",
+      title: "Enter and publish cases",
       description:
-        "At the state, we can publish ",
+        "At the state, we can enter cases and publish results.",
       icon: Looks1,
       iconColor: "primary.main",
+      to: "demo/state"
     },
     {
       title: "Look at the feed",
       description:
-        "Look the Atom feed using standard tools",
+        "Look the Atom feed that the state published using standard tools.",
       icon: Looks2,
       iconColor: "primary.main",
+      to: "demo/feed"
     },
     {
       title: "Look at the receiver",
       description:
-        "At the receiver, look at the recieved table",
+        "At the receiver, look at the recieved table.",
       icon: Looks3,
       iconColor: "primary.main",
+      to: "demo/cdc"
     },
   ];
 
@@ -77,13 +82,8 @@ function DemoFeaturesSection(props) {
       bgImageOpacity={props.bgImageOpacity}
     >
       <Container className={classes.container}>
-        <Grid container={true} alignItems="center" spacing={8}>
-          <Grid container={true} item={true} direction="column" xs={12} md={6}>
-            <figure className={classes.imageWrapper}>
-              <img src={props.image} alt="" />
-            </figure>
-          </Grid>
-          <Grid item={true} xs={12} md={6}>
+        <Grid container={true} alignItems="center" spacing={4}>
+          <Grid item={true} xs={8} md={8} lg={8}>
             {items.map((item, index) => (
               <Grid
                 className={classes.row}
@@ -104,11 +104,15 @@ function DemoFeaturesSection(props) {
                     width={70}
                     height={70}
                   >
-                    <IconButton
-                      color="primary.main"
-                    >
-                      <item.icon fontSize="large" />
-                    </IconButton>
+                    
+                      <IconButton
+                        component={Link}
+                        to={item.to}
+                        color="primary.main"
+                      >
+                        <item.icon fontSize="large" />
+                      </IconButton>
+
                   </Box>
                 </Grid>
                 <Grid item={true} xs={true}>
