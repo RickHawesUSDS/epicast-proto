@@ -9,7 +9,7 @@ function Meta(props) {
   // Meta values that are the same across all pages
   const globalMeta = {
     // Site name
-    siteName: "My App",
+    siteName: "EpiCast Demo",
     // Your production domain (example: https://myapp.com)
     domain: "",
     // Your Twitter handle (example: @divjoy)

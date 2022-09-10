@@ -1,21 +1,18 @@
 import React from "react";
 import Meta from "./../components/Meta";
-import HeroSection from "./../components/HeroSection";
+import HeroSection2 from "./../components/HeroSection2";
 
 function CdcPage(props) {
   return (
     <>
       <Meta title="Cdc" />
-      <HeroSection
+      <HeroSection2
         bgColor="default"
         size="medium"
         bgImage=""
         bgImageOpacity={1}
         title="Your landing page title here"
         subtitle="This landing page is perfect for showing off your awesome product and driving people to sign up for a paid plan."
-        buttonText="Get Started"
-        buttonColor="primary"
-        buttonPath="/pricing"
       />
     </>
   );

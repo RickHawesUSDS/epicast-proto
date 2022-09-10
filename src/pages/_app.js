@@ -32,11 +32,11 @@ function App(props) {
 
             <Route exact path="/demo" component={DemoPage} />
 
-            <Route exact path="/state" component={StatePage} />
+            <Route exact path="/demo/state" component={StatePage} />
 
-            <Route exact path="/feed" component={FeedPage} />
+            <Route exact path="/demo/feed" component={FeedPage} />
 
-            <Route exact path="/cdc" component={CdcPage} />
+            <Route exact path="/demo/cdc" component={CdcPage} />
 
             <Route component={NotFoundPage} />
           </Switch>
