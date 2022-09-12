@@ -8,13 +8,14 @@ import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import Button from "@material-ui/core/Button";
 import Drawer from "@material-ui/core/Drawer";
+import Link from "@material-ui/core/Link"
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Section from "./Section";
-import { Link } from "./../util/router";
+//import { Link } from "./../util/router";
 import { useDarkMode } from "./../util/theme";
 import { Link as RouterLink } from "react-router-dom";
 import { Route } from "react-router-dom";
@@ -47,7 +48,7 @@ function SimpleBreadcrumbs() {
                   EpiCast
                 </Typography>
               ) : (
-                <RouterLink to="/">
+                <RouterLink to="/" key="/" class="MuiTypography-root MuiLink-root MuiLink-underlineHover" >
                   <Typography color="textPrimary" variant="h5" >
                     EpiCast
                   </Typography>
@@ -63,7 +64,7 @@ function SimpleBreadcrumbs() {
                   {value}
                 </Typography>
               ) : (
-                <RouterLink to={to} key={to}>
+                <RouterLink to={to} key={to} class="MuiTypography-root MuiLink-root MuiLink-underlineHover">
                   <Typography color="textPrimary" key={to} variant="h5">
                     {value}
                   </Typography>
