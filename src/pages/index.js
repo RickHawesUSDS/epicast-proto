@@ -1,12 +1,12 @@
 import React from "react";
 import Meta from "./../components/Meta";
-import HeroSection from "./../components/HeroSection";
+import DemoHeroSection from "./../components/DemoHeroSection";
 
 function IndexPage(props) {
   return (
     <>
       <Meta />
-      <HeroSection
+      <DemoHeroSection
         bgColor="default"
         size="medium"
         bgImage=""
