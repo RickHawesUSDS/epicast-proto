@@ -19,9 +19,9 @@ function Meta(props) {
   // Default meta values for current page (override with props)
   const defaultPageMeta = {
     // Page title
-    title: "My App",
+    title: "EpiCast Demo",
     // Page description
-    description: "My app description",
+    description: "Demonstration of the EpiCast proposal",
     // Social share image (create this file in /public/images/)
     image: "/images/social.png",
     // Page type (see https://ogp.me/#types)

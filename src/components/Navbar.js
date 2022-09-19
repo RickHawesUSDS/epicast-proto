@@ -40,16 +40,17 @@ function SimpleBreadcrumbs() {
     <Route>
       {({ location }) => {
         const pathnames = location.pathname.split("/").filter(x => x);
+        const typographyVariant = "h5"
         return (
           <Breadcrumbs aria-label="Breadcrumb">
             {
               pathnames.length == 0 ? (
-                <Typography color="textPrimary" variant="h5">
+                <Typography  variant={typographyVariant}>
                   EpiCast
                 </Typography>
               ) : (
                 <RouterLink to="/" key="/" class="MuiTypography-root MuiLink-root MuiLink-underlineHover" >
-                  <Typography color="textPrimary" variant="h5" >
+                  <Typography variant={typographyVariant} >
                     EpiCast
                   </Typography>
                 </RouterLink>
@@ -60,12 +61,12 @@ function SimpleBreadcrumbs() {
               const to = `/${pathnames.slice(0, index + 1).join("/")}`;
 
               return last ? (
-                <Typography color="textPrimary" key={to} variant="h5">
+                <Typography key={to} variant={typographyVariant}>
                   {value}
                 </Typography>
               ) : (
                 <RouterLink to={to} key={to} class="MuiTypography-root MuiLink-root MuiLink-underlineHover">
-                  <Typography color="textPrimary" key={to} variant="h5">
+                  <Typography key={to} variant={typographyVariant}>
                     {value}
                   </Typography>
                 </RouterLink>
