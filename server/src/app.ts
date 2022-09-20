@@ -27,7 +27,7 @@ class App {
 
   private routerSetup() {
     this.app.use('/', indexRouter);
-    this.app.use('/users', usersRouter);
+    this.app.use('/api/users', usersRouter);
   }
 
 }
