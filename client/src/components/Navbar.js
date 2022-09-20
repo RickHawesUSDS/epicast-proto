@@ -44,7 +44,7 @@ function SimpleBreadcrumbs() {
         return (
           <Breadcrumbs aria-label="Breadcrumb">
             {
-              pathnames.length == 0 ? (
+              pathnames.length === 0 ? (
                 <Typography  variant={typographyVariant}>
                   EpiCast
                 </Typography>
