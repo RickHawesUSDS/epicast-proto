@@ -3,7 +3,8 @@ import Navbar from "./../components/Navbar";
 import IndexPage from "./index";
 import AboutPage from "./about";
 import FaqPage from "./faq";
-import DemoPage from "./demo";
+import DemoPage from "./demo"
+import ResetPage from "./reset";
 import StatePage from "./state"
 import FeedPage from "./feed"
 import CdcPage from "./cdc"
@@ -31,6 +32,8 @@ function App(props) {
             <Route exact path="/faq" component={FaqPage} />
 
             <Route exact path="/demo" component={DemoPage} />
+
+            <Route exact path="/demo/reset" component={ResetPage} />
 
             <Route exact path="/demo/state" component={StatePage} />
 

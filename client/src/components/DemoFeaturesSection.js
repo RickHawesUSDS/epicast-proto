@@ -46,7 +46,7 @@ function DemoFeaturesSection(props) {
         "Reset the demo",
       icon: Replay,
       iconColor: "primary.main",
-      to: "demo"
+      to: "demo/reset"
     },
     {
       title: "Enter and publish cases",
@@ -59,7 +59,7 @@ function DemoFeaturesSection(props) {
     {
       title: "Look at the feed",
       description:
-        "Look the Atom feed that the state published using standard tools.",
+        "Look the feed in the cloud that the state published.",
       icon: Looks2,
       iconColor: "primary.main",
       to: "demo/feed"
@@ -67,7 +67,7 @@ function DemoFeaturesSection(props) {
     {
       title: "Look at the receiver",
       description:
-        "At the receiver, look at the recieved table.",
+        "At the CDC, look at the recieved table.",
       icon: Looks3,
       iconColor: "primary.main",
       to: "demo/cdc"
