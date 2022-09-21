@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "export NODE_OPTIONS='--trace-deprecation --abort-on-uncaught-exception' && export NODE_ENV=development && nodemon --exec ts-node ./bin/www.ts",
+    "debug": "export NODE_OPTIONS='--inspect --trace-deprecation --abort-on-uncaught-exception' && export NODE_ENV=development && ts-node ./bin/www.ts",
     "build": "sh etc/build.sh"
   },
   "dependencies": {
@@ -14,8 +15,10 @@
     "log4js": "latest",
     "module-alias": "^2.2.2",
     "morgan": "~1.9.1",
+    "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "sequelize": "^6.23.0",
+    "sequelize-typescript": "^2.1.3",
     "sqlite3": "^5.1.1"
   },
   "devDependencies": {
@@ -28,6 +31,7 @@
     "@types/node": "^16.10.2",
     "nodemon": "^2.0.15",
     "ts-node": "^10.2.1",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^4.4.3"
   },
   "_moduleAliases": {
