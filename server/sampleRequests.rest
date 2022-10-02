@@ -1,1 +1,5 @@
+# Reset the demo
 POST http://localhost:3001/api/system/reset
+
+# Get all cases
+GET http://localhost:3001/api/cases

@@ -3,7 +3,6 @@ import { faker } from '@faker-js/faker';
 
 const MAX_NUMBER_OF_CASES_PER_DAY = 8
 
-
 function fakeStateCase(stateCase: StateCase, caseDate: Date) {
     stateCase.personFirstName = faker.name.firstName()
     stateCase.personLastName = faker.name.lastName()

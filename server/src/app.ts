@@ -6,6 +6,7 @@ import logger from 'morgan';
 
 import indexRouter from './routes/index';
 import systemRouter from './routes/system'
+import casesRouter from './routes/cases'
 
 class App {
   public app: express.Application;
@@ -28,6 +29,7 @@ class App {
   private routerSetup() {
     this.app.use('/', indexRouter);
     this.app.use('/api/system', systemRouter)
+    this.app.use('/api/cases', casesRouter)
   }
 
 }
