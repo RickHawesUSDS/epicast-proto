@@ -1,6 +1,6 @@
 import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt } from 'sequelize-typescript'
 
-@Table
+@Table({ tableName: 'stateCases'})
 export class StateCase extends Model<StateCase> {
     @PrimaryKey
     @Column
@@ -15,11 +15,50 @@ export class StateCase extends Model<StateCase> {
     updatedAt!: Date;
 
     @Column
-    personFamilyName!: string;
+    personFirstName!: string;
 
     @Column
-    personGivenName!: string;
+    personLastName!: string;
+
+    @Column
+    personDateOfBirth?: Date;
+
+    @Column
+    personRace?: string;
+
+    @Column
+    personEthnicity?: string; 
+
+    @Column
+    personSexAtBirth?: string;
+
+    @Column
+    personSexualOrientation?: string;
+
+    @Column
+    personAddress?: string;
+
+    @Column
+    personCity?: string;
+
+    @Column
+    personState?: string;
+
+    @Column
+    personPostalCode?: string;
+
+    @Column
+    personPhone?: string;
+
+    @Column
+    personEmail?: string;
 
     @Column
     onsetOfSymptoms!: Date;
+
+    @Column
+    hospitalized?: string;
+
+    @Column
+    subjectDied?: string;
 }

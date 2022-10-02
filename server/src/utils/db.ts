@@ -11,4 +11,4 @@ const db = new Sequelize({
     models: [__dirname + '/../models'] 
   })
 
-export { db }
+export { db, Sequelize }
