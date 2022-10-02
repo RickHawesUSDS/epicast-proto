@@ -1,5 +1,8 @@
 // Sequelize ORM (Typescript version)
 import { Sequelize } from "sequelize-typescript";
+import { getLogger } from '@/utils/loggers';
+
+const logger = getLogger('DB')
 
 // Connect to the database
 const db = new Sequelize({
@@ -8,6 +11,7 @@ const db = new Sequelize({
     username: 'root',
     password: '',
     storage: ':memory:',
+    logging: msg => logger.debug(msg),
     models: [__dirname + '/../models'] 
   })
 
