@@ -25,7 +25,6 @@ function randomBetween(min: number, max: number): number {
       Math.random() * (max - min) + min
     )
 }
-
   
 export async function insertFakeStateCases(startDate: Date, numberOfDays: number) {
     const caseDate = startDate

@@ -7,6 +7,7 @@ import logger from 'morgan';
 import indexRouter from './routes/index';
 import systemRouter from './routes/system'
 import casesRouter from './routes/cases'
+import { db }  from './utils/db'
 
 class App {
   public app: express.Application;
@@ -14,11 +15,11 @@ class App {
   constructor() {
     this.app = express();
     this.config();
+    this.databaseSetup();
     this.routerSetup();
   }
 
   private config() {
-
     this.app.use(logger('dev'));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
@@ -32,6 +33,9 @@ class App {
     this.app.use('/api/cases', casesRouter)
   }
 
+  private async databaseSetup() {
+    await db.sync()
+  }
 }
 
 export default new App().app;

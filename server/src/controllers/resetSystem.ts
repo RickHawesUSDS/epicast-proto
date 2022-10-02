@@ -7,7 +7,6 @@ const logger = getLogger('RESET_SYSTEM');
 
 export async function resetSystem() {
     logger.debug("Reset the demo database")
-    await db.sync()
     await StateCase.destroy({
         truncate: true
     })
