@@ -11,14 +11,14 @@ import TableRow from '@material-ui/core/TableRow';
 const columns = [
   { id: 'caseId', label: 'Case Id', minWidth: 100},
   // { id: 'createdAt', label: 'Created At', minWidth: 100},
-  { id: 'updatedAt', label: 'Updated At', minWitdh: 100},
+  { id: 'updatedAt', label: 'Updated At', minWitdh: 160, dateFormat: true},
   { id: 'personFirstName', label: 'First Name', minWidth: 120},
   { id: 'personFirstName', label: 'Last Name', minWidth: 120},
-  { id: 'personDateOfBirth', label: 'Date of Birth', minWidth: 100},
-  { id: 'personRace', label: 'Race', minWidth: 100},
-  { id: 'personEthnicity', label: 'Ethnicity', minWidth: 100},
-  { id: 'personSexAtBirth', label: 'Sex at Birth', minWidth: 100},
-  { id: 'personSexualOrientation', label: 'Sexual Orientation', minWidth: 100},
+  { id: 'personDateOfBirth', label: 'Date of Birth', minWidth: 160, dateFormat: true},
+  //{ id: 'personRace', label: 'Race', minWidth: 100},
+  //{ id: 'personEthnicity', label: 'Ethnicity', minWidth: 100},
+  //{ id: 'personSexAtBirth', label: 'Sex at Birth', minWidth: 100},
+  //{ id: 'personSexualOrientation', label: 'Sexual Orientation', minWidth: 100},
   { id: 'personAddress', label: 'Address', minWidth: 170},
   { id: 'personCity', label: 'City', minWidth: 100},
   { id: 'personState', label: 'State', minWidth: 100},
@@ -359,7 +359,11 @@ export default function CaseTable() {
                     const value = row[column.id];
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.format && typeof value === 'number' ? column.format(value) : value}
+                        {
+                          column.format && typeof value === 'number' ? column.format(value) : 
+                          column.dateFormat ? new Date(value).toLocaleDateString() :
+                          value
+                        }
                       </TableCell>
                     );
                   })}
