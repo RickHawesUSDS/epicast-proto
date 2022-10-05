@@ -302,7 +302,7 @@ function fetchCases() {
   return rows
 }
 
-export default function() {
+export default function StateCasesTable() {
   return (
     <CaseTable fetchRows={fetchCases} columns={columns}/>
   )
