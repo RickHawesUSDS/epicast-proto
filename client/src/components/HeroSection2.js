@@ -19,6 +19,7 @@ function HeroSection2(props) {
             subtitle={props.subtitle}
             size={4}
           />
+          {props.children}
         </Box>
       </Container>
     </Section>

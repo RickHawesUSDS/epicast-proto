@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 
-import { stateCasesSlice } from './features/stateCases/stateCaseSlice'
+import { apiSlice } from './features/api/apiSlice'
 
 export default configureStore({
   reducer: {
-    stateCases: stateCasesSlice.reducer
-  }
+    [apiSlice.reducerPath]: apiSlice.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(apiSlice.middleware),
 })

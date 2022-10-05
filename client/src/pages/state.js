@@ -14,8 +14,9 @@ function StatePage(props) {
         bgImageOpacity={1}
         title="State"
         subtitle="This is simple state surveillance system"
-      />
-      <StateCasesTable />
+      >
+        <StateCasesTable />
+      </HeroSection2>
     </>
   );
 }
