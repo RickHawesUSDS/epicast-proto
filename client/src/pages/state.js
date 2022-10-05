@@ -1,7 +1,7 @@
 import React from "react";
 import Meta from "./../components/Meta";
 import HeroSection2 from "./../components/HeroSection2";
-import CaseTable from "./../components/CaseTable"
+import StateCasesTable from "../features/stateCases/StateCasesTable"
 
 function StatePage(props) {
   return (
@@ -15,7 +15,7 @@ function StatePage(props) {
         title="State"
         subtitle="This is simple state surveillance system"
       />
-      <CaseTable />
+      <StateCasesTable />
     </>
   );
 }
