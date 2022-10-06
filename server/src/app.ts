@@ -6,7 +6,7 @@ import logger from 'morgan';
 
 import indexRouter from './routes/index';
 import systemRouter from './routes/system'
-import caseRouter from './routes/stateCases'
+import stateCaseRouter from './routes/stateCases'
 import { db }  from './utils/db'
 
 class App {
@@ -30,7 +30,7 @@ class App {
   private routerSetup() {
     this.app.use('/', indexRouter);
     this.app.use('/api/system', systemRouter)
-    this.app.use('/api/stateCases', caseRouter)
+    this.app.use('/api/stateCases', stateCaseRouter)
   }
 
   private async databaseSetup() {
