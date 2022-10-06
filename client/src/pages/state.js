@@ -14,13 +14,16 @@ function StatePage(props) {
         bgImage=""
         bgImageOpacity={1}
         title="State"
-        subtitle="This is simple state surveillance system"
+        subtitle=""
       >
+        <Container align="center">
+          This is simple state surveillance system. The table represents all the case of a particular disease.
+        </Container>
         <StateCasesTable />
         <Container color="text.primary" align="right">
-          <ButtonGroup>
-            <Button variant="contained" color="primary">Add Cases</Button>
-            <Button variant="contained" color="primary">Publish</Button>
+          <ButtonGroup color="primary">
+            <Button>Add Cases</Button>
+            <Button>Publish</Button>
           </ButtonGroup>
         </Container>
       </HeroSection2>

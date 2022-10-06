@@ -4,20 +4,16 @@ import HeroSection2 from "./../components/HeroSection2";
 import { Container } from "@material-ui/core"
 import { Button } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { useResetSystemMutation } from "../features/api/apiSlice"
+
 
 
 function ResetPage(props) {
   const history = useHistory();
+  const [resetSystem] = useResetSystemMutation()
 
   async function onReset() {
-    const resetUrl =  '/api/system/reset'
-    await fetch(resetUrl, {method: 'POST'})
-      .then((response) => {
-        console.log('Success: ' + response.status)
-      })
-      .catch((error) => {
-        console.error('Error:', error)
-      })
+    await resetSystem()
     history.push('/demo')
   }
 
