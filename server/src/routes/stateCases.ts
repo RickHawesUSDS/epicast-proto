@@ -8,8 +8,11 @@ const logger = getLogger('STATE_CASES_ROUTE');
 
 /* GET get all cases. */
 router.get('/', async function (req: express.Request, res: express.Response, _next) {
-  logger.info("Get all cases")
-  const cases = await getAllStateCases("DESC")
+  const sort = req.query.sort as string
+  logger.info("Get all cases: sort=" + sort)
+
+  const sortDecending = "DESC".localeCompare(sort, 'en', { sensitivity: 'base' }) == 0
+  const cases = await getAllStateCases(sortDecending)
   res.send(cases);
 })
 

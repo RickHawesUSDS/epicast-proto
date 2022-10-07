@@ -2,7 +2,7 @@
 POST http://localhost:3001/api/system/reset
 
 ### Get all cases
-GET http://localhost:3001/api/stateCases
+GET http://localhost:3001/api/stateCases?sort=desc
 
 ### Add a random case
 POST http://localhost:3001/api/stateCases/random

@@ -1,10 +1,11 @@
 import CaseTable from "../../components/CaseTable";
-import { useGetStateCasesQuery } from '../api/apiSlice'
+import { useGetAllStateCasesQuery } from '../api/apiSlice'
 import { CircularProgress } from "@material-ui/core";
 import { Alert } from "@material-ui/lab"
 
 const columns = [
   { id: 'caseId', label: 'Case Id', minWidth: 100},
+  { id: 'onsetOfSymptoms', label: 'Onset of Symptoms', dateFormat: true, minWidth: 100},
   // { id: 'createdAt', label: 'Created At', minWidth: 100},
   { id: 'updatedAt', label: 'Updated At', minWitdh: 160, dateFormat: true},
   { id: 'personFirstName', label: 'First Name', minWidth: 120},
@@ -20,7 +21,6 @@ const columns = [
   { id: 'personPostalCode', label: 'Postal Code', minWidth: 100},
   { id: 'personPhone', label: 'Telephone', minWidth: 100},
   { id: 'personEmail', label: 'Email', minWidth: 100},
-  { id: 'onsetOfSymptoms', label: 'Onset of Symptoms', minWidth: 100},
   { id: 'hospitalized', label: 'Hospitalized', minWidth: 100},
   { id: 'subjectDied', label: 'Subject Died', minWidth: 100},
 ];
@@ -32,7 +32,7 @@ export default function StateCasesTable() {
     isSuccess,
     isError,
     error,
-  } = useGetStateCasesQuery()
+  } = useGetAllStateCasesQuery("desc")
 
   let content
 

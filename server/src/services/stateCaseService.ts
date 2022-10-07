@@ -1,7 +1,10 @@
 import { StateCase } from '@/models/StateCase';
 import { faker } from '@faker-js/faker';
+import { addDays, set } from 'date-fns'
+import { getLogger } from 'log4js';
 
 const MAX_NUMBER_OF_CASES_PER_DAY = 8
+const logger = getLogger("STATE_CASE_SERVICE")
 
 function fakeStateCase(stateCase: StateCase, caseDate: Date) {
   stateCase.personFirstName = faker.name.firstName()
@@ -30,9 +33,9 @@ export async function insertManyFakeStateCases(numberOfDays: number) {
   const lastCaseDate = await getLastCaseDate()
   for(let i = 0; i < numberOfDays; i++) {
     const numberOfCases = randomBetween(0, MAX_NUMBER_OF_CASES_PER_DAY)
-    const newCaseDate = new Date(lastCaseDate)
-    newCaseDate.setDate(lastCaseDate.getDate() + i)
+    const newCaseDate = addDays(lastCaseDate, i)
     for(let j = 0; j < numberOfCases; j++) {
+      logger.debug("case date: " + newCaseDate.toISOString() + ", " + i)
       const stateCase = new StateCase()
       fakeStateCase(stateCase, newCaseDate)
       await stateCase.save()
@@ -41,10 +44,21 @@ export async function insertManyFakeStateCases(numberOfDays: number) {
 }
 
 export async function insertSingleFakeStateCase(): Promise<StateCase> {
-  const caseDate = await getLastCaseDate()
+  const lastCaseDate = await getLastCaseDate()
+  const now = new Date()
+  const caseDate = set(lastCaseDate, { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() })
   const stateCase = new StateCase()
   fakeStateCase(stateCase, caseDate)
   return await stateCase.save()
+}
+
+export async function getStateCases(sortDecending: boolean): Promise<StateCase[]> {
+  const listOrder = sortDecending ? "DESC" : "ASC"
+  return await StateCase.findAll({
+    order: [
+      ["onsetOfSymptoms", listOrder],
+    ]
+  })
 }
 
 export async function getLastCaseDate(): Promise<Date> {

@@ -15,8 +15,8 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['StateCase']
     }),
-    getStateCases: builder.query({
-      query: () => `stateCases`,
+    getAllStateCases: builder.query({
+      query: (sort) => `stateCases?sort=${sort}`,
       providesTags: ['StateCase']
     }),
     addRandomStateCase: builder.mutation({
@@ -34,6 +34,6 @@ export const apiSlice = createApi({
 // auto-generated based on the defined endpoints
 export const {
   useResetSystemMutation,
-  useGetStateCasesQuery,
-  useAddRandomStateCaseMutation, 
+  useGetAllStateCasesQuery,
+  useAddRandomStateCaseMutation,
 } = apiSlice

@@ -13,5 +13,8 @@
     "start": "concurrently \"yarn run server\" \"yarn run client\"",
     "server": "cd server && yarn start",
     "client": "cd client && yarn start"
+  },
+  "dependencies": {
+    "date-fns": "^2.29.3"
   }
 }
