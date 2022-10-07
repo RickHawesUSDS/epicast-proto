@@ -13,7 +13,7 @@ const useStyles = makeStyles({
     width: '100%',
   },
   container: {
-    maxHeight: 440,
+    maxHeight: 640,
   },
 });
 
@@ -34,7 +34,7 @@ export default function CaseTable(props) {
   };
 
   return (
-    <div style={{ paddingLeft: 30, paddingRight: 30}}>
+    <div style={{ paddingTop: 30, paddingBottom: 30 }}>
       <TableContainer className={classes.container}>
         <Table size="small" stickyHeader aria-label="sticky table">
           <TableHead>
@@ -73,7 +73,7 @@ export default function CaseTable(props) {
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
+        rowsPerPageOptions={[10, 20, 50]}
         component="div"
         count={rows.length}
         rowsPerPage={rowsPerPage}

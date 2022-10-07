@@ -19,9 +19,9 @@ export const apiSlice = createApi({
       query: (sort) => `stateCases?sort=${sort}`,
       providesTags: ['StateCase']
     }),
-    addRandomStateCase: builder.mutation({
-      query: () => ({
-        url: 'stateCases/random',
+    addRandomStateCases: builder.mutation({
+      query: ({numOfDays, numPerDay}) => ({
+        url: `stateCases/random?numOfDays=${numOfDays}&numPerDay=${numPerDay}`,
         method: 'POST',
         body: ""
       }),
@@ -35,5 +35,5 @@ export const apiSlice = createApi({
 export const {
   useResetSystemMutation,
   useGetAllStateCasesQuery,
-  useAddRandomStateCaseMutation,
+  useAddRandomStateCasesMutation,
 } = apiSlice

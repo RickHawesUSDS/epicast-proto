@@ -1,7 +1,7 @@
 import express from 'express';
 import { getLogger } from '@/utils/loggers';
 import { getAllStateCases } from '@/controllers/getAllStateCases'
-import { addRandomStateCase } from '@/controllers/addRandomStateCase';
+import { insertFakeStateCases } from '@/services/stateCaseService'
 
 const router = express.Router();
 const logger = getLogger('STATE_CASES_ROUTE');
@@ -17,10 +17,14 @@ router.get('/', async function (req: express.Request, res: express.Response, _ne
 })
 
 /* POST add a random new cases */
-router.post('/random', async function(_req, res, _next) {
-  logger.info("Add a random case")
-  const stateCase = await addRandomStateCase()
-  res.send(stateCase)
+router.post('/random', async function(req, res, _next) {
+  let numPerDay = parseInt(req.query.numPerDay as string)
+  let numOfDays = parseInt(req.query.numOfDays as string)
+  if (isNaN(numPerDay)) numPerDay = 1
+  if (isNaN(numOfDays)) numOfDays = 1
+  logger.info(`Add random cases: ${numOfDays}, ${numPerDay}`)
+  const stateCases = await insertFakeStateCases(numOfDays, numPerDay)
+  res.send(stateCases)
 })
 
 export default router;

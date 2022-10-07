@@ -23,33 +23,21 @@ function fakeStateCase(stateCase: StateCase, caseDate: Date) {
   stateCase.onsetOfSymptoms = caseDate
 }
 
-function randomBetween(min: number, max: number): number {
-  return Math.floor(
-    Math.random() * (max - min) + min
-  )
-}
-
-export async function insertManyFakeStateCases(numberOfDays: number) {
+export async function insertFakeStateCases(numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
   const lastCaseDate = await getLastCaseDate()
-  for(let i = 0; i < numberOfDays; i++) {
-    const numberOfCases = randomBetween(0, MAX_NUMBER_OF_CASES_PER_DAY)
-    const newCaseDate = addDays(lastCaseDate, i)
-    for(let j = 0; j < numberOfCases; j++) {
-      logger.debug("case date: " + newCaseDate.toISOString() + ", " + i)
+  const now = new Date()
+  const adjustedCaseDate = set(lastCaseDate, { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() })
+  let casesAdded = []
+  for(let day = 0; day < numberOfDays; day++) {
+    const newCaseDate = addDays(adjustedCaseDate, day)
+    for(let i = 0; i < numberPerDay; i++) {
       const stateCase = new StateCase()
       fakeStateCase(stateCase, newCaseDate)
       await stateCase.save()
+      casesAdded.push(stateCase)
     }
   }
-}
-
-export async function insertSingleFakeStateCase(): Promise<StateCase> {
-  const lastCaseDate = await getLastCaseDate()
-  const now = new Date()
-  const caseDate = set(lastCaseDate, { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() })
-  const stateCase = new StateCase()
-  fakeStateCase(stateCase, caseDate)
-  return await stateCase.save()
+  return casesAdded
 }
 
 export async function getStateCases(sortDecending: boolean): Promise<StateCase[]> {
