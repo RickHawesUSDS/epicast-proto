@@ -1,6 +1,6 @@
 import { StateCase } from "@/models/StateCase"
 import { getLogger } from '@/utils/loggers';
-import { insertSingleFakeStateCase } from "@/services/fakeStateCase";
+import { insertSingleFakeStateCase } from "@/services/stateCaseService";
 
 const logger = getLogger('ADD_RANDOM_STATE_CASE');
 

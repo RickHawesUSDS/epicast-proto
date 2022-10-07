@@ -7,13 +7,21 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
   tagTypes: ['StateCase'],
   endpoints: (builder) => ({
+    resetSystem: builder.mutation({
+      query: () => ({
+        url: 'system/reset',
+        method: 'POST',
+        body: ""
+      }),
+      invalidatesTags: ['StateCase']
+    }),
     getStateCases: builder.query({
       query: () => `stateCases`,
       providesTags: ['StateCase']
     }),
-    resetSystem: builder.mutation({
+    addRandomStateCase: builder.mutation({
       query: () => ({
-        url: 'system/reset',
+        url: 'stateCases/random',
         method: 'POST',
         body: ""
       }),
@@ -25,6 +33,7 @@ export const apiSlice = createApi({
 // Export hooks for usage in function components, which are
 // auto-generated based on the defined endpoints
 export const {
+  useResetSystemMutation,
   useGetStateCasesQuery,
-  useResetSystemMutation
+  useAddRandomStateCaseMutation, 
 } = apiSlice

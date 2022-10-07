@@ -1,6 +1,6 @@
 import { db } from "../utils/db"
 import { StateCase } from "@/models/StateCase"
-import { insertManyFakeStateCases } from "../services/fakeStateCase"
+import { insertManyFakeStateCases } from "../services/stateCaseService"
 import { getLogger } from '@/utils/loggers';
 
 const logger = getLogger('RESET_SYSTEM');

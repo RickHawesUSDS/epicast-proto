@@ -3,8 +3,15 @@ import Meta from "./../components/Meta";
 import HeroSection2 from "./../components/HeroSection2";
 import StateCasesTable from "../features/stateCases/StateCasesTable"
 import { Button, ButtonGroup, Container } from "@material-ui/core";
+import { useAddRandomStateCaseMutation } from "../features/api/apiSlice"
 
 function StatePage(props) {
+  const [addRandomStateCase] = useAddRandomStateCaseMutation()
+
+  async function onAddCaseClick() {
+    await addRandomStateCase()
+  }
+
   return (
     <>
       <Meta title="State" />
@@ -22,7 +29,7 @@ function StatePage(props) {
         <StateCasesTable />
         <Container color="text.primary" align="right">
           <ButtonGroup color="primary">
-            <Button>Add Cases</Button>
+            <Button onClick={ () => onAddCaseClick() }>Add Case</Button>
             <Button>Publish</Button>
           </ButtonGroup>
         </Container>

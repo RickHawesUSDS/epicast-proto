@@ -7,9 +7,9 @@ const router = express.Router();
 const logger = getLogger('STATE_CASES_ROUTE');
 
 /* GET get all cases. */
-router.get('/', async function (_req, res, _next) {
+router.get('/', async function (req: express.Request, res: express.Response, _next) {
   logger.info("Get all cases")
-  const cases = await getAllStateCases()
+  const cases = await getAllStateCases("DESC")
   res.send(cases);
 })
 
