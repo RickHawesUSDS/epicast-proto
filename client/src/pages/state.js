@@ -14,7 +14,7 @@ function StatePage (props) {
   }
 
   async function onAddMultipleCasesClick () {
-    await addRandomStateCase({ numOfDays: 3, numPerDay: 5 })
+    await addRandomStateCase({ numOfDays: 3, numPerDay: 5000 })
   }
 
   async function onPublishCasesClick () {
@@ -38,8 +38,8 @@ function StatePage (props) {
         <StateCasesTable />
         <Container color='text.primary' align='right'>
           <ButtonGroup color='primary'>
-            <Button onClick={() => onAddCaseClick()}>Add Case</Button>
-            <Button onClick={() => onAddMultipleCasesClick()}>Add Multiple Cases</Button>
+            <Button onClick={() => onAddCaseClick()}>Add 1 Case</Button>
+            <Button onClick={() => onAddMultipleCasesClick()}>Add 15000 Cases</Button>
             <Button onClick={() => onPublishCasesClick()}>Publish</Button>
           </ButtonGroup>
         </Container>
