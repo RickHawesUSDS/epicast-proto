@@ -1,130 +1,120 @@
-import React, { useState } from "react";
-import AppBar from "@material-ui/core/AppBar";
-import Container from "@material-ui/core/Container";
-import Toolbar from "@material-ui/core/Toolbar";
-import Hidden from "@material-ui/core/Hidden";
-import Breadcrumbs from "@material-ui/core/Breadcrumbs";
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
-import Button from "@material-ui/core/Button";
-import Drawer from "@material-ui/core/Drawer";
-import Link from "@material-ui/core/Link"
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
-import Section from "./Section";
-//import { Link } from "./../util/router";
-import { useDarkMode } from "./../util/theme";
-import { Link as RouterLink } from "react-router-dom";
-import { Route } from "react-router-dom";
-
+import React, { useState } from 'react'
+import AppBar from '@material-ui/core/AppBar'
+import Container from '@material-ui/core/Container'
+import Toolbar from '@material-ui/core/Toolbar'
+import Hidden from '@material-ui/core/Hidden'
+import Breadcrumbs from '@material-ui/core/Breadcrumbs'
+import IconButton from '@material-ui/core/IconButton'
+import MenuIcon from '@material-ui/icons/Menu'
+import Button from '@material-ui/core/Button'
+import Drawer from '@material-ui/core/Drawer'
+import Link from '@material-ui/core/Link'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemText from '@material-ui/core/ListItemText'
+import Typography from '@material-ui/core/Typography'
+import { makeStyles } from '@material-ui/core/styles'
+import Section from './Section'
+// import { Link } from "./../util/router";
+import { useDarkMode } from './../util/theme'
+import { Link as RouterLink, Route } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
   logo: {
     height: 28,
-    marginRight: theme.spacing(2),
+    marginRight: theme.spacing(2)
   },
   drawerList: {
-    width: 250,
+    width: 250
   },
   spacer: {
-    flexGrow: 1,
-  },
-}));
+    flexGrow: 1
+  }
+}))
 
-
-function SimpleBreadcrumbs() {
+function SimpleBreadcrumbs () {
   return (
     <Route>
       {({ location }) => {
-        const pathnames = location.pathname.split("/").filter(x => x);
-        const typographyVariant = "h5"
+        const pathnames = location.pathname.split('/').filter(x => x)
+        const typographyVariant = 'h5'
         return (
-          <Breadcrumbs aria-label="Breadcrumb">
+          <Breadcrumbs aria-label='Breadcrumb'>
             {
-              pathnames.length === 0 ? (
-                <Typography  variant={typographyVariant}>
-                  EpiCast
-                </Typography>
-              ) : (
-                <RouterLink to="/" key="/" class="MuiTypography-root MuiLink-root MuiLink-underlineHover" >
-                  <Typography variant={typographyVariant} >
+              pathnames.length === 0
+                ? (
+                  <Typography variant={typographyVariant}>
                     EpiCast
                   </Typography>
-                </RouterLink>
-              )
+                  )
+                : (
+                  <RouterLink to='/' key='/' class='MuiTypography-root MuiLink-root MuiLink-underlineHover'>
+                    <Typography variant={typographyVariant}>
+                      EpiCast
+                    </Typography>
+                  </RouterLink>
+                  )
             }
             {pathnames.map((value, index) => {
-              const last = index === pathnames.length - 1;
-              const to = `/${pathnames.slice(0, index + 1).join("/")}`;
+              const last = index === pathnames.length - 1
+              const to = `/${pathnames.slice(0, index + 1).join('/')}`
 
-              return last ? (
-                <Typography key={to} variant={typographyVariant}>
-                  {value}
-                </Typography>
-              ) : (
-                <RouterLink to={to} key={to} class="MuiTypography-root MuiLink-root MuiLink-underlineHover">
+              return last
+                ? (
                   <Typography key={to} variant={typographyVariant}>
                     {value}
                   </Typography>
-                </RouterLink>
-              );
+                  )
+                : (
+                  <RouterLink to={to} key={to} class='MuiTypography-root MuiLink-root MuiLink-underlineHover'>
+                    <Typography key={to} variant={typographyVariant}>
+                      {value}
+                    </Typography>
+                  </RouterLink>
+                  )
             })}
           </Breadcrumbs>
-        );
+        )
       }}
     </Route>
-  );
+  )
 }
 
-function Navbar(props) {
-  const classes = useStyles();
+function Navbar (props) {
+  const classes = useStyles()
 
-  const darkMode = useDarkMode();
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [menuState, setMenuState] = useState(null);
+  const darkMode = useDarkMode()
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   // Use inverted logo if specified
   // and we are in dark mode
-  const logo = props.logoInverted && darkMode.value ? props.logoInverted : props.logo;
-
-  const handleOpenMenu = (event, id) => {
-    // Store clicked element (to anchor the menu to)
-    // and the menu id so we can tell which menu is open.
-    setMenuState({ anchor: event.currentTarget, id });
-  };
-
-  const handleCloseMenu = () => {
-    setMenuState(null);
-  };
+  const logo = props.logoInverted && darkMode.value ? props.logoInverted : props.logo
 
   return (
-    <Section bgColor={props.color} size="auto">
-      <AppBar position="static" color="transparent" elevation={0}>
-        <Container disableGutters={true}>
+    <Section bgColor={props.color} size='auto'>
+      <AppBar position='static' color='transparent' elevation={0}>
+        <Container disableGutters>
           <Toolbar>
-            <Link to="/">
-              <img src={process.env.PUBLIC_URL + "/" + logo} alt="Logo" className={classes.logo} />
+            <Link to='/'>
+              <img src={process.env.PUBLIC_URL + '/' + logo} alt='Logo' className={classes.logo} />
             </Link>
             <SimpleBreadcrumbs />
             <div className={classes.spacer} />
-            <Hidden mdUp={true} implementation="css">
+            <Hidden mdUp implementation='css'>
               <IconButton
                 onClick={() => {
-                  setDrawerOpen(true);
+                  setDrawerOpen(true)
                 }}
-                color="inherit"
+                color='inherit'
               >
                 <MenuIcon />
               </IconButton>
             </Hidden>
-            <Hidden smDown={true} implementation="css">
-              <Button component={Link} to="/about" color="inherit">
+            <Hidden smDown implementation='css'>
+              <Button component={Link} to='/about' color='inherit'>
                 About
               </Button>
-              <Button component={Link} to="/faq" color="inherit">
+              <Button component={Link} to='/faq' color='inherit'>
                 FAQ
               </Button>
             </Hidden>
@@ -132,7 +122,7 @@ function Navbar(props) {
         </Container>
       </AppBar>
       <Drawer
-        anchor="right"
+        anchor='right'
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
       >
@@ -140,16 +130,16 @@ function Navbar(props) {
           className={classes.drawerList}
           onClick={() => setDrawerOpen(false)}
         >
-          <ListItem component={Link} to="/about" button={true}>
+          <ListItem component={Link} to='/about' button>
             <ListItemText>About</ListItemText>
           </ListItem>
-          <ListItem component={Link} to="/faq" button={true}>
+          <ListItem component={Link} to='/faq' button>
             <ListItemText>FAQ</ListItemText>
           </ListItem>
         </List>
       </Drawer>
     </Section>
-  );
+  )
 }
 
-export default Navbar;
+export default Navbar

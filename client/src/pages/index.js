@@ -1,24 +1,24 @@
-import React from "react";
-import Meta from "./../components/Meta";
-import DemoHeroSection from "./../components/DemoHeroSection";
+import React from 'react'
+import Meta from './../components/Meta'
+import DemoHeroSection from './../components/DemoHeroSection'
 
-function IndexPage(props) {
+function IndexPage (props) {
   return (
     <>
       <Meta />
       <DemoHeroSection
-        bgColor="default"
-        size="medium"
-        bgImage=""
+        bgColor='default'
+        size='medium'
+        bgImage=''
         bgImageOpacity={1}
-        title="EpiCast Demonstration"
-        subtitle="EpiCast is new way from states to transmit case data to the CDC"
-        buttonText="Start Demo"
-        buttonColor="primary"
-        buttonPath="/demo"
+        title='EpiCast Demonstration'
+        subtitle='EpiCast is new way from states to transmit case data to the CDC'
+        buttonText='Start Demo'
+        buttonColor='primary'
+        buttonPath='/demo'
       />
     </>
-  );
+  )
 }
 
-export default IndexPage;
+export default IndexPage

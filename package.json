@@ -6,7 +6,9 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "concurrently": "^7.4.0"
+    "concurrently": "^7.4.0",
+    "standard": "^17.0.0",
+    "ts-standard": "^12.0.1"
   },
   "scripts": {
     "install-all": "cd client && yarn install && cd ../server && yarn install",

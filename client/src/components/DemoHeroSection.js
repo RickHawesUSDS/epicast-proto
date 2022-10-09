@@ -1,12 +1,12 @@
-import React from "react";
-import Container from "@material-ui/core/Container";
-import Box from "@material-ui/core/Box";
-import Button from "@material-ui/core/Button";
-import Section from "./Section";
-import SectionHeader from "./SectionHeader";
-import { Link } from "../util/router";
+import React from 'react'
+import Container from '@material-ui/core/Container'
+import Box from '@material-ui/core/Box'
+import Button from '@material-ui/core/Button'
+import Section from './Section'
+import SectionHeader from './SectionHeader'
+import { Link } from '../util/router'
 
-function HeroSection(props) {
+function HeroSection (props) {
   return (
     <Section
       bgColor={props.bgColor}
@@ -15,20 +15,20 @@ function HeroSection(props) {
       bgImageOpacity={props.bgImageOpacity}
     >
       <Container>
-        <Box textAlign="center">
+        <Box textAlign='center'>
           <SectionHeader
             title={props.title}
             subtitle={props.subtitle}
             size={4}
           />
           <div>
-            <img src="epicast-flow.svg" alt="EpiCast Flow" />
+            <img src='epicast-flow.svg' alt='EpiCast Flow' />
           </div>
           <Button
             component={Link}
             to={props.buttonPath}
-            variant="contained"
-            size="large"
+            variant='contained'
+            size='large'
             color={props.buttonColor}
           >
             {props.buttonText}
@@ -36,7 +36,7 @@ function HeroSection(props) {
         </Box>
       </Container>
     </Section>
-  );
+  )
 }
 
-export default HeroSection;
+export default HeroSection

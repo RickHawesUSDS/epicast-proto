@@ -11,7 +11,7 @@ export const apiSlice = createApi({
       query: () => ({
         url: 'system/reset',
         method: 'POST',
-        body: ""
+        body: ''
       }),
       invalidatesTags: ['StateCase']
     }),
@@ -20,14 +20,14 @@ export const apiSlice = createApi({
       providesTags: ['StateCase']
     }),
     addRandomStateCases: builder.mutation({
-      query: ({numOfDays, numPerDay}) => ({
+      query: ({ numOfDays, numPerDay }) => ({
         url: `stateCases/random?numOfDays=${numOfDays}&numPerDay=${numPerDay}`,
         method: 'POST',
-        body: ""
+        body: ''
       }),
       invalidatesTags: ['StateCase']
-    }),
-  }),
+    })
+  })
 })
 
 // Export hooks for usage in function components, which are
@@ -35,5 +35,5 @@ export const apiSlice = createApi({
 export const {
   useResetSystemMutation,
   useGetAllStateCasesQuery,
-  useAddRandomStateCasesMutation,
+  useAddRandomStateCasesMutation
 } = apiSlice

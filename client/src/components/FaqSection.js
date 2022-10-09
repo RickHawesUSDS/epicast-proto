@@ -1,68 +1,68 @@
-import React from "react";
-import Container from "@material-ui/core/Container";
-import Accordion from "@material-ui/core/Accordion";
-import AccordionSummary from "@material-ui/core/AccordionSummary";
-import Typography from "@material-ui/core/Typography";
-import AccordionDetails from "@material-ui/core/AccordionDetails";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { makeStyles } from "@material-ui/core/styles";
-import Section from "./Section";
-import SectionHeader from "./SectionHeader";
+import React from 'react'
+import Container from '@material-ui/core/Container'
+import Accordion from '@material-ui/core/Accordion'
+import AccordionSummary from '@material-ui/core/AccordionSummary'
+import Typography from '@material-ui/core/Typography'
+import AccordionDetails from '@material-ui/core/AccordionDetails'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import { makeStyles } from '@material-ui/core/styles'
+import Section from './Section'
+import SectionHeader from './SectionHeader'
 
 const useStyles = makeStyles((theme) => ({
   accordion: {
     // Remove shadow
-    boxShadow: "none",
-    "&:before": {
+    boxShadow: 'none',
+    '&:before': {
       // Remove default divider
-      display: "none",
+      display: 'none'
     },
     // Add a custom border
-    "&:not(:last-child)": {
-      borderBottom: `1px solid ${theme.palette.divider}`,
-    },
+    '&:not(:last-child)': {
+      borderBottom: `1px solid ${theme.palette.divider}`
+    }
   },
   expanded: {
-    margin: `0 !important`,
+    margin: '0 !important'
   },
   summary: {
-    minHeight: 78,
+    minHeight: 78
   },
   summaryContent: {
-    margin: "0 !important",
-  },
-}));
+    margin: '0 !important'
+  }
+}))
 
-function FaqSection(props) {
-  const classes = useStyles();
+function FaqSection (props) {
+  const classes = useStyles()
 
   const items = [
     {
-      question: "Integer ornare neque mauris?",
+      question: 'Integer ornare neque mauris?',
       answer:
-        "Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus. Suspendisse ut tincidunt eros. In velit mi, rhoncus dictum neque a, tincidunt lobortis justo.",
+        'Integer ornare neque mauris, ac vulputate lacus venenatis et. Pellentesque ut ultrices purus. Suspendisse ut tincidunt eros. In velit mi, rhoncus dictum neque a, tincidunt lobortis justo.'
     },
     {
-      question: "Lorem ipsum dolor sit amet?",
+      question: 'Lorem ipsum dolor sit amet?',
       answer:
-        "Nunc nulla mauris, laoreet vel cursus lacinia, consectetur sit amet tellus. Suspendisse ut tincidunt eros. In velit mi, rhoncus dictum neque a, tincidunt lobortis justo.",
+        'Nunc nulla mauris, laoreet vel cursus lacinia, consectetur sit amet tellus. Suspendisse ut tincidunt eros. In velit mi, rhoncus dictum neque a, tincidunt lobortis justo.'
     },
     {
-      question: "Suspendisse ut tincidunt?",
+      question: 'Suspendisse ut tincidunt?',
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In lobortis, metus et mattis ullamcorper. Suspendisse ut tincidunt eros. In velit mi, rhoncus dictum neque a, tincidunt lobortis justo.",
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In lobortis, metus et mattis ullamcorper. Suspendisse ut tincidunt eros. In velit mi, rhoncus dictum neque a, tincidunt lobortis justo.'
     },
     {
-      question: "Ut enim ad minim veniam?",
+      question: 'Ut enim ad minim veniam?',
       answer:
-        "Suspendisse ut tincidunt eros. In velit mi, rhoncus dictum neque a, tincidunt lobortis justo.",
+        'Suspendisse ut tincidunt eros. In velit mi, rhoncus dictum neque a, tincidunt lobortis justo.'
     },
     {
-      question: "In velit mi, rhoncus dictum neque?",
+      question: 'In velit mi, rhoncus dictum neque?',
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.",
-    },
-  ];
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.'
+    }
+  ]
 
   return (
     <Section
@@ -71,31 +71,31 @@ function FaqSection(props) {
       bgImage={props.bgImage}
       bgImageOpacity={props.bgImageOpacity}
     >
-      <Container maxWidth="md">
+      <Container maxWidth='md'>
         <SectionHeader
           title={props.title}
           subtitle={props.subtitle}
           size={4}
-          textAlign="center"
+          textAlign='center'
         />
 
         {items.map((item, index) => (
           <Accordion
             classes={{
               root: classes.accordion,
-              expanded: classes.expanded,
+              expanded: classes.expanded
             }}
             key={index}
           >
             <AccordionSummary
               classes={{
                 root: classes.summary,
-                content: classes.summaryContent,
+                content: classes.summaryContent
               }}
               expandIcon={<ExpandMoreIcon />}
               aria-controls={`faq-panel-${index}`}
             >
-              <Typography variant="h6">{item.question}</Typography>
+              <Typography variant='h6'>{item.question}</Typography>
             </AccordionSummary>
             <AccordionDetails id={`faq-panel-${index}`}>
               <Typography>{item.answer}</Typography>
@@ -104,7 +104,7 @@ function FaqSection(props) {
         ))}
       </Container>
     </Section>
-  );
+  )
 }
 
-export default FaqSection;
+export default FaqSection

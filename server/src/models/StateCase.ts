@@ -1,65 +1,65 @@
 import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, AutoIncrement } from 'sequelize-typescript'
 
-@Table({ tableName: 'stateCases'})
+@Table({ tableName: 'stateCases' })
 export class StateCase extends Model<StateCase> {
-    @PrimaryKey
-    @AutoIncrement
-    @Column
-    caseId!: number;
+  @PrimaryKey
+  @AutoIncrement
+  @Column
+    caseId!: number
 
-    @CreatedAt
-    @Column
-    createdAt!: Date;
+  @CreatedAt
+  @Column
+    createdAt!: Date
 
-    @UpdatedAt
-    @Column
-    updatedAt!: Date;
+  @UpdatedAt
+  @Column
+    updatedAt!: Date
 
-    @Column
-    personFirstName!: string;
+  @Column
+    personFirstName!: string
 
-    @Column
-    personLastName!: string;
+  @Column
+    personLastName!: string
 
-    @Column
-    personDateOfBirth?: Date;
+  @Column
+    personDateOfBirth?: Date
 
-    @Column
-    personRace?: string;
+  @Column
+    personRace?: string
 
-    @Column
-    personEthnicity?: string;
+  @Column
+    personEthnicity?: string
 
-    @Column
-    personSexAtBirth?: string;
+  @Column
+    personSexAtBirth?: string
 
-    @Column
-    personSexualOrientation?: string;
+  @Column
+    personSexualOrientation?: string
 
-    @Column
-    personAddress?: string;
+  @Column
+    personAddress?: string
 
-    @Column
-    personCity?: string;
+  @Column
+    personCity?: string
 
-    @Column
-    personState?: string;
+  @Column
+    personState?: string
 
-    @Column
-    personPostalCode?: string;
+  @Column
+    personPostalCode?: string
 
-    @Column
-    personPhone?: string;
+  @Column
+    personPhone?: string
 
-    @Column
-    personEmail?: string;
+  @Column
+    personEmail?: string
 
-    @Column
-    onsetOfSymptoms!: Date;
+  @Column
+    onsetOfSymptoms!: Date
 
-    @Column
-    hospitalized?: string;
+  @Column
+    hospitalized?: string
 
-    @Column
-    subjectDied?: string;
+  @Column
+    subjectDied?: string
 }

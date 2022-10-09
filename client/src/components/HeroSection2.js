@@ -1,10 +1,10 @@
-import React from "react";
-import Container from "@material-ui/core/Container";
-import Box from "@material-ui/core/Box";
-import Section from "./Section";
-import SectionHeader from "./SectionHeader";
+import React from 'react'
+import Container from '@material-ui/core/Container'
+import Box from '@material-ui/core/Box'
+import Section from './Section'
+import SectionHeader from './SectionHeader'
 
-function HeroSection2(props) {
+function HeroSection2 (props) {
   return (
     <Section
       bgColor={props.bgColor}
@@ -13,7 +13,7 @@ function HeroSection2(props) {
       bgImageOpacity={props.bgImageOpacity}
     >
       <Container>
-        <Box textAlign="center">
+        <Box textAlign='center'>
           <SectionHeader
             title={props.title}
             subtitle={props.subtitle}
@@ -23,7 +23,7 @@ function HeroSection2(props) {
         {props.children}
       </Container>
     </Section>
-  );
+  )
 }
 
-export default HeroSection2;
+export default HeroSection2

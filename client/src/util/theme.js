@@ -1,66 +1,66 @@
-import React from "react";
+import React from 'react'
 import {
   useTheme,
   createTheme,
-  ThemeProvider as MuiThemeProvider,
-} from "@material-ui/core/styles";
-import * as colors from "@material-ui/core/colors";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { createLocalStorageStateHook } from "use-local-storage-state";
+  ThemeProvider as MuiThemeProvider
+} from '@material-ui/core/styles'
+import * as colors from '@material-ui/core/colors'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
+import { createLocalStorageStateHook } from 'use-local-storage-state'
 
 const themeConfig = {
   // Light theme
   light: {
     palette: {
-      type: "light",
+      type: 'light',
       primary: {
         // Use hue from colors or hex
-        main: colors.indigo["500"],
+        main: colors.indigo['500']
         // Uncomment to specify light/dark
         // shades instead of automatically
         // calculating from above value.
-        //light: "#4791db",
-        //dark: "#115293",
+        // light: "#4791db",
+        // dark: "#115293",
       },
       secondary: {
-        main: colors.pink["500"],
+        main: colors.pink['500']
       },
       background: {
         // Background for <body>
         // and <Section color="default">
-        default: "#fff",
+        default: '#fff',
         // Background for elevated
         // components (<Card>, etc)
-        paper: "#fff",
-      },
-    },
+        paper: '#fff'
+      }
+    }
   },
 
   // Dark theme
   dark: {
     palette: {
-      type: "dark",
+      type: 'dark',
       primary: {
         // Same as in light but we could
         // adjust color hue if needed
-        main: colors.indigo["500"],
+        main: colors.indigo['500']
       },
       secondary: {
-        main: colors.pink["500"],
+        main: colors.pink['500']
       },
       background: {
-        default: colors.grey["900"],
-        paper: colors.grey["800"],
-      },
-    },
+        default: colors.grey['900'],
+        paper: colors.grey['800']
+      }
+    }
   },
 
   // Values for both themes
   common: {
     typography: {
       fontSize: 14,
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
       // Uncomment to make button lowercase
       // button: { textTransform: "none" },
     },
@@ -70,37 +70,37 @@ const themeConfig = {
         sm: 600,
         md: 960,
         lg: 1200,
-        xl: 1920,
-      },
+        xl: 1920
+      }
     },
     // Override component styles
     overrides: {
       // Global styles
       MuiCssBaseline: {
-        "@global": {
-          "#root": {
+        '@global': {
+          '#root': {
             // Flex column that is height
             // of viewport so that footer
             // can push self to bottom by
             // with auto margin-top
-            minHeight: "100vh",
-            display: "flex",
-            flexDirection: "column",
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
             // Prevent child elements from
             // shrinking when content
             // is taller than the screen
             // (quirk of flex parent)
-            "& > *": {
-              flexShrink: 0,
-            },
-          },
-        },
-      },
-    },
-  },
-};
+            '& > *': {
+              flexShrink: 0
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
-function getTheme(name) {
+function getTheme (name) {
   // Create MUI theme from themeConfig
   return createTheme({
     ...themeConfig[name],
@@ -109,34 +109,34 @@ function getTheme(name) {
     overrides: {
       // Merge overrides
       ...(themeConfig[name] && themeConfig[name].overrides),
-      ...(themeConfig.common && themeConfig.common.overrides),
-    },
-  });
+      ...(themeConfig.common && themeConfig.common.overrides)
+    }
+  })
 }
 
 // Create a local storage hook for dark mode preference
-const useDarkModeStorage = createLocalStorageStateHook("isDarkMode");
+const useDarkModeStorage = createLocalStorageStateHook('isDarkMode')
 
 export const ThemeProvider = (props) => {
   // Get system dark mode preference
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)", {
-    noSsr: true,
-  });
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)', {
+    noSsr: true
+  })
 
   // Get stored dark mode preference
-  let [isDarkModeStored, setIsDarkModeStored] = useDarkModeStorage();
+  const [isDarkModeStored, setIsDarkModeStored] = useDarkModeStorage()
 
   // Use stored dark mode with fallback to system preference
   const isDarkMode =
-    isDarkModeStored === undefined ? prefersDarkMode : isDarkModeStored;
+    isDarkModeStored === undefined ? prefersDarkMode : isDarkModeStored
 
   // Get MUI theme object
-  // const themeName = isDarkMode ? "dark" : "light";
+  const themeName = isDarkMode ? 'dark' : 'light'
   // Always use the light theme because I don't want to deal with dark
-  const theme = getTheme("light");
+  const theme = getTheme(themeName)
 
   // Add toggle function to theme object
-  theme.palette.toggle = () => setIsDarkModeStored((value) => !value);
+  theme.palette.toggle = () => setIsDarkModeStored((value) => !value)
 
   return (
     <MuiThemeProvider theme={theme}>
@@ -144,16 +144,16 @@ export const ThemeProvider = (props) => {
       <CssBaseline />
       {props.children}
     </MuiThemeProvider>
-  );
-};
+  )
+}
 
 // Hook for detecting dark mode and toggling between light/dark
 // More convenient than reading theme.palette.type from useTheme
-export function useDarkMode() {
+export function useDarkMode () {
   // Get current Material UI theme
-  const theme = useTheme();
+  const theme = useTheme()
   // Check if it's the dark theme
-  const isDarkMode = theme.palette.type === "dark";
+  const isDarkMode = theme.palette.type === 'dark'
   // Return object containing dark mode value and toggle function
-  return { value: isDarkMode, toggle: theme.palette.toggle };
+  return { value: isDarkMode, toggle: theme.palette.toggle }
 }

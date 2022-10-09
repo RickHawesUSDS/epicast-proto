@@ -1,28 +1,28 @@
-import React from "react";
-import Box from "@material-ui/core/Box";
-import { makeStyles } from "@material-ui/core/styles";
-import { emphasize } from "@material-ui/core/styles/colorManipulator";
-import capitalize from "@material-ui/core/utils/capitalize";
-import BackgroundImage from "./BackgroundImage";
+import React from 'react'
+import Box from '@material-ui/core/Box'
+import { makeStyles } from '@material-ui/core/styles'
+import { emphasize } from '@material-ui/core/styles/colorManipulator'
+import capitalize from '@material-ui/core/utils/capitalize'
+import BackgroundImage from './BackgroundImage'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    position: "relative",
+    position: 'relative',
     // Ensure child <Container> is above background
     // image (if one is set with the bgImage prop).
-    "& > .MuiContainer-root": {
-      position: "relative",
-    },
+    '& > .MuiContainer-root': {
+      position: 'relative'
+    }
   },
 
   // Create color classes that set background color and determine
   // text color and dividing border automatically based on background color.
   // Adds the keys colorDefault, colorLight, etc
   ...[
-    ["default", theme.palette.background.default],
-    ["light", emphasize(theme.palette.background.default, 0.03)],
-    ["primary", theme.palette.primary.main],
-    ["secondary", theme.palette.secondary.main],
+    ['default', theme.palette.background.default],
+    ['light', emphasize(theme.palette.background.default, 0.03)],
+    ['primary', theme.palette.primary.main],
+    ['secondary', theme.palette.secondary.main]
   ].reduce((acc, [name, value]) => {
     acc[`color${capitalize(name)}`] = {
       backgroundColor: value,
@@ -32,35 +32,35 @@ const useStyles = makeStyles((theme) => ({
       // has the same color class.
       // We use emphasize to compute border based on background color
       // and make sure it's always lightly visible.
-      [`& + &`]: {
-        borderTop: `1px solid ${emphasize(value, 0.09)}`,
-      },
-    };
-    return acc;
+      '& + &': {
+        borderTop: `1px solid ${emphasize(value, 0.09)}`
+      }
+    }
+    return acc
   }, {}),
 
   colorInherit: {
-    color: "inherit",
+    color: 'inherit'
   },
 
   colorTransparent: {
-    backgroundColor: "transparent",
-    color: "inherit",
-  },
-}));
+    backgroundColor: 'transparent',
+    color: 'inherit'
+  }
+}))
 
-function Section(props) {
-  const classes = useStyles();
+function Section (props) {
+  const classes = useStyles()
 
   const {
-    bgColor = "default",
+    bgColor = 'default',
     bgImage,
     bgImageOpacity,
-    size = "normal",
+    size = 'normal',
     className,
     children,
     ...otherProps
-  } = props;
+  } = props
 
   // Get MUI responsize size object based
   // on size prop (normal, medium, large, auto)
@@ -68,17 +68,17 @@ function Section(props) {
     normal: { xs: 6 },
     medium: { xs: 6, sm: 10 },
     large: { xs: 6, sm: 20 },
-    auto: 0,
-  }[size];
+    auto: 0
+  }[size]
 
   return (
     <Box
-      component="section"
+      component='section'
       py={verticalPadding}
       className={
         classes.root +
         ` ${classes[`color${capitalize(bgColor)}`]}` +
-        (className ? ` ${className}` : "")
+        (className ? ` ${className}` : '')
       }
       {...otherProps}
     >
@@ -86,7 +86,7 @@ function Section(props) {
 
       {props.children}
     </Box>
-  );
+  )
 }
 
-export default Section;
+export default Section
