@@ -3,10 +3,11 @@ import Meta from './../components/Meta'
 import HeroSection2 from './../components/HeroSection2'
 import StateCasesTable from '../features/stateCases/StateCasesTable'
 import { Button, ButtonGroup, Container } from '@material-ui/core'
-import { useAddRandomStateCasesMutation } from '../features/api/apiSlice'
+import { useAddRandomStateCasesMutation, usePublishStateCasesMutation } from '../features/api/apiSlice'
 
 function StatePage (props) {
   const [addRandomStateCase] = useAddRandomStateCasesMutation()
+  const [publishStateCases] = usePublishStateCasesMutation()
 
   async function onAddCaseClick () {
     await addRandomStateCase({ numOfDays: 1, numPerDay: 1 })
@@ -14,6 +15,10 @@ function StatePage (props) {
 
   async function onAddMultipleCasesClick () {
     await addRandomStateCase({ numOfDays: 3, numPerDay: 5 })
+  }
+
+  async function onPublishCasesClick () {
+    await publishStateCases()
   }
 
   return (
@@ -35,7 +40,7 @@ function StatePage (props) {
           <ButtonGroup color='primary'>
             <Button onClick={() => onAddCaseClick()}>Add Case</Button>
             <Button onClick={() => onAddMultipleCasesClick()}>Add Multiple Cases</Button>
-            <Button>Publish</Button>
+            <Button onClick={() => onPublishCasesClick()}>Publish</Button>
           </ButtonGroup>
         </Container>
       </HeroSection2>

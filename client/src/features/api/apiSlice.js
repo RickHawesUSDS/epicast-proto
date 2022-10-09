@@ -7,6 +7,7 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
   tagTypes: ['StateCase'],
   endpoints: (builder) => ({
+
     resetSystem: builder.mutation({
       query: () => ({
         url: 'system/reset',
@@ -15,10 +16,12 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['StateCase']
     }),
+
     getAllStateCases: builder.query({
       query: (sort) => `stateCases?sort=${sort}`,
       providesTags: ['StateCase']
     }),
+
     addRandomStateCases: builder.mutation({
       query: ({ numOfDays, numPerDay }) => ({
         url: `stateCases/random?numOfDays=${numOfDays}&numPerDay=${numPerDay}`,
@@ -26,6 +29,15 @@ export const apiSlice = createApi({
         body: ''
       }),
       invalidatesTags: ['StateCase']
+    }),
+
+    publishStateCases: builder.mutation({
+      query: () => ({
+        url: `stateCases/publish`,
+        method: 'POST',
+        body: ''
+      }),
+      invalidatesTags: []
     })
   })
 })
@@ -35,5 +47,6 @@ export const apiSlice = createApi({
 export const {
   useResetSystemMutation,
   useGetAllStateCasesQuery,
-  useAddRandomStateCasesMutation
+  useAddRandomStateCasesMutation,
+  usePublishStateCasesMutation,
 } = apiSlice

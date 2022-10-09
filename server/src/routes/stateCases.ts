@@ -1,8 +1,8 @@
 import express from 'express'
+import asyncHandler from 'express-async-handler'
 import { getLogger } from '@/utils/loggers'
 import { getAllStateCases } from '@/controllers/getAllStateCases'
 import { insertFakeStateCases } from '@/services/stateCaseService'
-import asyncHandler from 'express-async-handler'
 
 const router = express.Router()
 const logger = getLogger('STATE_CASES_ROUTE')
@@ -26,6 +26,13 @@ router.post('/random', asyncHandler(async (req, res, _next) => {
   logger.info(`Add random cases: ${numOfDays}, ${numPerDay}`)
   const stateCases = await insertFakeStateCases(numOfDays, numPerDay)
   res.send(stateCases)
+}))
+
+
+/* POST publish all cases */
+router.post('/publish', asyncHandler(async (req, res, _next) => {
+  logger.info('publish cases')
+  res.send('success')
 }))
 
 export default router

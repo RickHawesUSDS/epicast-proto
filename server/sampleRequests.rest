@@ -9,3 +9,6 @@ POST http://localhost:3001/api/stateCases/random
 
 ### Add multiple random cases
 POST http://localhost:3001/api/stateCases/random?numOfDays=3&numPerDay=5
+
+### Publish cases
+POST http://localhost:3001/api/stateCases/publish 
