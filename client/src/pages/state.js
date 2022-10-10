@@ -5,19 +5,19 @@ import StateCasesTable from '../features/stateCases/StateCasesTable'
 import { Button, ButtonGroup, Container } from '@material-ui/core'
 import { useAddRandomStateCasesMutation, usePublishStateCasesMutation } from '../features/api/apiSlice'
 
-function StatePage (props) {
+function StatePage(props) {
   const [addRandomStateCase] = useAddRandomStateCasesMutation()
   const [publishStateCases] = usePublishStateCasesMutation()
 
-  async function onAddCaseClick () {
+  async function onAddCaseClick() {
     await addRandomStateCase({ numOfDays: 1, numPerDay: 1 })
   }
 
-  async function onAddMultipleCasesClick () {
-    await addRandomStateCase({ numOfDays: 3, numPerDay: 5000 })
+  async function onAddMultipleCasesClick() {
+    await addRandomStateCase({ numOfDays: 50, numPerDay: 300 })
   }
 
-  async function onPublishCasesClick () {
+  async function onPublishCasesClick() {
     await publishStateCases()
   }
 

@@ -10,9 +10,10 @@
   },
   "scripts": {
     "install-all": "cd client && yarn install && cd ../server && yarn install",
-    "start": "concurrently \"yarn run server\" \"yarn run client\"",
+    "start": "concurrently \"yarn run server\" \"yarn run client\" \"yarn run storage\"",
     "server": "cd server && yarn start",
-    "client": "cd client && yarn start"
+    "client": "cd client && yarn start",
+    "storage": "cd storage && bash start.sh"
   },
   "dependencies": {
     "date-fns": "^2.29.3"
