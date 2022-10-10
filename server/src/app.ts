@@ -8,7 +8,7 @@ import indexRouter from './routes/index'
 import systemRouter from './routes/system'
 import stateCaseRouter from './routes/stateCases'
 import { db } from './utils/db'
-import { setupBucket } from './utils/bucket'
+import { checkBucket } from './utils/bucket'
 
 const logger = getLogger('APP')
 
@@ -18,8 +18,8 @@ class App {
   constructor () {
     this.app = express()
     this.config()
-    this.databaseSetup().then(() => {}).catch((_) => {})
-    this.storageSetup()
+    this.databaseSetup().catch((error) => { logger.error(error) })
+    this.storageSetup().catch((error) => { logger.error(error) })
     this.routerSetup()
   }
 
@@ -40,8 +40,8 @@ class App {
     await db.sync()
   }
 
-  private storageSetup (): void {
-    setupBucket()
+  private async storageSetup (): Promise<void> {
+    await checkBucket()
   }
 }
 

@@ -8,6 +8,8 @@
     "build": "sh etc/build.sh"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.186.0",
+    "@aws-sdk/credential-providers": "^3.186.0",
     "@faker-js/faker": "^7.5.0",
     "@types/validator": "*",
     "cookie-parser": "~1.4.4",
@@ -19,6 +21,7 @@
     "minio": "^7.0.32",
     "module-alias": "^2.2.2",
     "morgan": "~1.9.1",
+    "npm": "^8.19.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "sequelize": "^6.23.0",
