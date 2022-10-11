@@ -2,6 +2,7 @@ import { GetObjectCommand, HeadBucketCommand, ListObjectsCommand, PutObjectComma
 import { fromIni } from "@aws-sdk/credential-providers"
 import { getLogger } from '@/utils/loggers'
 import { FeedInterface } from '@/utils/FeedInterface'
+import { ReadStream } from "fs";
 
 const logger = getLogger('BUCKET')
 export const REGION = 'us-west-1'
@@ -47,7 +48,7 @@ export class S3Feed implements FeedInterface {
     }
   }
 
-  async putObject(name: string, body: Blob): Promise<void> {
+  async putObject(name: string, body: ReadStream): Promise<void> {
     const putResponse = await this.s3Client.send(new PutObjectCommand({
       Bucket: BUCKET_NAME,
       Key: name,
@@ -59,13 +60,13 @@ export class S3Feed implements FeedInterface {
     }
   }
 
-  async getObject(name: string): Promise<Blob> {
+  async getObject(name: string): Promise<ReadableStream> {
     const getResponse = await this.s3Client.send(new GetObjectCommand({
       Bucket: BUCKET_NAME,
       Key: name
     }))
     if (getResponse.$metadata.httpStatusCode == 200) {
-      return getResponse?.Body as Blob ?? Promise.reject(Error("no body"))
+      return getResponse?.Body as ReadableStream ?? Promise.reject(new Error("no body"))
     } else {
       return this.handleError(`get error: ${name}, ${getResponse.$metadata.httpStatusCode}`)
     }

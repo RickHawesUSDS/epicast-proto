@@ -3,6 +3,8 @@ import asyncHandler from 'express-async-handler'
 import { getLogger } from '@/utils/loggers'
 import { getAllStateCases } from '@/controllers/getAllStateCases'
 import { insertFakeStateCases } from '@/services/stateCaseService'
+import { publishStateCaseTables } from '@/services/publish'
+import { S3Feed } from '@/utils/bucket'
 
 const router = express.Router()
 const logger = getLogger('STATE_CASES_ROUTE')
@@ -32,6 +34,8 @@ router.post('/random', asyncHandler(async (req, res, _next) => {
 /* POST publish all cases */
 router.post('/publish', asyncHandler(async (req, res, _next) => {
   logger.info('publish cases')
+  const feed = new S3Feed()
+  await publishStateCaseTables(feed)
   res.send('success')
 }))
 
