@@ -2,10 +2,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "command": "export NODE_OPTIONS='--inspect --trace-deprecation --abort-on-uncaught-exception' && export NODE_ENV=development && ts-node-dev ./bin/www.ts",
-            "name": "server start",
+            "command": "export NODE_OPTIONS='--inspect --trace-deprecation --abort-on-uncaught-exception' && ts-node ./bin/www.ts",
+            "name": "server debug",
             "request": "launch",
             "type": "node-terminal",
+            "localRoot": "${workspaceFolder}/server",
             "cwd": "${workspaceFolder}/server"
         },
         {

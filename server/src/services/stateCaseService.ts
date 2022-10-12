@@ -1,6 +1,9 @@
 import { StateCase } from '@/models/StateCase'
 import { faker } from '@faker-js/faker'
-import { addDays, set } from 'date-fns'
+import { add, addDays, set } from 'date-fns'
+import { Period } from '@/utils/Period'
+import { Op } from 'sequelize'
+
 // import { getLogger } from 'log4js'
 
 // const logger = getLogger('STATE_CASE_SERVICE')
@@ -39,11 +42,64 @@ export async function insertFakeStateCases (numberOfDays: number, numberPerDay: 
   return casesAdded
 }
 
-export async function getStateCases (sortDecending: boolean): Promise<StateCase[]> {
+export async function findAllStateCases (sortDecending: boolean = false): Promise<StateCase[]> {
   const listOrder = sortDecending ? 'DESC' : 'ASC'
   return await StateCase.findAll({
     order: [
       ['onsetOfSymptoms', listOrder]
+    ]
+  })
+}
+
+export async function findStateCases (period: Period): Promise<StateCase[]> {
+  return await StateCase.findAll({
+    where: {
+      onsetOfSymptoms: {
+        [Op.between]: [period.start, period.end]
+      }
+    },
+    order: [
+      ['onsetOfSymptoms', 'ASC']
+    ]
+  })
+}
+
+export async function findStateCasesAfter (afterDate: Date): Promise<StateCase[]> {
+  return await StateCase.findAll({
+    where: {
+      onsetOfSymptoms: {
+        [Op.gte]: afterDate
+      }
+    },
+    order: [
+      ['onsetOfSymptoms', 'ASC']
+    ]
+  })
+}
+
+export async function countStateCasesAfter (afterDate: Date): Promise<number> {
+  const result = await StateCase.count({
+    where: {
+      onsetOfSymptoms: {
+        [Op.gte]: afterDate
+      }
+    }
+  })
+  return result
+}
+
+export async function findUpdatedStateCases (period: Period, updatedAfter: Date): Promise<StateCase[]> {
+  return await StateCase.findAll({
+    where: {
+      onsetOfSymptoms: {
+        [Op.between]: [period.start, period.end]
+      },
+      updatedAt: {
+        [Op.gt]: updatedAfter
+      }
+    },
+    order: [
+      ['onsetOfSymptoms', 'ASC']
     ]
   })
 }

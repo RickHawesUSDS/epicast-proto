@@ -1,9 +1,8 @@
 import express from 'express'
 import asyncHandler from 'express-async-handler'
 import { getLogger } from '@/utils/loggers'
-import { getAllStateCases } from '@/controllers/getAllStateCases'
-import { insertFakeStateCases } from '@/services/stateCaseService'
-import { publishStateCaseTables } from '@/services/publish'
+import { insertFakeStateCases, findAllStateCases } from '@/services/stateCaseService'
+import { publishStateCaseFeed } from '@/services/publishFeedService'
 import { S3Feed } from '@/utils/bucket'
 
 const router = express.Router()
@@ -15,7 +14,7 @@ router.get('/', asyncHandler(async (req, res, _next) => {
   logger.info('Get all cases: sort=' + sort)
 
   const sortDecending = 'DESC'.localeCompare(sort, 'en', { sensitivity: 'base' }) === 0
-  const cases = await getAllStateCases(sortDecending)
+  const cases = await findAllStateCases(sortDecending)
   res.send(cases)
 }))
 
@@ -30,12 +29,11 @@ router.post('/random', asyncHandler(async (req, res, _next) => {
   res.send(stateCases)
 }))
 
-
 /* POST publish all cases */
 router.post('/publish', asyncHandler(async (req, res, _next) => {
   logger.info('publish cases')
   const feed = new S3Feed()
-  await publishStateCaseTables(feed)
+  await publishStateCaseFeed(feed)
   res.send('success')
 }))
 
