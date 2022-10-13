@@ -18,7 +18,7 @@ interface LogEntry {
 export class FeedLog {
   private entries: LogEntry[] = []
 
-  add (fileName: string, message?: string): void {
+  add(fileName: string, message?: string): void {
     this.entries.push({
       timestamp: new Date(),
       action: 'ADD',
@@ -26,7 +26,7 @@ export class FeedLog {
     })
   }
 
-  replace (fileName: string, addNames: string[], message?: string): void {
+  replace(fileName: string, addNames: string[], message?: string): void {
     this.entries.push({
       timestamp: new Date(),
       action: 'REPLACE',
@@ -34,7 +34,7 @@ export class FeedLog {
     })
   }
 
-  update (fileName: string, message?: string): void {
+  update(fileName: string, message?: string): void {
     this.entries.push({
       timestamp: new Date(),
       action: 'UPDATE',
@@ -42,7 +42,7 @@ export class FeedLog {
     })
   }
 
-  delete (fileName: string, message?: string): void {
+  delete(fileName: string, message?: string): void {
     this.entries.push({
       timestamp: new Date(),
       action: 'DELETE',
@@ -50,7 +50,7 @@ export class FeedLog {
     })
   }
 
-  note (message: string): void {
+  note(message: string): void {
     this.entries.push({
       timestamp: new Date(),
       action: 'NOTE',
@@ -58,7 +58,8 @@ export class FeedLog {
     })
   }
 
-  async appendAndClear (feed: Feed): Promise<void> {
+  async publish(feed: Feed): Promise<void> {
+    if (this.entries.length == 0) return
     // NOTE: Object locking and thread locking problems ignored
     const oldEntries = await this.readTodaysLog(feed)
     const newEntries = oldEntries.concat(this.entries)
@@ -72,7 +73,7 @@ export class FeedLog {
   private async writeTodaysLog(feed: Feed, entries: LogEntry[]): Promise<void> {
     const rawDirectives = `#Version: 1.0\n#Fields: x-iso-timestamp x-action x-message\n`
     const rawEntries = entries.flatMap((entry: LogEntry) => {
-      const timestamp = formatISO(entry.timestamp, { format: "extended", representation: "complete"})
+      const timestamp = formatISO(entry.timestamp, { format: "extended", representation: "complete" })
       return `${timestamp} ${entry.action} "${entry.message}"`
     }).join('\n')
     const key = this.todaysLogKey()
@@ -105,14 +106,14 @@ export class FeedLog {
       const time = parseISO(timePart)
 
       const action = isLogEntryAction(actionPart) ? actionPart : 'NOTE'
-      const messagePart = line.substring(line.indexOf(' ', timePart.length + actionPart.length + 1)+1)
+      const messagePart = line.substring(line.indexOf(' ', timePart.length + actionPart.length + 1) + 1)
       const message = messagePart.substring(1, messagePart.length - 2)
-      return {timestamp: time, action: action, message: message }
+      return { timestamp: time, action: action, message: message }
     }
   }
 
   private todaysLogKey(): string {
-    const today = formatISO(new Date(), { format: "basic", representation: "date"})
+    const today = formatISO(new Date(), { format: "basic", representation: "date" })
     return `${LOG_FOLDER}/${today}.${LOG_EXTENSION}`
   }
 }

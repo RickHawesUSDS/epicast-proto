@@ -1,8 +1,8 @@
 import express from 'express'
 import asyncHandler from 'express-async-handler'
 import { getLogger } from '@/utils/loggers'
-import { insertFakeStateCases, findAllStateCases } from '@/services/stateCaseService'
-import { publishStateCaseFeed } from '@/services/publishFeedService'
+import { insertFakeStateCases, findAllStateCases } from '@/services/stateCases'
+import { publishStateCaseFeed } from '@/services/publishStateCasesFeed'
 import { S3Feed } from '@/utils/bucket'
 
 const router = express.Router()

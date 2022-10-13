@@ -48,6 +48,7 @@ export class S3Feed implements Feed {
   }
 
   async putObject(name: string, body: string | ReadStream): Promise<void> {
+    logger.debug(`put object: ${name}`)
     const putResponse = await this.s3Client.send(new PutObjectCommand({
       Bucket: BUCKET_NAME,
       Key: name,
@@ -88,6 +89,7 @@ export class S3Feed implements Feed {
   }
 
   async deleteObject(name: string): Promise<void> {
+    logger.debug(`delete object: ${name}`)
     const deleteResponse = await this.s3Client.send(new DeleteObjectCommand({
       Bucket: BUCKET_NAME,
       Key: name

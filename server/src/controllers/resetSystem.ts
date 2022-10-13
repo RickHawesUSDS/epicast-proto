@@ -1,5 +1,5 @@
 import { StateCase } from '@/models/StateCase'
-import { insertFakeStateCases } from '../services/stateCaseService'
+import { insertFakeStateCases } from '../services/stateCases'
 import { getLogger } from '@/utils/loggers'
 import { S3Feed } from '@/utils/bucket'
 
@@ -7,7 +7,7 @@ const logger = getLogger('RESET_SYSTEM')
 const daysOfFakeCasesOnReset = 3
 const fakesPerDayOnReset = 5
 
-export async function resetSystem (): Promise<void> {
+export async function resetSystem(): Promise<void> {
   logger.debug('Resetting the database')
   await StateCase.destroy({
     truncate: true
@@ -17,7 +17,7 @@ export async function resetSystem (): Promise<void> {
   await insertFakeStateCases(daysOfFakeCasesOnReset, fakesPerDayOnReset)
 }
 
-export async function resetStorage (): Promise<void> {
+export async function resetStorage(): Promise<void> {
   logger.info('Resetting storage')
   const feed = new S3Feed()
   const s3Objects = await feed.listObjects('')
