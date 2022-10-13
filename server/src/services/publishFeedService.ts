@@ -25,10 +25,10 @@ interface CasePartion {
 }
 
 export async function publishStateCaseFeed (feed: Feed): Promise<void> {
-  const log = await FeedLog.read(feed)
+  const log = new FeedLog()
   await publishSchema(feed, log)
   await publishStateCaseTables(feed, log)
-  await log.write(feed)
+  await log.appendAndClear(feed)
 }
 
 async function publishSchema (feed: Feed, log: FeedLog): Promise<void> {
