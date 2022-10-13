@@ -2,7 +2,7 @@ import { Feed } from '@/utils/Feed'
 import { FeedLog } from './FeedLog'
 import pathPosix from 'node:path/posix'
 import { _Object } from '@aws-sdk/client-s3'
-import { max as maxDate, parseISO, isAfter, isWithinInterval, differenceInMonths } from 'date-fns'
+import { max as maxDate, parseISO, isAfter, isWithinInterval, differenceInMonths, isFuture } from 'date-fns'
 import { findStateCases, findUpdatedStateCases, findStateCasesAfter, findAllStateCases } from '@/services/stateCaseService'
 import { createReadStream } from 'fs'
 import { StateCase } from '@/models/StateCase'
@@ -10,7 +10,7 @@ import { getLogger } from '@/utils/loggers'
 import { Period, Frequency } from '@/utils/Period'
 import { stringify } from 'csv-string'
 
-const SCHEMA_NAME = 'epicast-demoserver-feed1-schema.yaml'
+const SCHEMA_NAME = 'schema/epicast-demoserver-feed1-schema.yaml'
 const SCHEMA_TEMPLATE_PATH = './src/public/epicast-demoserver-feed1-schema.yaml'
 const TIMESERIES_FOLDER = 'time_series'
 const DESIRED_MAX_PER_PERIOD = 10000
@@ -45,35 +45,6 @@ async function publishStateCaseTables (feed: Feed, log: FeedLog): Promise<void> 
 }
 
 async function updatePublishedPartions (feed: Feed, log: FeedLog): Promise<void> {
-  async function hasUpdates (period: Period, after: Date | null): Promise<boolean> {
-    let updatedCases: StateCase[]
-    if (after !== null) {
-      updatedCases = await findUpdatedStateCases(period, after)
-    } else {
-      updatedCases = await findStateCases(period)
-    }
-    return updatedCases.length > 0
-  }
-
-  async function updateReport (period: Period, periodCases: StateCase[], log: FeedLog): Promise<void> {
-    const key = objectKeyFromPeriod(period)
-    await putReport(feed, key, periodCases)
-    log.update(key)
-  }
-
-  async function replaceMonthlyWithDaily (publishedPeriod: Period, stateCases: StateCase[], log: FeedLog): Promise<void> {
-    const partitions = makeCasePartions(stateCases, publishedPeriod.start, publishedPeriod.end, Frequency.DAILY)
-    const newKeys: string[] = []
-    for (const partition of partitions) {
-      const key = objectKeyFromPeriod(partition.period)
-      await putReport(feed, key, partition.cases)
-      newKeys.push(key)
-    }
-    const oldKey = objectKeyFromPeriod(publishedPeriod)
-    await feed.deleteObject(oldKey)
-    log.replace(oldKey, newKeys)
-  }
-
   const publishedObjects = await feed.listObjects(TIMESERIES_FOLDER)
   if (publishedObjects.length === 0) return // early shortcut
   const lastPublishDate = calcMaxLastModified(publishedObjects)
@@ -86,9 +57,43 @@ async function updatePublishedPartions (feed: Feed, log: FeedLog): Promise<void>
       if (period.frequency === Frequency.MONTHLY && periodCases.length > DESIRED_MAX_PER_PERIOD) {
         await replaceMonthlyWithDaily(period, periodCases, log)
       } else {
-        await updateReport(period, periodCases, log)
+        await updatePartition(period, periodCases, log)
       }
     }
+  }
+  return
+
+  async function hasUpdates (period: Period, after?: Date): Promise<boolean> {
+    let updatedCases: StateCase[]
+    if (after !== undefined) {
+      updatedCases = await findUpdatedStateCases(period, after)
+    } else {
+      updatedCases = await findStateCases(period)
+    }
+    return updatedCases.length > 0
+  }
+
+  async function updatePartition (period: Period, periodCases: StateCase[], log: FeedLog): Promise<void> {
+    const key = objectKeyFromPeriod(period)
+    await putPartition(feed, key, periodCases)
+    log.update(key)
+  }
+
+  async function replaceMonthlyWithDaily (publishedPeriod: Period, stateCases: StateCase[], log: FeedLog): Promise<void> {
+    let endDate = publishedPeriod.end
+    if (isFuture(publishedPeriod.end)) {
+      endDate = stateCases.at(-1)?.onsetOfSymptoms ?? publishedPeriod.end
+    }
+    const partitions = makeCasePartions(stateCases, publishedPeriod.start, endDate, Frequency.DAILY)
+    const newKeys: string[] = []
+    for (const partition of partitions) {
+      const key = objectKeyFromPeriod(partition.period)
+      await putPartition(feed, key, partition.cases)
+      newKeys.push(key)
+    }
+    const oldKey = objectKeyFromPeriod(publishedPeriod)
+    await feed.deleteObject(oldKey)
+    log.replace(oldKey, newKeys)
   }
 }
 
@@ -117,7 +122,7 @@ async function publishNewPartitions (feed: Feed, lastPublishedPeriod: Period | n
   const partitions = makeCasePartions(stateCases, startDate, endDate, frequency)
   for (const partition of partitions) {
     const key = objectKeyFromPeriod(partition.period)
-    await putReport(feed, key, partition.cases)
+    await putPartition(feed, key, partition.cases)
     log.add(key)
   }
 }
@@ -129,7 +134,7 @@ function decideOnFrequency (stateCases: StateCase[], lastFrequency: Frequency): 
   return stateCases.length / months > DESIRED_MAX_PER_PERIOD ? Frequency.DAILY : lastFrequency
 }
 
-async function putReport (feed: Feed, key: string, cases: StateCase[]): Promise<void> {
+async function putPartition (feed: Feed, key: string, cases: StateCase[]): Promise<void> {
   function createCSV (cases: StateCase[]): string {
     const columns = Object.keys(StateCase.getAttributes())
     const csv = cases.map(stateCase => {
@@ -141,8 +146,8 @@ async function putReport (feed: Feed, key: string, cases: StateCase[]): Promise<
   }
 
   const report = createCSV(cases)
-  logger.info(`Publish an object: ${key}`)
   await feed.putObject(key, report)
+  logger.info(`Publish an object: ${key}`)
 }
 
 function makeCasePartions (stateCases: StateCase[], startDate: Date, endDate: Date, frequency: Frequency): CasePartion[] {
@@ -175,7 +180,8 @@ function objectKeyFromPeriod (period: Period): string {
   return `${TIMESERIES_FOLDER}/${fileName}`
 }
 
-function calcMaxLastModified (objects: _Object[]): Date | null {
+function calcMaxLastModified (objects: _Object[]): Date | undefined {
+  if (objects.length) return undefined
   const modifiedDates = objects.map((object) => { return object.LastModified ?? EARLY_DATE })
   return maxDate(modifiedDates)
 }
