@@ -82,7 +82,7 @@ async function updatePublishedPartions (feed: Feed, log: FeedLog): Promise<void>
   async function replaceMonthlyWithDaily (publishedPeriod: Period, stateCases: StateCase[], log: FeedLog): Promise<void> {
     let endDate = publishedPeriod.end
     if (isFuture(publishedPeriod.end)) {
-      endDate = maxDate([stateCases.at(-1)?.onsetOfSymptoms ?? new Date(), new Date()])
+      endDate = endOfDay(maxDate([stateCases.at(-1)?.onsetOfSymptoms ?? new Date(), new Date()]))
     }
     const partitions = makeCasePartions(stateCases, publishedPeriod.start, endDate, Frequency.DAILY)
     const newKeys: string[] = []
