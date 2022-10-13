@@ -15,7 +15,7 @@ const DESIRED_MAX_PER_PERIOD = 10000
 const EARLY_DATE = parseISO('19000101')
 const CSV_EXT = 'csv'
 
-const logger = getLogger('PUBLISH_STATE_CASES_SERVICE')
+const logger = getLogger('PUBLISH_TIME_SERIES_SERVICE')
 
 interface CasePartion {
   period: Period

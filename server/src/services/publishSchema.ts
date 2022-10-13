@@ -1,4 +1,4 @@
-import { createReadStream } from 'fs'
+import { readFileSync } from 'fs'
 import { getLogger } from 'log4js'
 
 import { Feed } from '@/utils/Feed'
@@ -10,7 +10,7 @@ const SCHEMA_TEMPLATE_PATH = './src/public/epicast-demoserver-feed1-schema.yaml'
 
 export async function publishSchema(feed: Feed, log: FeedLog): Promise<void> {
   logger.info("publishing schema")
-  const stream = createReadStream(SCHEMA_TEMPLATE_PATH, 'utf8')
-  await feed.putObject(SCHEMA_NAME, stream)
+  const rawSchema = readFileSync(SCHEMA_TEMPLATE_PATH, { encoding: 'utf8' })
+  await feed.putObject(SCHEMA_NAME, rawSchema)
   log.update(SCHEMA_NAME)
 }
