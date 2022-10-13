@@ -2,12 +2,13 @@ import { Feed } from '@/utils/Feed'
 import { FeedLog } from './FeedLog'
 import pathPosix from 'node:path/posix'
 import { _Object } from '@aws-sdk/client-s3'
-import { max as maxDate, parseISO, isAfter, isWithinInterval, isBefore, differenceInMonths } from 'date-fns'
+import { max as maxDate, parseISO, isAfter, isWithinInterval, differenceInMonths } from 'date-fns'
 import { findStateCases, findUpdatedStateCases, findStateCasesAfter, findAllStateCases } from '@/services/stateCaseService'
 import { createReadStream } from 'fs'
 import { StateCase } from '@/models/StateCase'
 import { getLogger } from '@/utils/loggers'
 import { Period, Frequency } from '@/utils/Period'
+import { stringify } from 'csv-string'
 
 const SCHEMA_NAME = 'epicast-demoserver-feed1-schema.yaml'
 const SCHEMA_TEMPLATE_PATH = './src/public/epicast-demoserver-feed1-schema.yaml'
@@ -16,7 +17,7 @@ const DESIRED_MAX_PER_PERIOD = 10000
 const EARLY_DATE = parseISO('19000101')
 const CSV_EXT = 'csv'
 
-const logger = getLogger("PUBLISH_FEED_SERVICE")
+const logger = getLogger('PUBLISH_FEED_SERVICE')
 
 interface CasePartion {
   period: Period
@@ -37,9 +38,9 @@ async function publishSchema (feed: Feed, log: FeedLog): Promise<void> {
 }
 
 async function publishStateCaseTables (feed: Feed, log: FeedLog): Promise<void> {
-  // await updatePublishedPartions(feed, log)
+  await updatePublishedPartions(feed, log)
   const lastReportedPeriod = await findLastPublishedPeriod(feed)
-  logger.debug(`last published period: ${lastReportedPeriod}`)
+  logger.debug(`last published period: ${lastReportedPeriod ?? ""}`)
   await publishNewPartitions(feed, lastReportedPeriod, log)
 }
 
@@ -74,6 +75,7 @@ async function updatePublishedPartions (feed: Feed, log: FeedLog): Promise<void>
   }
 
   const publishedObjects = await feed.listObjects(TIMESERIES_FOLDER)
+  if (publishedObjects.length === 0) return // early shortcut
   const lastPublishDate = calcMaxLastModified(publishedObjects)
 
   for (const publishedObject of publishedObjects) {
@@ -120,21 +122,25 @@ async function publishNewPartitions (feed: Feed, lastPublishedPeriod: Period | n
   }
 }
 
-function decideOnFrequency(stateCases: StateCase[], lastFrequency: Frequency): Frequency {
+function decideOnFrequency (stateCases: StateCase[], lastFrequency: Frequency): Frequency {
   if (stateCases.length === 0) return lastFrequency
-  const months = differenceInMonths(stateCases.at(0)!.onsetOfSymptoms, stateCases.at(-1)!.onsetOfSymptoms)
+  const months = differenceInMonths(stateCases.at(0)?.onsetOfSymptoms ?? new Date(), stateCases.at(-1)?.onsetOfSymptoms ?? new Date())
   if (months === 0) return lastFrequency
   return stateCases.length / months > DESIRED_MAX_PER_PERIOD ? Frequency.DAILY : lastFrequency
 }
 
 async function putReport (feed: Feed, key: string, cases: StateCase[]): Promise<void> {
-  function createReport (cases: StateCase[]): string {
-    const csv = cases.map(row => Object.values(row))
-    csv.unshift(Object.keys(StateCase.getAttributes()))
-    return csv.join('\n')
+  function createCSV (cases: StateCase[]): string {
+    const columns = Object.keys(StateCase.getAttributes())
+    const csv = cases.map(stateCase => {
+      const values = columns.map(column => stateCase.getDataValue(column as keyof StateCase) as string ?? '')
+      return stringify(values)
+    })
+    csv.unshift(stringify(columns))
+    return csv.join('')
   }
 
-  const report = createReport(cases)
+  const report = createCSV(cases)
   logger.info(`Publish an object: ${key}`)
   await feed.putObject(key, report)
 }
@@ -151,7 +157,7 @@ function makeCasePartions (stateCases: StateCase[], startDate: Date, endDate: Da
 }
 
 function findCasesForPeriod (stateCases: StateCase[], period: Period): StateCase[] {
-  return stateCases.filter(stateCase => { isWithinInterval(stateCase.onsetOfSymptoms, period.interval) })
+  return stateCases.filter(stateCase => { return isWithinInterval(stateCase.onsetOfSymptoms, period.interval) })
 }
 
 function periodFromObjectKey (key: string | undefined): Period {
@@ -184,8 +190,4 @@ function calcLastPeriod (publishedObjects: _Object[]): Period | null {
     }
   }
   return lastPeriod
-}
-
-function calcLastCaseDate (stateCases: StateCase[]): Date {
-  return maxDate(stateCases.map((stateCase) => stateCase.onsetOfSymptoms))
 }

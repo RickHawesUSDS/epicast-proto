@@ -1,6 +1,6 @@
 import { StateCase } from '@/models/StateCase'
 import { faker } from '@faker-js/faker'
-import { add, addDays, set } from 'date-fns'
+import { addDays, set } from 'date-fns'
 import { Period } from '@/utils/Period'
 import { Op } from 'sequelize'
 

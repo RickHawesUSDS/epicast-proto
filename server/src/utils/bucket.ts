@@ -1,4 +1,4 @@
-import { GetObjectCommand, HeadBucketCommand, ListObjectsCommand, PutObjectCommand, S3Client, _Object } from '@aws-sdk/client-s3'
+import { DeleteObjectCommand, GetObjectCommand, HeadBucketCommand, ListObjectsCommand, PutObjectCommand, S3Client, _Object } from '@aws-sdk/client-s3'
 import { fromIni } from '@aws-sdk/credential-providers'
 import { getLogger } from '@/utils/loggers'
 import { Feed } from '@/utils/Feed'
@@ -70,11 +70,11 @@ export class S3Feed implements Feed {
   }
 
   async deleteObject (name: string): Promise<void> {
-    const deleteResponse = await this.s3Client.send(new PutObjectCommand({
+    const deleteResponse = await this.s3Client.send(new DeleteObjectCommand({
       Bucket: BUCKET_NAME,
       Key: name
     }))
-    if (deleteResponse.$metadata.httpStatusCode !== 200) {
+    if (deleteResponse.$metadata.httpStatusCode !== 204) {
       return await this.handleError(`delete error: ${name}, ${deleteResponse.$metadata.httpStatusCode ?? 0}`)
     }
   }

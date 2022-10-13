@@ -9,6 +9,7 @@ import systemRouter from './routes/system'
 import stateCaseRouter from './routes/stateCases'
 import { db } from './utils/db'
 import { S3Feed } from './utils/bucket'
+import { resetStorage } from './controllers/resetSystem'
 
 const logger = getLogger('APP')
 
@@ -41,8 +42,7 @@ class App {
   }
 
   private async storageSetup (): Promise<void> {
-    const s3Feed = new S3Feed()
-    await s3Feed.checkConnection()
+    await resetStorage()
   }
 }
 
