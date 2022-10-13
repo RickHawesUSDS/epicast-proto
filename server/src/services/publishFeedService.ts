@@ -2,7 +2,7 @@ import { Feed } from '@/utils/Feed'
 import { FeedLog } from './FeedLog'
 import pathPosix from 'node:path/posix'
 import { _Object } from '@aws-sdk/client-s3'
-import { max as maxDate, parseISO, isAfter, isWithinInterval, differenceInMonths, isFuture } from 'date-fns'
+import { max as maxDate, parseISO, isAfter, isWithinInterval, differenceInMonths, isFuture, endOfDay } from 'date-fns'
 import { findStateCases, findUpdatedStateCases, findStateCasesAfter, findAllStateCases } from '@/services/stateCaseService'
 import { createReadStream } from 'fs'
 import { StateCase } from '@/models/StateCase'
@@ -82,7 +82,7 @@ async function updatePublishedPartions (feed: Feed, log: FeedLog): Promise<void>
   async function replaceMonthlyWithDaily (publishedPeriod: Period, stateCases: StateCase[], log: FeedLog): Promise<void> {
     let endDate = publishedPeriod.end
     if (isFuture(publishedPeriod.end)) {
-      endDate = stateCases.at(-1)?.onsetOfSymptoms ?? publishedPeriod.end
+      endDate = maxDate([stateCases.at(-1)?.onsetOfSymptoms ?? new Date(), new Date()])
     }
     const partitions = makeCasePartions(stateCases, publishedPeriod.start, endDate, Frequency.DAILY)
     const newKeys: string[] = []
