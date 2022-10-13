@@ -82,7 +82,7 @@ export class S3Feed implements Feed {
         Bucket: BUCKET_NAME,
         Key: name
       }))
-      return headResponse.$metadata.httpStatusCode === 200
+      return headResponse.$metadata.httpStatusCode == 200
     } catch (error) {
       return false
     }

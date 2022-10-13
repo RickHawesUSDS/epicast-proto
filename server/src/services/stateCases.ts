@@ -2,7 +2,7 @@ import { StateCase } from '@/models/StateCase'
 import { faker } from '@faker-js/faker'
 import { addDays, set } from 'date-fns'
 import { Period } from '@/utils/Period'
-import { Op } from 'sequelize'
+import { FindAndCountOptions, Op, Order, WhereAttributeHash, WhereOptions } from 'sequelize'
 
 // import { getLogger } from 'log4js'
 
@@ -42,66 +42,49 @@ export async function insertFakeStateCases (numberOfDays: number, numberPerDay: 
   return casesAdded
 }
 
-export async function findAllStateCases (sortDecending: boolean = false): Promise<StateCase[]> {
-  const listOrder = sortDecending ? 'DESC' : 'ASC'
-  return await StateCase.findAll({
-    order: [
-      ['onsetOfSymptoms', listOrder]
-    ]
-  })
+interface FindStateCasesOptions {
+  period?: Period
+  after?: Date
+  before?: Date
+  updatedAfter?: Date
+  sortDescending?: boolean
 }
 
-export async function findStateCases (period: Period): Promise<StateCase[]> {
-  return await StateCase.findAll({
-    where: {
-      onsetOfSymptoms: {
-        [Op.between]: [period.start, period.end]
-      }
-    },
-    order: [
-      ['onsetOfSymptoms', 'ASC']
-    ]
-  })
+export async function findStateCases (options: FindStateCasesOptions): Promise<StateCase[]> {
+  let where: WhereOptions<StateCase> = {}
+  if (options.period !== undefined) {
+    where.onsetOfSymptoms = { [Op.between]: [options.period.start, options.period.end] }
+  } else if(options.after !== undefined) {
+    where.onsetOfSymptoms = { [Op.gt]: options.after }
+  } else if(options.before !== undefined) {
+    where.onsetOfSymptoms = { [Op.lt]: options.before }
+  }
+  if (options.updatedAfter !== undefined) {
+    where.updatedAt = { [Op.gt]: options.updatedAfter }
+  }
+  const order: Order = [['onsetOfSymptoms', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']]
+  return await StateCase.findAll({ where: where, order: order })
+}
+interface CountStateCasesOptions {
+  period?: Period
+  after?: Date
+  before?: Date
+  updatedAfter?: Date
 }
 
-export async function findStateCasesAfter (afterDate: Date): Promise<StateCase[]> {
-  return await StateCase.findAll({
-    where: {
-      onsetOfSymptoms: {
-        [Op.gte]: afterDate
-      }
-    },
-    order: [
-      ['onsetOfSymptoms', 'ASC']
-    ]
-  })
-}
-
-export async function countStateCasesAfter (afterDate: Date): Promise<number> {
-  const result = await StateCase.count({
-    where: {
-      onsetOfSymptoms: {
-        [Op.gte]: afterDate
-      }
-    }
-  })
-  return result
-}
-
-export async function findUpdatedStateCases (period: Period, updatedAfter: Date): Promise<StateCase[]> {
-  return await StateCase.findAll({
-    where: {
-      onsetOfSymptoms: {
-        [Op.between]: [period.start, period.end]
-      },
-      updatedAt: {
-        [Op.gt]: updatedAfter
-      }
-    },
-    order: [
-      ['onsetOfSymptoms', 'ASC']
-    ]
-  })
+export async function countStateCases(options: CountStateCasesOptions): Promise<number> {
+  let where: WhereOptions<StateCase> = {}
+  if (options.period !== undefined) {
+    where.onsetOfSymptoms = { [Op.between]: [options.period.start, options.period.end] }
+  } else if(options.after !== undefined) {
+    where.onsetOfSymptoms = { [Op.gt]: options.after }
+  } else if(options.before !== undefined) {
+    where.onsetOfSymptoms = { [Op.lt]: options.before }
+  }
+  if (options.updatedAfter !== undefined) {
+    where.updatedAt = { [Op.gt]: options.updatedAfter }
+  }
+  return await StateCase.count({where: where})
 }
 
 export async function getLastCaseDate (): Promise<Date> {

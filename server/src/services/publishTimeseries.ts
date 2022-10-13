@@ -1,5 +1,5 @@
 import { max as maxDate, parseISO, isAfter, isWithinInterval, differenceInMonths, isFuture, endOfDay } from 'date-fns'
-import { findStateCases, findUpdatedStateCases, findStateCasesAfter, findAllStateCases } from '@/services/stateCases'
+import { countStateCases, findStateCases } from '@/services/stateCases'
 import { stringify } from 'csv-string'
 import pathPosix from 'node:path/posix'
 import { _Object } from '@aws-sdk/client-s3'
@@ -38,7 +38,7 @@ async function updatePublishedPartions(feed: Feed, log: FeedLog): Promise<void> 
     const period = periodFromObjectKey(publishedObject.Key)
     const isPeriodUpdated = await hasUpdates(period, lastPublishDate)
     if (isPeriodUpdated) {
-      const periodCases = await findStateCases(period)
+      const periodCases = await findStateCases({ period: period })
       if (period.frequency === Frequency.MONTHLY && periodCases.length > DESIRED_MAX_PER_PERIOD) {
         await replaceMonthlyWithDaily(period, periodCases, log)
       } else {
@@ -49,13 +49,13 @@ async function updatePublishedPartions(feed: Feed, log: FeedLog): Promise<void> 
   return
 
   async function hasUpdates(period: Period, after?: Date): Promise<boolean> {
-    let updatedCases: StateCase[]
+    let updatedCases: number
     if (after !== undefined) {
-      updatedCases = await findUpdatedStateCases(period, after)
+      updatedCases = await countStateCases({ period: period, updatedAfter: after })
     } else {
-      updatedCases = await findStateCases(period)
+      updatedCases = await countStateCases({ period: period})
     }
-    return updatedCases.length > 0
+    return updatedCases > 0
   }
 
   async function updatePartition(period: Period, periodCases: StateCase[], log: FeedLog): Promise<void> {
@@ -93,13 +93,13 @@ async function publishNewPartitions(feed: Feed, lastPublishedPeriod: Period | nu
   let endDate: Date
   let frequency: Frequency
   if (lastPublishedPeriod === null) {
-    stateCases = await findAllStateCases()
+    stateCases = await findStateCases({})
     startDate = stateCases.at(0)?.onsetOfSymptoms ?? new Date()
     endDate = stateCases.at(-1)?.onsetOfSymptoms ?? new Date()
     frequency = decideOnFrequency(stateCases, Frequency.MONTHLY)
   } else {
     startDate = lastPublishedPeriod.nextPeriod().start
-    stateCases = await findStateCasesAfter(startDate)
+    stateCases = await findStateCases({ after: startDate })
     if (stateCases.length === 0) return // short cut the work
     endDate = stateCases.at(-1)?.onsetOfSymptoms ?? new Date()
     frequency = decideOnFrequency(stateCases, lastPublishedPeriod.frequency)
@@ -165,7 +165,7 @@ function objectKeyFromPeriod(period: Period): string {
 }
 
 function calcMaxLastModified(objects: _Object[]): Date | undefined {
-  if (objects.length) return undefined
+  if (objects.length === 0) return undefined
   const modifiedDates = objects.map((object) => { return object.LastModified ?? EARLY_DATE })
   return maxDate(modifiedDates)
 }

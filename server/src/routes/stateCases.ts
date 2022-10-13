@@ -1,7 +1,7 @@
 import express from 'express'
 import asyncHandler from 'express-async-handler'
 import { getLogger } from '@/utils/loggers'
-import { insertFakeStateCases, findAllStateCases } from '@/services/stateCases'
+import { insertFakeStateCases, findStateCases } from '@/services/stateCases'
 import { publishStateCaseFeed } from '@/services/publishStateCasesFeed'
 import { S3Feed } from '@/utils/bucket'
 
@@ -13,8 +13,8 @@ router.get('/', asyncHandler(async (req, res, _next) => {
   const sort = req.query.sort as string
   logger.info('Get all cases: sort=' + sort)
 
-  const sortDecending = 'DESC'.localeCompare(sort, 'en', { sensitivity: 'base' }) === 0
-  const cases = await findAllStateCases(sortDecending)
+  const sortDescending = 'DESC'.localeCompare(sort, 'en', { sensitivity: 'base' }) === 0
+  const cases = await findStateCases({ sortDescending: sortDescending })
   res.send(cases)
 }))
 
