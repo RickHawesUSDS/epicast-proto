@@ -4,7 +4,7 @@ export interface Feed {
   checkConnection(): Promise<void>
   listObjects(prefix: string): Promise<_Object[]>
   putObject(name: string, body: string): Promise<void>
-  getObject(name: string): Promise<string>
   doesObjectExist(name: string): Promise<boolean>
+  getObject(name: string): Promise<string>
   deleteObject(name: string): Promise<void>
 }
