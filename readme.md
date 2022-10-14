@@ -1,24 +1,38 @@
 # EpiCast Prototype
 
-This is private repository for rhawes@cdc.gov to explore concepts about the EpiCast protocol.
+This is a repository for rhawes@cdc.gov to explore concepts about the EpiCast protocol.
 
-## EpiCast is...
+## EpiCast aims to...
 A proposed technical solution to for public health programs to share case information with CDC, each other and the public.
 
 * **Human and machine readable** - Simple enough for humans to read, structured and standardized enough that machines can acess the data.
 * **Flexible** - able to handle data element changes, local and national, that occur in an new outbreak.
 * **Scalable** - Support pandemic scale. From 1 to 1M data items per month.
 * **Sustainable** - Standardized, open-source reference implementations, free tooling and services.
-* **Secure** - Support both public and private data.
+* **Secure** - Support both public and private feeds.
 
-In broad sense, EpiCast supports the CDC's NorthStar architecture, the open data movement, and the DMI direction for NNDSS.
+In broad sense, EpiCast supports the CDC's NorthStar architecture, the open data movement, and the CDC's DMI direction for NNDSS.
 
-## Potential Demo
+## Current ideas
+
+* Publish complete data sets instead of sending individual messages.
+* States are the source of truth for data set
+* Use CSV because it is understood by both epidemiolgist and data scientists.
+* Support for supplemental datatypes including FHIR, and HL7 messages.
+* Take important ideas from TESSY including validation language and support from aggregates
+* Define a schema language
+* Validation done on entry by using a computable language (CQL inspired)
+* Logging of events in the feed.
+* Use S3 Buckets and Azure Blobs as the base protocol because all cloud vendors can support these protocols
+
+## A demo script
+The prototype should be support a demonstration of these concepts.
+
 1. Simple case
     1. Add cases
-    2. Publish
+    2. Publish is controlled by the publisher
     3. Show published folder and timeseries
-    4. Receive
+    4. Receive is automatic
 2. Pandemic spike
     1. Add 15000 cases
     2. Look at logs
@@ -31,12 +45,15 @@ In broad sense, EpiCast supports the CDC's NorthStar architecture, the open data
     3. Show the receive table
 
 ## TODO
-- [x] Finish log feed
+- [x] Demo website
+- [x] State page
+- [x] Timeseries publish
+- [x] Log publish
 - [ ] Define table, element, case interfaces
-- [ ] Finish schema publishing (enumerate elements), define Member interface
+- [ ] Schema publishing (enumerate elements), define Member interface
 - [ ] Color code columns in interface
 - [ ] Timeseries read interface (id, at, lastModifiedAt, enumerate elements)
 - [ ] Timeseries demo update interface (addRandom, updateRandom, deleteRandom)
-- [ ] Automatic receive
+- [ ] CDC Receiver auto receive, only CDC elements
 
 
