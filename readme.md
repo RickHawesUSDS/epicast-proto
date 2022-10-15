@@ -49,7 +49,7 @@ The prototype should be support a demonstration of these concepts.
 - [x] State page
 - [x] Timeseries publish
 - [x] Log publish
-- [ ] Define table, element, case interfaces
+- [ ] Define table, timeseries, element, cases
 - [ ] Schema publishing (enumerate elements), define Member interface
 - [ ] Color code columns in interface
 - [ ] Timeseries read interface (id, at, lastModifiedAt, enumerate elements)

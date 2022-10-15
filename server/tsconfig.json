@@ -7,10 +7,11 @@
         "src/*"
       ]
     },
+    "typeRoots": ["./src/types"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "Node16",
     "forceConsistentCasingInFileNames": true,
     "target": "ES2020",
     "experimentalDecorators": true,

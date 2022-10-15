@@ -6,9 +6,9 @@ const router = express.Router()
 const logger = getLogger('SYSTEM_ROUTE')
 
 /* Reset the system. */
-router.post('/reset', asyncHandler(async (_req, res, _next) => {
+router.post('/reset', asyncHandler(async (req, res, _next) => {
   logger.info('system reset')
-  await resetSystem()
+  await resetSystem(req.stateCaseTimeSeries, req.feed)
   res.send('Successful reset')
 }))
 

@@ -8,13 +8,17 @@ import indexRouter from './routes/index'
 import systemRouter from './routes/system'
 import stateCaseRouter from './routes/stateCases'
 import { db } from './utils/db'
-import { S3Feed } from './utils/bucket'
 import { resetStorage } from './controllers/resetSystem'
+import { StateCaseTimeSeries } from './services/StateCaseTimeSeries'
+import { S3Feed } from './utils/bucket'
 
 const logger = getLogger('APP')
 
 class App {
   public app: express.Application
+  public db = db
+  public stateCaseTimeSeries = new StateCaseTimeSeries()
+  public feed = new S3Feed()
 
   constructor () {
     this.app = express()
@@ -32,17 +36,23 @@ class App {
   }
 
   private routerSetup (): void {
+    this.app.use((req, _res, next) => {
+      req.db = this.db
+      req.stateCaseTimeSeries = this.stateCaseTimeSeries
+      req.feed = this.feed
+      next()
+    })
     this.app.use('/', indexRouter)
     this.app.use('/api/system', systemRouter)
     this.app.use('/api/stateCases', stateCaseRouter)
   }
 
   private async databaseSetup (): Promise<void> {
-    await db.sync()
+    await this.db.sync()
   }
 
   private async storageSetup (): Promise<void> {
-    await resetStorage()
+    await resetStorage(this.feed)
   }
 }
 

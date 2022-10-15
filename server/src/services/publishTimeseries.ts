@@ -1,14 +1,14 @@
 import { max as maxDate, parseISO, isAfter, isWithinInterval, differenceInMonths, isFuture, endOfDay } from 'date-fns'
-import { countStateCases, findStateCases } from '@/services/stateCases'
 import { stringify } from 'csv-string'
 import pathPosix from 'node:path/posix'
 import { _Object } from '@aws-sdk/client-s3'
 
 import { Feed } from '@/utils/Feed'
 import { FeedLog } from './FeedLog'
-import { StateCase } from '@/models/StateCase'
 import { getLogger } from '@/utils/loggers'
-import { Period, Frequency } from '@/utils/Period'
+import { Period, Frequency } from '@/services/Period'
+import { TimeSeries } from './TimeSeries'
+import { FeedElement } from './FeedElement'
 
 const TIMESERIES_FOLDER = 'time_series'
 const DESIRED_MAX_PER_PERIOD = 10000
@@ -17,167 +17,193 @@ const CSV_EXT = 'csv'
 
 const logger = getLogger('PUBLISH_TIME_SERIES_SERVICE')
 
-interface CasePartion {
+export async function publishTimeseries<T> (timeseries: TimeSeries<T>, feed: Feed, log: FeedLog): Promise<void> {
+  logger.info(`publishing timeseries: ${typeof timeseries}`)
+  const publisher = new TimeSeriesPublisher(timeseries, feed, log)
+  await publisher.publish()
+}
+
+interface CasePartion<T> {
   period: Period
-  cases: StateCase[]
+  cases: T[]
 }
 
-export async function publishStateCaseTimeseries(feed: Feed, log: FeedLog): Promise<void> {
-  logger.info("publishing state cases timeseries")
-  await updatePublishedPartions(feed, log)
-  const lastReportedPeriod = await findLastPublishedPeriod(feed)
-  await publishNewPartitions(feed, lastReportedPeriod, log)
-}
+class TimeSeriesPublisher<T> {
+  timeseries: TimeSeries<T>
+  feed: Feed
+  log: FeedLog
 
-async function updatePublishedPartions(feed: Feed, log: FeedLog): Promise<void> {
-  const publishedObjects = await feed.listObjects(TIMESERIES_FOLDER)
-  if (publishedObjects.length === 0) return // early shortcut
-  const lastPublishDate = calcMaxLastModified(publishedObjects)
+  constructor (timeseries: TimeSeries<T>, feed: Feed, log: FeedLog) {
+    this.timeseries = timeseries
+    this.feed = feed
+    this.log = log
+  }
 
-  for (const publishedObject of publishedObjects) {
-    const period = periodFromObjectKey(publishedObject.Key)
-    const isPeriodUpdated = await hasUpdates(period, lastPublishDate)
-    if (isPeriodUpdated) {
-      const periodCases = await findStateCases({ period: period })
-      if (period.frequency === Frequency.MONTHLY && periodCases.length > DESIRED_MAX_PER_PERIOD) {
-        await replaceMonthlyWithDaily(period, periodCases, log)
-      } else {
-        await updatePartition(period, periodCases, log)
+  async publish (): Promise<void> {
+    await this.updatePublishedPartions()
+    const lastReportedPeriod = await this.findLastPublishedPeriod()
+    await this.publishNewPartitions(lastReportedPeriod)
+  }
+
+  async updatePublishedPartions (): Promise<void> {
+    const publishedObjects = await this.feed.listObjects(TIMESERIES_FOLDER)
+    if (publishedObjects.length === 0) return // early shortcut
+    const lastPublishDate = this.calcMaxLastModified(publishedObjects)
+
+    for (const publishedObject of publishedObjects) {
+      const period = this.periodFromObjectKey(publishedObject.Key)
+      const isPeriodUpdated = await this.hasUpdates(period, lastPublishDate)
+      if (isPeriodUpdated) {
+        const periodCases = await this.timeseries.findEvents({ interval: period.interval })
+        if (period.frequency === Frequency.MONTHLY && periodCases.length > DESIRED_MAX_PER_PERIOD) {
+          await this.replaceMonthlyWithDaily(period, periodCases)
+        } else {
+          await this.updatePartition(period, periodCases)
+        }
       }
     }
   }
-  return
 
-  async function hasUpdates(period: Period, after?: Date): Promise<boolean> {
-    let updatedCases: number
+  async hasUpdates (period: Period, after?: Date): Promise<boolean> {
+    let updatedEvents: number
     if (after !== undefined) {
-      updatedCases = await countStateCases({ period: period, updatedAfter: after })
+      updatedEvents = await this.timeseries.countEvents({ interval: period.interval, updatedAfter: after })
     } else {
-      updatedCases = await countStateCases({ period: period})
+      updatedEvents = await this.timeseries.countEvents({ interval: period.interval })
     }
-    return updatedCases > 0
+    return updatedEvents > 0
   }
 
-  async function updatePartition(period: Period, periodCases: StateCase[], log: FeedLog): Promise<void> {
-    const key = objectKeyFromPeriod(period)
-    await putPartition(feed, key, periodCases)
-    log.update(key)
+  async updatePartition (period: Period, periodEvents: T[]): Promise<void> {
+    const key = this.objectKeyFromPeriod(period)
+    await this.putPartition(key, periodEvents)
+    this.log.update(key)
   }
 
-  async function replaceMonthlyWithDaily(publishedPeriod: Period, stateCases: StateCase[], log: FeedLog): Promise<void> {
+  async replaceMonthlyWithDaily (publishedPeriod: Period, events: T[]): Promise<void> {
     let endDate = publishedPeriod.end
     if (isFuture(publishedPeriod.end)) {
-      endDate = endOfDay(maxDate([stateCases.at(-1)?.onsetOfSymptoms ?? new Date(), new Date()]))
+      const lastEventDate = this.lastEventDate(events) ?? new Date()
+      endDate = endOfDay(maxDate([lastEventDate, new Date()]))
     }
-    const partitions = makeCasePartions(stateCases, publishedPeriod.start, endDate, Frequency.DAILY)
+    const partitions = this.makeCasePartions(events, publishedPeriod.start, endDate, Frequency.DAILY)
     const newKeys: string[] = []
     for (const partition of partitions) {
-      const key = objectKeyFromPeriod(partition.period)
-      await putPartition(feed, key, partition.cases)
+      const key = this.objectKeyFromPeriod(partition.period)
+      await this.putPartition(key, partition.cases)
       newKeys.push(key)
     }
-    const oldKey = objectKeyFromPeriod(publishedPeriod)
-    await feed.deleteObject(oldKey)
-    log.replace(oldKey, newKeys)
-  }
-}
-
-async function findLastPublishedPeriod(feed: Feed): Promise<Period | null> {
-  const publishedObjects = await feed.listObjects(TIMESERIES_FOLDER)
-  return calcLastPeriod(publishedObjects)
-}
-
-async function publishNewPartitions(feed: Feed, lastPublishedPeriod: Period | null, log: FeedLog): Promise<void> {
-  let stateCases: StateCase[]
-  let startDate: Date
-  let endDate: Date
-  let frequency: Frequency
-  if (lastPublishedPeriod === null) {
-    stateCases = await findStateCases({})
-    startDate = stateCases.at(0)?.onsetOfSymptoms ?? new Date()
-    endDate = stateCases.at(-1)?.onsetOfSymptoms ?? new Date()
-    frequency = decideOnFrequency(stateCases, Frequency.MONTHLY)
-  } else {
-    startDate = lastPublishedPeriod.nextPeriod().start
-    stateCases = await findStateCases({ after: startDate })
-    if (stateCases.length === 0) return // short cut the work
-    endDate = stateCases.at(-1)?.onsetOfSymptoms ?? new Date()
-    frequency = decideOnFrequency(stateCases, lastPublishedPeriod.frequency)
-  }
-  const partitions = makeCasePartions(stateCases, startDate, endDate, frequency)
-  for (const partition of partitions) {
-    const key = objectKeyFromPeriod(partition.period)
-    await putPartition(feed, key, partition.cases)
-    log.add(key)
-  }
-}
-
-function decideOnFrequency(stateCases: StateCase[], lastFrequency: Frequency): Frequency {
-  if (stateCases.length === 0) return lastFrequency
-  const months = differenceInMonths(stateCases.at(0)?.onsetOfSymptoms ?? new Date(), stateCases.at(-1)?.onsetOfSymptoms ?? new Date())
-  if (months === 0) return lastFrequency
-  return stateCases.length / months > DESIRED_MAX_PER_PERIOD ? Frequency.DAILY : lastFrequency
-}
-
-async function putPartition(feed: Feed, key: string, cases: StateCase[]): Promise<void> {
-  function createCSV(cases: StateCase[]): string {
-    const columns = Object.keys(StateCase.getAttributes())
-    const csv = cases.map(stateCase => {
-      const values = columns.map(column => stateCase.getDataValue(column as keyof StateCase) as string ?? '')
-      return stringify(values)
-    })
-    csv.unshift(stringify(columns))
-    return csv.join('')
+    const oldKey = this.objectKeyFromPeriod(publishedPeriod)
+    await this.feed.deleteObject(oldKey)
+    this.log.replace(oldKey, newKeys)
   }
 
-  const report = createCSV(cases)
-  await feed.putObject(key, report)
-}
-
-function makeCasePartions(stateCases: StateCase[], startDate: Date, endDate: Date, frequency: Frequency): CasePartion[] {
-  const partions: CasePartion[] = []
-  let partitionPeriod = new Period(startDate, frequency)
-  while (!isAfter(partitionPeriod.start, endDate)) {
-    const partitionCases = findCasesForPeriod(stateCases, partitionPeriod)
-    partions.push({ period: partitionPeriod, cases: partitionCases })
-    partitionPeriod = partitionPeriod.nextPeriod()
+  async findLastPublishedPeriod (): Promise<Period | undefined> {
+    const publishedObjects = await this.feed.listObjects(TIMESERIES_FOLDER)
+    return this.calcLastPeriod(publishedObjects)
   }
-  return partions
-}
 
-function findCasesForPeriod(stateCases: StateCase[], period: Period): StateCase[] {
-  return stateCases.filter(stateCase => { return isWithinInterval(stateCase.onsetOfSymptoms, period.interval) })
-}
-
-function periodFromObjectKey(key: string | undefined): Period {
-  if (key === undefined) throw Error('Object key is undefined')
-  const periodPart = pathPosix.parse(key).name
-  return Period.parse(periodPart)
-}
-
-function fileNameFromPeriod(period: Period): string {
-  return `${period.toString()}.${CSV_EXT}`
-}
-
-function objectKeyFromPeriod(period: Period): string {
-  const fileName = fileNameFromPeriod(period)
-  return `${TIMESERIES_FOLDER}/${fileName}`
-}
-
-function calcMaxLastModified(objects: _Object[]): Date | undefined {
-  if (objects.length === 0) return undefined
-  const modifiedDates = objects.map((object) => { return object.LastModified ?? EARLY_DATE })
-  return maxDate(modifiedDates)
-}
-
-function calcLastPeriod(publishedObjects: _Object[]): Period | null {
-  if (publishedObjects.length === 0) return null
-  let lastPeriod = periodFromObjectKey(publishedObjects.at(0)?.Key)
-  for (const publishedObject of publishedObjects) {
-    const period = periodFromObjectKey(publishedObject.Key)
-    if (isAfter(period.start, lastPeriod.start)) {
-      lastPeriod = period
+  async publishNewPartitions (lastPublishedPeriod: Period | undefined): Promise<void> {
+    let events: T[]
+    let startDate: Date
+    let endDate: Date
+    let frequency: Frequency
+    if (lastPublishedPeriod === undefined) {
+      events = await this.timeseries.findEvents({})
+      startDate = this.firstEventDate(events) ?? new Date()
+      endDate = this.lastEventDate(events) ?? new Date()
+      frequency = this.decideOnFrequency(events, Frequency.MONTHLY)
+    } else {
+      startDate = lastPublishedPeriod.nextPeriod().start
+      events = await this.timeseries.findEvents({ after: startDate })
+      if (events.length === 0) return // short cut the work
+      endDate = this.lastEventDate(events) ?? new Date()
+      frequency = this.decideOnFrequency(events, lastPublishedPeriod.frequency)
+    }
+    const partitions = this.makeCasePartions(events, startDate, endDate, frequency)
+    for (const partition of partitions) {
+      const key = this.objectKeyFromPeriod(partition.period)
+      await this.putPartition(key, partition.cases)
+      this.log.add(key)
     }
   }
-  return lastPeriod
+
+  decideOnFrequency (events: T[], lastFrequency: Frequency): Frequency {
+    if (events.length === 0) return lastFrequency
+    const months = differenceInMonths(this.firstEventDate(events) ?? new Date(), this.lastEventDate(events) ?? new Date())
+    if (months === 0) return lastFrequency
+    return events.length / months > DESIRED_MAX_PER_PERIOD ? Frequency.DAILY : lastFrequency
+  }
+
+  async putPartition (key: string, events: T[]): Promise<void> {
+    function createCSV (events: T[], elements: FeedElement[]): string {
+      const csv = events.map(event => {
+        const values = elements.map(element => event[element.name as keyof T] as string ?? '')
+        return stringify(values)
+      })
+      csv.unshift(stringify(elements.map(element => element.name)))
+      return csv.join('')
+    }
+
+    const report = createCSV(events, this.timeseries.feedElements)
+    await this.feed.putObject(key, report)
+  }
+
+  makeCasePartions (events: T[], startDate: Date, endDate: Date, frequency: Frequency): Array<CasePartion<T>> {
+    const partions: Array<CasePartion<T>> = []
+    let partitionPeriod = new Period(startDate, frequency)
+    while (!isAfter(partitionPeriod.start, endDate)) {
+      const partitionCases = this.findCasesForPeriod(events, partitionPeriod)
+      partions.push({ period: partitionPeriod, cases: partitionCases })
+      partitionPeriod = partitionPeriod.nextPeriod()
+    }
+    return partions
+  }
+
+  firstEventDate (events: T[]): Date | undefined {
+    const event = events.at(0)
+    return event !== undefined ? this.timeseries.getEventAt(event) : undefined
+  }
+
+  lastEventDate (events: T[]): Date | undefined {
+    const event = events.at(-1)
+    return event !== undefined ? this.timeseries.getEventAt(event) : undefined
+  }
+
+  findCasesForPeriod (events: T[], period: Period): T[] {
+    return events.filter(event => { return isWithinInterval(this.timeseries.getEventAt(event), period.interval) })
+  }
+
+  periodFromObjectKey (key: string | undefined): Period {
+    if (key === undefined) throw Error('Object key is undefined')
+    const periodPart = pathPosix.parse(key).name
+    return Period.parse(periodPart)
+  }
+
+  fileNameFromPeriod (period: Period): string {
+    return `${period.toString()}.${CSV_EXT}`
+  }
+
+  objectKeyFromPeriod (period: Period): string {
+    const fileName = this.fileNameFromPeriod(period)
+    return `${TIMESERIES_FOLDER}/${fileName}`
+  }
+
+  calcMaxLastModified (objects: _Object[]): Date | undefined {
+    if (objects.length === 0) return undefined
+    const modifiedDates = objects.map((object) => { return object.LastModified ?? EARLY_DATE })
+    return maxDate(modifiedDates)
+  }
+
+  calcLastPeriod (publishedObjects: _Object[]): Period | undefined {
+    if (publishedObjects.length === 0) return undefined
+    let lastPeriod = this.periodFromObjectKey(publishedObjects.at(0)?.Key)
+    for (const publishedObject of publishedObjects) {
+      const period = this.periodFromObjectKey(publishedObject.Key)
+      if (isAfter(period.start, lastPeriod.start)) {
+        lastPeriod = period
+      }
+    }
+    return lastPeriod
+  }
 }
