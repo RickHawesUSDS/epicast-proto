@@ -4,7 +4,7 @@ import { formatISO } from 'date-fns'
 import { compile } from 'handlebars'
 
 import { Bucket } from '@/models/Bucket'
-import { FeedLog } from './FeedLog'
+import { PublishLog } from './PublishLog'
 import { FeedSchema } from '@/models/FeedSchema'
 
 const logger = getLogger('PUBLISH_SCHEMA_SERVICE')
@@ -12,7 +12,7 @@ export const SCHEMA_FOLDER = 'schema'
 export const SCHEMA_EXTENSION = 'yaml'
 const SCHEMA_TEMPLATE_PATH = './src/public/epicast-demoserver-feed1-schema.handlebars'
 
-export async function publishSchema (bucket: Bucket, schema: FeedSchema, log: FeedLog): Promise<void> {
+export async function publishSchema(bucket: Bucket, schema: FeedSchema, log: PublishLog): Promise<void> {
   const schemaKey = formSchemaKey(schema)
   if (!await bucket.doesObjectExist(schemaKey)) {
     logger.info('publishing schema')
@@ -25,12 +25,12 @@ export async function publishSchema (bucket: Bucket, schema: FeedSchema, log: Fe
   }
 }
 
-export function formSchemaKey (schema: FeedSchema): string {
+export function formSchemaKey(schema: FeedSchema): string {
   const validFrom = formatISO(schema.validFrom, { format: 'basic', representation: 'complete' })
   return `${SCHEMA_FOLDER}/${schema.organizationId}-${schema.systemId}-${schema.feedId}-${validFrom}.${SCHEMA_EXTENSION}`
 }
 
-function formTemplateContext (schema: FeedSchema): any {
+function formTemplateContext(schema: FeedSchema): any {
   // format stuff in the way that the YAML file wants
   return {
     organizationId: schema.organizationId,

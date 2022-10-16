@@ -1,9 +1,7 @@
 import express from 'express'
 import asyncHandler from 'express-async-handler'
 import { getLogger } from '@/utils/loggers'
-import { publishSchema } from '@/services/publishSchema'
-import { publishTimeseries } from '@/services/publishTimeSeries'
-import { FeedLog } from '@/services/FeedLog'
+import { publishFeed } from '@/controllers/publishFeed'
 
 const router = express.Router()
 const logger = getLogger('STATE_CASES_ROUTE')
@@ -32,10 +30,7 @@ router.post('/random', asyncHandler(async (req, res, _next) => {
 /* POST publish all cases */
 router.post('/publish', asyncHandler(async (req, res, _next) => {
   logger.info('publish state cases')
-  const log = new FeedLog()
-  await publishSchema(req.bucket, req.stateCaseTimeSeries.schema, log)
-  await publishTimeseries(req.bucket, req.stateCaseTimeSeries, log)
-  await log.publish(req.bucket)
+  publishFeed(req.bucket, req.stateCaseTimeSeries)
   res.send('success')
 }))
 

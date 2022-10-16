@@ -2,9 +2,10 @@ import { Op, Order, WhereOptions } from 'sequelize'
 
 import { CDCCase } from '@/models/sequelizeModels/CDCCase'
 import { FeedSchema } from './FeedSchema'
-import { TimeSeries, TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions } from './TimeSeries'
+import { TimeSeries, TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMutator } from './TimeSeries'
 
-export class CDCCaseTimeSeries implements TimeSeries {
+export class CDCCaseTimeSeries implements TimeSeries, TimeSeriesMutator {
+
   async findEvents (options: TimeSeriesFindOptions): Promise<TimeSeriesEvent[]> {
     const where: WhereOptions<CDCCase> = {}
     if (options.interval !== undefined) {
@@ -48,6 +49,14 @@ export class CDCCaseTimeSeries implements TimeSeries {
 
   updateSchema (newSchema: FeedSchema): void {
     this.schema = newSchema
+  }
+
+  updateEvents(events: TimeSeriesEvent[]): void {
+    throw new Error('Method not implemented.')
+  }
+  
+  initialize(newSchema: FeedSchema, newEvents: TimeSeriesEvent[]): void {
+    throw new Error('Method not implemented.')
   }
 }
 
