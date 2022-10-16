@@ -52,7 +52,7 @@ The prototype should be support a demonstration of these concepts.
 - [x] Define bucket, schema, element, schema for StateCases
 - [x] Timeseries read interface (id, at, lastModifiedAt, enumerate elements)
 - [x] Schema publishing (enumerate elements), define Member interface
-- [ ] /statecases/schema route & read in State table
+- [x] /statecases/schema route & read in State table
 - [ ] Show only published elements in State table
 - [ ] Start CDCCase (model, cdcCaseTimeSeries, cdccases route)
 - [ ] Read schema from feed (readSchema)

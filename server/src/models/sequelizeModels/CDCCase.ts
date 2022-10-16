@@ -1,9 +1,8 @@
-import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, AutoIncrement } from 'sequelize-typescript'
+import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt } from 'sequelize-typescript'
 
-@Table({ tableName: 'stateCases' })
-export class StateCase extends Model<StateCase> {
+@Table({ tableName: 'cdcCases' })
+export class CDCCase extends Model<CDCCase> {
   @PrimaryKey
-  @AutoIncrement
   @Column
     caseId!: number
 
@@ -19,12 +18,6 @@ export class StateCase extends Model<StateCase> {
     updatedAt!: Date
 
   @Column
-    personFirstName!: string
-
-  @Column
-    personLastName!: string
-
-  @Column
     personDateOfBirth?: Date
 
   @Column
@@ -37,25 +30,10 @@ export class StateCase extends Model<StateCase> {
     personSexAtBirth?: string
 
   @Column
-    personSexualOrientation?: string
-
-  @Column
-    personAddress?: string
-
-  @Column
-    personCity?: string
-
-  @Column
     personState?: string
 
   @Column
     personPostalCode?: string
-
-  @Column
-    personPhone?: string
-
-  @Column
-    personEmail?: string
 
   @Column
     onsetOfSymptoms!: Date

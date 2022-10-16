@@ -3,11 +3,11 @@ import { addDays, endOfDay, startOfDay } from 'date-fns'
 import { Op, Order, WhereOptions } from 'sequelize'
 
 import { StateCase } from '@/models/sequelizeModels/StateCase'
-import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions } from '../models/TimeSeries'
-import { stateCaseTimeSeriesSchemaV1 } from '../models/stateCaseTimeSeriesElements'
+import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesEvent } from './TimeSeries'
+import { stateCaseTimeSeriesSchemaV1 } from './stateCaseElements'
 
-export class StateCaseTimeSeries implements TimeSeries<StateCase> {
-  async findEvents(options: TimeSeriesFindOptions): Promise<StateCase[]> {
+export class StateCaseTimeSeries implements TimeSeries {
+  async findEvents (options: TimeSeriesFindOptions): Promise<TimeSeriesEvent[]> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -20,10 +20,11 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
       where.updatedAt = { [Op.gt]: options.updatedAfter }
     }
     const order: Order = [['caseDate', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']]
-    return await StateCase.findAll({ where, order })
+    const stateCases = await StateCase.findAll({ where, order })
+    return stateCases.map((c) => new StateCaseTimeSeriesEvent(c))
   }
 
-  async countEvents(options: TimeSeriesCountOptions): Promise<number> {
+  async countEvents (options: TimeSeriesCountOptions): Promise<number> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -38,21 +39,9 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return await StateCase.count({ where })
   }
 
-  getEventAt(event: StateCase): Date {
-    return event.caseDate
-  }
-
-  getEventId(event: StateCase): string {
-    return event.caseId.toString()
-  }
-
-  getEventUpdatedAt(event: StateCase): Date {
-    return event.updatedAt
-  }
-
   schema = stateCaseTimeSeriesSchemaV1
 
-  async insertFakeStateCases(numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
+  async insertFakeStateCases (numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
     const decideOnDate = async (): Promise<Date> => {
       const now = new Date()
       const stateCase = await StateCase.findOne({
@@ -81,7 +70,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return casesAdded
   }
 
-  private static fakeStateCase(stateCase: StateCase, caseDate: Date): void {
+  private static fakeStateCase (stateCase: StateCase, caseDate: Date): void {
     stateCase.personFirstName = faker.name.firstName()
     stateCase.personLastName = faker.name.lastName()
     stateCase.personAddress = faker.address.streetAddress()
@@ -102,8 +91,32 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     stateCase.caseDate = caseDate
   }
 
-  private static sample(codeset: string[]): string {
+  private static sample (codeset: string[]): string {
     const random = Math.floor(Math.random() * codeset.length)
     return codeset[random]
+  }
+}
+
+export class StateCaseTimeSeriesEvent implements TimeSeriesEvent {
+  #stateCase: StateCase
+
+  constructor (stateCase: StateCase) {
+    this.#stateCase = stateCase
+  }
+
+  get eventAt (): Date {
+    return this.#stateCase.caseDate
+  }
+
+  get eventId (): number {
+    return this.#stateCase.caseId
+  }
+
+  get eventUpdatedAt (): Date {
+    return this.#stateCase.updatedAt
+  }
+
+  getValue (name: string): any {
+    return this.#stateCase[name as keyof StateCase]
   }
 }

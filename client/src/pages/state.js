@@ -57,7 +57,7 @@ function StatePage(props) {
             <Button onClick={() => onAdd15CasesClick()}>Add 15 Case</Button>
             <Button onClick={() => onAdd15KCasesClick()}>Add 15000 Cases</Button>
           </ButtonGroup>
-          <Button onClick={() => onPublishCasesClick()} color='primary' variant='outlined' px="5px">Publish</Button>
+          <Button onClick={() => onPublishCasesClick()} color='primary' variant='outlined'>Publish</Button>
         </div>
       </HeroSection2>
     </>

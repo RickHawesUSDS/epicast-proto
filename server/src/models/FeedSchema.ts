@@ -1,4 +1,4 @@
-import { FeedElement } from "./FeedElement"
+import { FeedElement } from './FeedElement'
 
 export interface FeedSchema {
   epicastVersion: number
@@ -8,5 +8,3 @@ export interface FeedSchema {
   validFrom: Date
   elements: FeedElement[]
 }
-
-
