@@ -2,8 +2,9 @@ import React from 'react'
 import Meta from './../components/Meta'
 import HeroSection2 from './../components/HeroSection2'
 import StateCasesTable from '../features/stateCases/StateCasesTable'
-import { Button, ButtonGroup, Container } from '@material-ui/core'
+import { Button, ButtonGroup, Container, makeStyles } from '@material-ui/core'
 import { useAddRandomStateCasesMutation, usePublishStateCasesMutation } from '../features/api/apiSlice'
+import { ArrowRight } from '@material-ui/icons'
 
 function StatePage(props) {
   const [addRandomStateCase] = useAddRandomStateCasesMutation()
@@ -13,13 +14,27 @@ function StatePage(props) {
     await addRandomStateCase({ numOfDays: 1, numPerDay: 1 })
   }
 
-  async function onAddMultipleCasesClick() {
+  async function onAdd15CasesClick() {
+    await addRandomStateCase({ numOfDays: 5, numPerDay: 3 })
+  }
+
+  async function onAdd15KCasesClick() {
     await addRandomStateCase({ numOfDays: 50, numPerDay: 300 })
   }
 
   async function onPublishCasesClick() {
     await publishStateCases()
   }
+
+  const useButtonStyles = makeStyles((theme) => ({
+    root: {
+      '& > *': {
+        margin: theme.spacing(1),
+      },
+    },
+  }));
+
+  const buttonClasses = useButtonStyles()
 
   return (
     <>
@@ -36,13 +51,14 @@ function StatePage(props) {
           This is simple state surveillance system. The table represents all the case of a particular disease.
         </Container>
         <StateCasesTable />
-        <Container color='text.primary' align='right'>
+        <div className={buttonClasses.root} align='right'>
           <ButtonGroup color='primary'>
             <Button onClick={() => onAddCaseClick()}>Add 1 Case</Button>
-            <Button onClick={() => onAddMultipleCasesClick()}>Add 15000 Cases</Button>
-            <Button onClick={() => onPublishCasesClick()}>Publish</Button>
+            <Button onClick={() => onAdd15CasesClick()}>Add 15 Case</Button>
+            <Button onClick={() => onAdd15KCasesClick()}>Add 15000 Cases</Button>
           </ButtonGroup>
-        </Container>
+          <Button onClick={() => onPublishCasesClick()} color='primary' variant='outlined' px="5px">Publish</Button>
+        </div>
       </HeroSection2>
     </>
   )

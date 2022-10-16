@@ -38,6 +38,28 @@ export const stateCaseTimeSeriesSchemaV1: FeedSchema = {
       memberOfSchemas: ['cdc', 'state'],
     },
     {
+      name: 'onsetOfSymptoms',
+      displayName: 'Onset of Symptoms',
+      type: 'date',
+      tags: [],
+      memberOfSchemas: ['cdc', 'state'],
+    },
+    {
+      name: 'hospitalized',
+      displayName: 'Hospitalized',
+      type: 'code',
+      tags: [],
+      memberOfSchemas: ['cdc', 'state'],
+    },
+    {
+      name: 'subjectDied',
+      displayName: 'Subject Died',
+      type: 'code',
+      tags: [],
+      memberOfSchemas: ['cdc', 'state'],
+    },
+    // person elements
+    {
       name: 'personFirstName',
       displayName: 'First Name',
       type: 'string',
@@ -122,27 +144,6 @@ export const stateCaseTimeSeriesSchemaV1: FeedSchema = {
       tags: ['pii'],
       memberOfSchemas: ['state'],
     },
-    {
-      name: 'onsetOfSymptoms',
-      displayName: 'Onset of Symptoms',
-      type: 'date',
-      tags: [],
-      memberOfSchemas: ['cdc', 'state'],
-    },
-    {
-      name: 'hospitalized',
-      displayName: 'Hospitalized',
-      type: 'code',
-      tags: [],
-      memberOfSchemas: ['cdc', 'state'],
-    },
-    {
-      name: 'subjectDied',
-      displayName: 'Subject Died',
-      type: 'code',
-      tags: [],
-      memberOfSchemas: ['cdc', 'state'],
-    }
   ]
 }
 
