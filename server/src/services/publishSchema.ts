@@ -18,13 +18,7 @@ export async function publishSchema(bucket: Bucket, schema: FeedSchema, log: Fee
     logger.info('publishing schema')
     const schemaTemplate = readFileSync(SCHEMA_TEMPLATE_PATH, { encoding: 'utf8' })
     const compiledSchemaTemplate = compile(schemaTemplate)
-    const templateContext = {
-      organizationId: schema.organizationId,
-      systemId: schema.systemId,
-      feedId: schema.feedId,
-      validFrom: formatISO(schema.validFrom, { format: 'basic', representation: 'complete' }),
-      elements: schema.elements
-    }
+    const templateContext = formTemplateContext(schema)
     const rawSchema = compiledSchemaTemplate(templateContext)
     await bucket.putObject(schemaKey, rawSchema)
     log.add(schemaKey)
@@ -34,4 +28,15 @@ export async function publishSchema(bucket: Bucket, schema: FeedSchema, log: Fee
 export function formSchemaKey(schema: FeedSchema): string {
   const validFrom = formatISO(schema.validFrom, { format:'basic', representation:'complete' })
   return `${SCHEMA_FOLDER}/${schema.organizationId}-${schema.systemId}-${schema.feedId}-${validFrom}.${SCHEMA_EXTENSION}`
+}
+
+function formTemplateContext(schema: FeedSchema): any {
+  // format stuff in the way that the YAML file wants
+  return {
+    organizationId: schema.organizationId,
+    systemId: schema.systemId,
+    feedId: schema.feedId,
+    validFrom: formatISO(schema.validFrom),
+    elements: schema.elements
+  }
 }
