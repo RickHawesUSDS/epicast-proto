@@ -1,4 +1,4 @@
-import { max as maxDate, parseISO, isAfter, isWithinInterval, differenceInMonths, isFuture, endOfDay } from 'date-fns'
+import { max as maxDate, parseISO, isAfter, isWithinInterval, differenceInMonths, isFuture, endOfDay, formatISO } from 'date-fns'
 import { stringify } from 'csv-string'
 import pathPosix from 'node:path/posix'
 
@@ -134,9 +134,23 @@ class TimeSeriesPublisher<T> {
   }
 
   async putPartition(key: string, events: T[]): Promise<void> {
+    function formatValue(event: T, element: FeedElement): string {
+      let result: string
+      switch(element.type) {
+        case 'date':
+          const value = event[element.name as keyof T] as Date
+          result = formatISO(value)
+          break
+        default:
+          result = event[element.name as keyof T] as string ?? ''
+          break
+      }
+      return result
+    }
+
     function createCSV(events: T[], elements: FeedElement[]): string {
       const csv = events.map(event => {
-        const values = elements.map(element => event[element.name as keyof T] as string ?? '')
+        const values = elements.map(element => formatValue(event, element))
         return stringify(values)
       })
       csv.unshift(stringify(elements.map(element => element.name)))
