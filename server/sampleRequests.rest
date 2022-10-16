@@ -12,3 +12,6 @@ POST http://localhost:3001/api/stateCases/random?numOfDays=5&numPerDay=3000
 
 ### Publish cases
 POST http://localhost:3001/api/stateCases/publish
+
+### Get the schema
+GET http://localhost:3001/api/stateCases/schema 

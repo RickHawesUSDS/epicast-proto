@@ -9,7 +9,7 @@ import systemRouter from './routes/system'
 import stateCaseRouter from './routes/stateCases'
 import { db } from './utils/db'
 import { S3Bucket } from './utils/S3Bucket'
-import { resetStorage } from './controllers/resetSystem'
+import { resetStorage } from './services/resetSystem'
 import { StateCaseTimeSeries } from './services/StateCaseTimeSeries'
 import { Bucket } from '@/models/Bucket'
 

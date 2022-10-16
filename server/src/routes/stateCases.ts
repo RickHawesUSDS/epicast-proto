@@ -39,4 +39,10 @@ router.post('/publish', asyncHandler(async (req, res, _next) => {
   res.send('success')
 }))
 
+/* GET schema */
+router.get('/schema', asyncHandler(async (req, res, _next) => {
+  logger.info('get the schema')
+  res.send(req.stateCaseTimeSeries.schema)
+}))
+
 export default router

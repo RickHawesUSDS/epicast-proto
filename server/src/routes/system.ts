@@ -1,6 +1,6 @@
 import express from 'express'
 import { getLogger } from '@/utils/loggers'
-import { resetSystem } from '@/controllers/resetSystem'
+import { resetSystem } from '@/services/resetSystem'
 import asyncHandler from 'express-async-handler'
 const router = express.Router()
 const logger = getLogger('SYSTEM_ROUTE')

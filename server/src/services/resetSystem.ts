@@ -1,5 +1,5 @@
 import { StateCase } from '@/models/sequelizeModels/StateCase'
-import { StateCaseTimeSeries } from '../services/StateCaseTimeSeries'
+import { StateCaseTimeSeries } from './StateCaseTimeSeries'
 import { getLogger } from '@/utils/loggers'
 import { Bucket } from '@/models/Bucket'
 

@@ -47,14 +47,17 @@ The prototype should be support a demonstration of these concepts.
 ## TODO
 - [x] Demo website
 - [x] State page
-- [x] Timeseries publish
-- [x] Log publish
-- [x] Define table, timeseries, element, cases
-- [x] Schema publishing (enumerate elements), define Member interface
-- [ ] Show only published elements in State table
+- [x] Publish a timeseries
+- [x] Publish a log
+- [x] Define bucket, schema, element, schema for StateCases
 - [x] Timeseries read interface (id, at, lastModifiedAt, enumerate elements)
-- [x] Timeseries demo update interface (addRandom, updateRandom, deleteRandom)
-- [ ] CDC Receiver auto receive, only CDC elements
+- [x] Schema publishing (enumerate elements), define Member interface
+- [ ] /statecases/schema route & read in State table
+- [ ] Show only published elements in State table
+- [ ] Start CDCCase (model, cdcCaseTimeSeries, cdccases route)
+- [ ] Read schema from feed (readSchema)
+- [ ] readTimeSeries, readCDCfeed
+- [ ] automatic receive
 - [ ] Show only what is CDC elements in CDC table
 
 
