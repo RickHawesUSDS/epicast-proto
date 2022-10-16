@@ -49,11 +49,13 @@ The prototype should be support a demonstration of these concepts.
 - [x] State page
 - [x] Timeseries publish
 - [x] Log publish
-- [ ] Define table, timeseries, element, cases
-- [ ] Schema publishing (enumerate elements), define Member interface
-- [ ] Color code columns in interface
-- [ ] Timeseries read interface (id, at, lastModifiedAt, enumerate elements)
-- [ ] Timeseries demo update interface (addRandom, updateRandom, deleteRandom)
+- [x] Define table, timeseries, element, cases
+- [x] Schema publishing (enumerate elements), define Member interface
+- [ ] Show only published elements in State table
+- [x] Timeseries read interface (id, at, lastModifiedAt, enumerate elements)
+- [x] Timeseries demo update interface (addRandom, updateRandom, deleteRandom)
 - [ ] CDC Receiver auto receive, only CDC elements
+- [ ] Show only what is CDC elements in CDC table
+
 
 
