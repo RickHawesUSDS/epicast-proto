@@ -1,18 +1,37 @@
 import { readFileSync } from 'fs'
 import { getLogger } from 'log4js'
+import { formatISO } from 'date-fns'
+import { compile } from 'handlebars'
 
-import { Feed } from '@/utils/Feed'
+import { Bucket } from '@/models/Bucket'
 import { FeedLog } from './FeedLog'
+import { FeedSchema } from '@/models/FeedSchema'
 
 const logger = getLogger('PUBLISH_SCHEMA_SERVICE')
-const SCHEMA_NAME = 'schema/epicast-demoserver-feed1-schema.yaml'
-const SCHEMA_TEMPLATE_PATH = './src/public/epicast-demoserver-feed1-schema.yaml'
+export const SCHEMA_FOLDER = 'schema'
+export const SCHEMA_EXTENSION = 'yaml'
+const SCHEMA_TEMPLATE_PATH = './src/public/epicast-demoserver-feed1-schema.handlebars'
 
-export async function publishSchema (feed: Feed, log: FeedLog): Promise<void> {
-  if (!await feed.doesObjectExist(SCHEMA_NAME)) {
+export async function publishSchema(bucket: Bucket, schema: FeedSchema, log: FeedLog): Promise<void> {
+  const schemaKey = formSchemaKey(schema)
+  if (!await bucket.doesObjectExist(schemaKey)) {
     logger.info('publishing schema')
-    const rawSchema = readFileSync(SCHEMA_TEMPLATE_PATH, { encoding: 'utf8' })
-    await feed.putObject(SCHEMA_NAME, rawSchema)
-    log.add(SCHEMA_NAME)
+    const schemaTemplate = readFileSync(SCHEMA_TEMPLATE_PATH, { encoding: 'utf8' })
+    const compiledSchemaTemplate = compile(schemaTemplate)
+    const templateContext = {
+      organizationId: schema.organizationId,
+      systemId: schema.systemId,
+      feedId: schema.feedId,
+      validFrom: formatISO(schema.validFrom, { format: 'basic', representation: 'complete' }),
+      elements: schema.elements
+    }
+    const rawSchema = compiledSchemaTemplate(templateContext)
+    await bucket.putObject(schemaKey, rawSchema)
+    log.add(schemaKey)
   }
+}
+
+export function formSchemaKey(schema: FeedSchema): string {
+  const validFrom = formatISO(schema.validFrom, { format:'basic', representation:'complete' })
+  return `${SCHEMA_FOLDER}/${schema.organizationId}-${schema.systemId}-${schema.feedId}-${validFrom}.${SCHEMA_EXTENSION}`
 }

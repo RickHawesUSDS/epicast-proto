@@ -2,12 +2,12 @@ import { faker } from '@faker-js/faker'
 import { addDays, endOfDay, startOfDay } from 'date-fns'
 import { Op, Order, WhereOptions } from 'sequelize'
 
-import { StateCase } from '@/models/StateCase'
-import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions } from './TimeSeries'
-import { FeedElement } from './FeedElement'
+import { StateCase } from '@/models/sequelizeModels/StateCase'
+import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions } from '../models/TimeSeries'
+import { stateCaseTimeSeriesSchemaV1 } from '../models/stateCaseTimeSeriesElements'
 
 export class StateCaseTimeSeries implements TimeSeries<StateCase> {
-  async findEvents (options: TimeSeriesFindOptions): Promise<StateCase[]> {
+  async findEvents(options: TimeSeriesFindOptions): Promise<StateCase[]> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       where.onsetOfSymptoms = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -23,7 +23,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return await StateCase.findAll({ where, order })
   }
 
-  async countEvents (options: TimeSeriesCountOptions): Promise<number> {
+  async countEvents(options: TimeSeriesCountOptions): Promise<number> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       where.onsetOfSymptoms = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -38,21 +38,21 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return await StateCase.count({ where })
   }
 
-  getEventAt (event: StateCase): Date {
+  getEventAt(event: StateCase): Date {
     return event.onsetOfSymptoms
   }
 
-  getEventId (event: StateCase): string {
+  getEventId(event: StateCase): string {
     return event.caseId.toString()
   }
 
-  getEventUpdatedAt (event: StateCase): Date {
+  getEventUpdatedAt(event: StateCase): Date {
     return event.updatedAt
   }
 
-  feedElements: FeedElement[] = []
+  schema = stateCaseTimeSeriesSchemaV1
 
-  async insertFakeStateCases (numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
+  async insertFakeStateCases(numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
     const decideOnDate = async (): Promise<Date> => {
       const now = new Date()
       const stateCase = await StateCase.findOne({
@@ -81,7 +81,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return casesAdded
   }
 
-  private static fakeStateCase (stateCase: StateCase, caseDate: Date): void {
+  private static fakeStateCase(stateCase: StateCase, caseDate: Date): void {
     stateCase.personFirstName = faker.name.firstName()
     stateCase.personLastName = faker.name.lastName()
     stateCase.personAddress = faker.address.streetAddress()

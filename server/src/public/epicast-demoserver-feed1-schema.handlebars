@@ -1,0 +1,57 @@
+# version of the epicast that is used
+epicastVersion: 0.1
+
+# Organization ID represent the organization. In this case, epicast is used to
+# represent the organization in charge of EpiCast.
+# Note: CDC is the organization behind EpiCast at the current time
+organizationId: {{ organizationId }}
+
+# An organization may have many different publishing systems.
+systemId: {{ systemId }}
+
+# The name of the feed from this publishing system
+feedId: {{ feedId }}
+
+# The date that this schema was used in this feed
+validFrom: {{ validFrom }}
+
+#
+# Elements of the schema
+#
+# Each element has:
+# - name
+# - displayName (optional)
+# - description (optional)
+# - type: either 'string', 'date', 'number', or 'code'
+# - codeSet (optional)
+# - valueSet (optional)
+# - validation (optional)
+#
+elements:
+{{#each elements}}
+- name: {{ this.name }}
+  {{#if this.displayName }}
+  displayName: {{ this }}
+  {{/if}}
+  {{#if this.description }}
+  description: {{this.description}}
+  {{/if}}
+  type: {{ this.type }}
+  {{#if this.codeSet}}
+  codeSet: {{this.codeSet}}
+  {{/if}}
+  {{#if this.valueSet}}
+  valueSet: {{this.valueSet}}
+  {{/if}}
+  {{#if this.validation}}
+  validation: {{this.validation}}
+  {{/if}}
+  tags:
+  {{#each this.tags }}
+  - {{ this }}
+  {{/each}}
+  memberOfSchemas:
+  {{#each this.memberOfSchemas }}
+  - {{ this }}
+  {{/each}}
+{{/each}}

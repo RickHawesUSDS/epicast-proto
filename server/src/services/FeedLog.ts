@@ -1,4 +1,4 @@
-import { Feed } from '@/utils/Feed'
+import { Bucket } from '@/models/Bucket'
 import { compareAsc, formatISO, parseISO } from 'date-fns'
 
 const LOG_FOLDER = 'logs'
@@ -6,7 +6,7 @@ const LOG_EXTENSION = 'log'
 
 type LogEntryAction = 'ADD' | 'UPDATE' | 'REPLACE' | 'DELETE' | 'NOTE'
 
-function isLogEntryAction (str: string): str is LogEntryAction {
+function isLogEntryAction(str: string): str is LogEntryAction {
   return ['ADD', 'UPDATE', 'REPLACE', 'DELETE', 'NOTE'].includes(str)
 }
 interface LogEntry {
@@ -18,7 +18,7 @@ interface LogEntry {
 export class FeedLog {
   private entries: LogEntry[] = []
 
-  add (fileName: string, message?: string): void {
+  add(fileName: string, message?: string): void {
     this.entries.push({
       timestamp: new Date(),
       action: 'ADD',
@@ -26,7 +26,7 @@ export class FeedLog {
     })
   }
 
-  replace (fileName: string, addNames: string[], message?: string): void {
+  replace(fileName: string, addNames: string[], message?: string): void {
     this.entries.push({
       timestamp: new Date(),
       action: 'REPLACE',
@@ -34,7 +34,7 @@ export class FeedLog {
     })
   }
 
-  update (fileName: string, message?: string): void {
+  update(fileName: string, message?: string): void {
     this.entries.push({
       timestamp: new Date(),
       action: 'UPDATE',
@@ -42,7 +42,7 @@ export class FeedLog {
     })
   }
 
-  delete (fileName: string, message?: string): void {
+  delete(fileName: string, message?: string): void {
     this.entries.push({
       timestamp: new Date(),
       action: 'DELETE',
@@ -50,7 +50,7 @@ export class FeedLog {
     })
   }
 
-  note (message: string): void {
+  note(message: string): void {
     this.entries.push({
       timestamp: new Date(),
       action: 'NOTE',
@@ -58,7 +58,7 @@ export class FeedLog {
     })
   }
 
-  async publish (feed: Feed): Promise<void> {
+  async publish(feed: Bucket): Promise<void> {
     if (this.entries.length === 0) return
     // NOTE: Object locking and thread locking problems ignored
     const oldEntries = await this.readTodaysLog(feed)
@@ -70,7 +70,7 @@ export class FeedLog {
 
   // Follows the Extended Log File Format from the W3C https://www.w3.org/TR/WD-logfile.html
   // but uses ISO timestamps formats
-  private async writeTodaysLog (feed: Feed, entries: LogEntry[]): Promise<void> {
+  private async writeTodaysLog(feed: Bucket, entries: LogEntry[]): Promise<void> {
     const rawDirectives = '#Version: 1.0\n#Fields: x-iso-timestamp x-action x-message\n'
     const rawEntries = entries.flatMap((entry: LogEntry) => {
       const timestamp = formatISO(entry.timestamp, { format: 'extended', representation: 'complete' })
@@ -80,7 +80,7 @@ export class FeedLog {
     await feed.putObject(key, rawDirectives + rawEntries)
   }
 
-  private async readTodaysLog (feed: Feed): Promise<LogEntry[]> {
+  private async readTodaysLog(feed: Bucket): Promise<LogEntry[]> {
     const logName = this.todaysLogKey()
     const exists = await feed.doesObjectExist(logName)
     if (exists) {
@@ -98,7 +98,7 @@ export class FeedLog {
       return []
     }
 
-    function parseLine (line: string): LogEntry | undefined {
+    function parseLine(line: string): LogEntry | undefined {
       if (line.at(0) === '#') return // ignore directives
       if (line.trim().length === 0) return // empty lines
       const [timePart, actionPart] = line.split(' ', 2)
@@ -112,7 +112,7 @@ export class FeedLog {
     }
   }
 
-  private todaysLogKey (): string {
+  private todaysLogKey(): string {
     const today = formatISO(new Date(), { format: 'basic', representation: 'date' })
     return `${LOG_FOLDER}/${today}.${LOG_EXTENSION}`
   }

@@ -1,5 +1,5 @@
 import { Interval } from 'date-fns'
-import { FeedElement } from './FeedElement'
+import { FeedSchema } from './FeedSchema'
 
 export interface TimeSeries<T> {
   findEvents: (options: TimeSeriesFindOptions) => Promise<T[]>
@@ -9,7 +9,7 @@ export interface TimeSeries<T> {
   getEventId: (event: T) => string
   getEventUpdatedAt: (event: T) => Date
 
-  readonly feedElements: FeedElement[]
+  readonly schema: FeedSchema
 }
 
 export interface TimeSeriesFindOptions {

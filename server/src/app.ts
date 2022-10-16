@@ -8,9 +8,10 @@ import indexRouter from './routes/index'
 import systemRouter from './routes/system'
 import stateCaseRouter from './routes/stateCases'
 import { db } from './utils/db'
+import { S3Bucket } from './utils/S3Bucket'
 import { resetStorage } from './controllers/resetSystem'
 import { StateCaseTimeSeries } from './services/StateCaseTimeSeries'
-import { S3Feed } from './utils/bucket'
+import { Bucket } from '@/models/Bucket'
 
 const logger = getLogger('APP')
 
@@ -18,9 +19,9 @@ class App {
   public app: express.Application
   public db = db
   public stateCaseTimeSeries = new StateCaseTimeSeries()
-  public feed = new S3Feed()
+  public bucket: Bucket = new S3Bucket()
 
-  constructor () {
+  constructor() {
     this.app = express()
     this.config()
     this.databaseSetup().catch((error) => { logger.error(error) })
@@ -28,18 +29,18 @@ class App {
     this.routerSetup()
   }
 
-  private config (): void {
+  private config(): void {
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: false }))
     this.app.use(cookieParser())
     this.app.use(express.static(path.join(__dirname, 'public')))
   }
 
-  private routerSetup (): void {
+  private routerSetup(): void {
     this.app.use((req, _res, next) => {
       req.db = this.db
       req.stateCaseTimeSeries = this.stateCaseTimeSeries
-      req.feed = this.feed
+      req.bucket = this.bucket
       next()
     })
     this.app.use('/', indexRouter)
@@ -47,12 +48,12 @@ class App {
     this.app.use('/api/stateCases', stateCaseRouter)
   }
 
-  private async databaseSetup (): Promise<void> {
+  private async databaseSetup(): Promise<void> {
     await this.db.sync()
   }
 
-  private async storageSetup (): Promise<void> {
-    await resetStorage(this.feed)
+  private async storageSetup(): Promise<void> {
+    await resetStorage(this.bucket)
   }
 }
 

@@ -13,7 +13,7 @@ const db = new Sequelize({
   password: '',
   storage: ':memory:',
   logging: msg => logger.debug(msg),
-  models: [join(__dirname, '/../models')]
+  models: [join(__dirname, '/../models/sequelizeModels')]
 })
 
 export { db, Sequelize }
