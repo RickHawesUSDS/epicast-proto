@@ -10,27 +10,27 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
   async findEvents(options: TimeSeriesFindOptions): Promise<StateCase[]> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
-      where.onsetOfSymptoms = { [Op.between]: [options.interval.start, options.interval.end] }
+      where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
     } else if (options.after !== undefined) {
-      where.onsetOfSymptoms = { [Op.gt]: options.after }
+      where.caseDate = { [Op.gt]: options.after }
     } else if (options.before !== undefined) {
-      where.onsetOfSymptoms = { [Op.lt]: options.before }
+      where.caseDate = { [Op.lt]: options.before }
     }
     if (options.updatedAfter !== undefined) {
       where.updatedAt = { [Op.gt]: options.updatedAfter }
     }
-    const order: Order = [['onsetOfSymptoms', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']]
+    const order: Order = [['caseDate', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']]
     return await StateCase.findAll({ where, order })
   }
 
   async countEvents(options: TimeSeriesCountOptions): Promise<number> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
-      where.onsetOfSymptoms = { [Op.between]: [options.interval.start, options.interval.end] }
+      where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
     } else if (options.after !== undefined) {
-      where.onsetOfSymptoms = { [Op.gt]: options.after }
+      where.caseDate = { [Op.gt]: options.after }
     } else if (options.before !== undefined) {
-      where.onsetOfSymptoms = { [Op.lt]: options.before }
+      where.caseDate = { [Op.lt]: options.before }
     }
     if (options.updatedAfter !== undefined) {
       where.updatedAt = { [Op.gt]: options.updatedAfter }
@@ -39,7 +39,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
   }
 
   getEventAt(event: StateCase): Date {
-    return event.onsetOfSymptoms
+    return event.caseDate
   }
 
   getEventId(event: StateCase): string {
@@ -57,10 +57,10 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
       const now = new Date()
       const stateCase = await StateCase.findOne({
         order: [
-          ['onsetOfSymptoms', 'DESC']
+          ['caseDate', 'DESC']
         ]
       })
-      const lastCaseDate = stateCase?.onsetOfSymptoms != null ? stateCase.onsetOfSymptoms : now
+      const lastCaseDate = stateCase?.caseDate != null ? stateCase.caseDate : now
       const countOfLastCaseDate = await this.countEvents({ interval: { start: startOfDay(lastCaseDate), end: endOfDay(lastCaseDate) } })
       let adjustedCaseDate = lastCaseDate
       if (countOfLastCaseDate > 5) adjustedCaseDate = addDays(adjustedCaseDate, 1)
@@ -87,6 +87,9 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     stateCase.personAddress = faker.address.streetAddress()
     stateCase.personCity = faker.address.city()
     stateCase.personState = 'CA'
+    stateCase.personRace = this.sample(['White', 'Black or African American', 'American Indian or Alaska Native', 'Asian', 'Native Hawaiian'])
+    stateCase.personSexAtBirth = this.sample(['Male', 'Female'])
+    stateCase.personEthnicity = this.sample(['Hispanic or Latino', 'Not Hispanic or Latino'])
     stateCase.personPostalCode = faker.address.zipCodeByState('CA')
     stateCase.personPhone = faker.phone.number()
     stateCase.personEmail = faker.internet.email()
@@ -94,7 +97,13 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     stateCase.subjectDied = 'N'
 
     stateCase.personDateOfBirth = faker.date.birthdate({ min: 5, max: 100, mode: 'age' })
-
     stateCase.onsetOfSymptoms = caseDate
+
+    stateCase.caseDate = caseDate
+  }
+
+  private static sample(codeset: string[]): string {
+    const random = Math.floor(Math.random() * codeset.length)
+    return codeset[random]
   }
 }

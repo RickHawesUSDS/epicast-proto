@@ -1,54 +1,72 @@
 import CaseTable from '../../components/CaseTable'
-import { useGetAllStateCasesQuery } from '../api/apiSlice'
+import { useGetAllStateCasesQuery, useGetStateCaseSchemaQuery } from '../api/apiSlice'
 import { CircularProgress } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 
-const columns = [
-  { id: 'caseId', label: 'Case Id', minWidth: 100 },
-  { id: 'onsetOfSymptoms', label: 'Onset of Symptoms', dateFormat: true, minWidth: 100 },
-  // { id: 'createdAt', label: 'Created At', minWidth: 100},
-  { id: 'updatedAt', label: 'Updated At', minWitdh: 160, dateFormat: true },
-  { id: 'personFirstName', label: 'First Name', minWidth: 120 },
-  { id: 'personFirstName', label: 'Last Name', minWidth: 120 },
-  { id: 'personDateOfBirth', label: 'Date of Birth', minWidth: 160, dateFormat: true },
-  // { id: 'personRace', label: 'Race', minWidth: 100},
-  // { id: 'personEthnicity', label: 'Ethnicity', minWidth: 100},
-  // { id: 'personSexAtBirth', label: 'Sex at Birth', minWidth: 100},
-  // { id: 'personSexualOrientation', label: 'Sexual Orientation', minWidth: 100},
-  { id: 'personAddress', label: 'Address', minWidth: 170 },
-  { id: 'personCity', label: 'City', minWidth: 100 },
-  { id: 'personState', label: 'State', minWidth: 100 },
-  { id: 'personPostalCode', label: 'Postal Code', minWidth: 100 },
-  { id: 'personPhone', label: 'Telephone', minWidth: 100 },
-  { id: 'personEmail', label: 'Email', minWidth: 100 },
-  { id: 'hospitalized', label: 'Hospitalized', minWidth: 100 },
-  { id: 'subjectDied', label: 'Subject Died', minWidth: 100 }
-]
+const customWidths = {
+  personFirstName: 140,
+  personLastName: 140,
+  personRace: 200,
+  personEthnicity: 200,
+  personPostalCode: 140,
+  personAddress: 200,
+  personPhone: 200,
+  personEmail: 200,
+}
+
+function makeColumns(schema) {
+  return schema.elements.map((element) => {
+    return {
+      id: element.name,
+      label: element.displayName,
+      minWidth: customWidths[element.name] ?? 100,
+      dateFormat: element.type === 'date',
+    }
+  })
+}
 
 export default function StateCasesTable () {
   const {
+    data: schema = undefined,
+    isLoading: isSchemaLoading,
+    isSuccess: isSchemaSucccesful,
+    isError: isSchemaFailed,
+    error: schemaError
+  } = useGetStateCaseSchemaQuery()
+
+  const {
     data: cases = [],
-    isLoading,
-    isSuccess,
-    isError,
-    error
+    isLoading: isCasesLoading,
+    isSuccess: isCasesSucccesful,
+    isError: isCasesFailed,
+    error: casesError
   } = useGetAllStateCasesQuery('desc')
 
-  let content
+  let content = ''
 
-  if (isLoading) {
+  if (isCasesFailed || isSchemaFailed) {
+    if (isCasesFailed) {
+      content += (
+        <Alert severity='error'>
+          Get state cases api error: {casesError.status + ': ' + casesError.error}
+        </Alert>
+      )
+    }
+    if (isSchemaFailed) {
+      content += (
+        <Alert severity='error'>
+          Get state cases schema api error: {schemaError.status + ': ' + schemaError.error}
+        </Alert>
+      )
+    }
+  } else if (isCasesLoading || isSchemaLoading) {
     content = (
       <CircularProgress />
     )
-  } else if (isSuccess) {
+  } else if (isCasesSucccesful && isSchemaSucccesful) {
+    const columns = makeColumns(schema)
     content = (
       <CaseTable fetchRows={() => cases} columns={columns} />
-    )
-  } else if (isError) {
-    content = (
-      <Alert severity='error'>
-        Get state cases api error: {error.status + ': ' + error.error}
-      </Alert>
     )
   }
 

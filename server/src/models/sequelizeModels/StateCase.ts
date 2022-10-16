@@ -5,61 +5,64 @@ export class StateCase extends Model<StateCase> {
   @PrimaryKey
   @AutoIncrement
   @Column
-    caseId!: number
+  caseId!: number
+
+  @Column
+  caseDate!: Date
 
   @CreatedAt
   @Column
-    createdAt!: Date
+  createdAt!: Date
 
   @UpdatedAt
   @Column
-    updatedAt!: Date
+  updatedAt!: Date
 
   @Column
-    personFirstName!: string
+  personFirstName!: string
 
   @Column
-    personLastName!: string
+  personLastName!: string
 
   @Column
-    personDateOfBirth?: Date
+  personDateOfBirth?: Date
 
   @Column
-    personRace?: string
+  personRace?: string
 
   @Column
-    personEthnicity?: string
+  personEthnicity?: string
 
   @Column
-    personSexAtBirth?: string
+  personSexAtBirth?: string
 
   @Column
-    personSexualOrientation?: string
+  personSexualOrientation?: string
 
   @Column
-    personAddress?: string
+  personAddress?: string
 
   @Column
-    personCity?: string
+  personCity?: string
 
   @Column
-    personState?: string
+  personState?: string
 
   @Column
-    personPostalCode?: string
+  personPostalCode?: string
 
   @Column
-    personPhone?: string
+  personPhone?: string
 
   @Column
-    personEmail?: string
+  personEmail?: string
 
   @Column
-    onsetOfSymptoms!: Date
+  onsetOfSymptoms!: Date
 
   @Column
-    hospitalized?: string
+  hospitalized?: string
 
   @Column
-    subjectDied?: string
+  subjectDied?: string
 }

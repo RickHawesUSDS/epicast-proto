@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
-  tagTypes: ['StateCase'],
+  tagTypes: ['StateCase', 'StateCaseSchema'],
   endpoints: (builder) => ({
 
     resetSystem: builder.mutation({
@@ -20,6 +20,11 @@ export const apiSlice = createApi({
     getAllStateCases: builder.query({
       query: (sort) => `stateCases?sort=${sort}`,
       providesTags: ['StateCase']
+    }),
+
+    getStateCaseSchema: builder.query({
+      query: () => `stateCases/schema`,
+      providesTags: ['StateCaseSchema']
     }),
 
     addRandomStateCases: builder.mutation({
@@ -49,4 +54,5 @@ export const {
   useGetAllStateCasesQuery,
   useAddRandomStateCasesMutation,
   usePublishStateCasesMutation,
+  useGetStateCaseSchemaQuery
 } = apiSlice
