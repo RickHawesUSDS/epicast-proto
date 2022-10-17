@@ -55,7 +55,7 @@ The prototype should be support a demonstration of these concepts.
 - [x] /statecases/schema route & read in State table
 - [ ] Show only published elements in State table
 - [x] Start CDCCase (model, cdcCaseTimeSeries, cdccases route)
-- [ ] Define /cdccase/subscriber { lastCheckedAt: , automatic: true }
+- [x] Define /cdccase/subscriber { lastCheckedAt: , automatic: true }
 - [ ] Read schema from feed (readSchema)
 - [ ] readTimeSeries, readCDCfeed
 - [ ] automatic receive

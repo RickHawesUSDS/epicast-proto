@@ -19,7 +19,7 @@
     "express": "~4.16.1",
     "express-async-handler": "^1.2.0",
     "handlebars": "^4.7.7",
-    "log4js": "latest",
+    "log4js": "^6.7.0",
     "minio": "^7.0.32",
     "module-alias": "^2.2.2",
     "morgan": "~1.9.1",
