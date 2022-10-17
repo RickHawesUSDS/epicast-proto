@@ -1,4 +1,4 @@
-import { Bucket } from '@/models/Bucket'
+import { FeedBucket } from '@/models/FeedBucket'
 import { compareAsc, formatISO, parseISO } from 'date-fns'
 
 const LOG_FOLDER = 'logs'
@@ -58,7 +58,7 @@ export class PublishLog {
     })
   }
 
-  async publish(feed: Bucket): Promise<void> {
+  async publish(feed: FeedBucket): Promise<void> {
     if (this.entries.length === 0) return
     // NOTE: Object locking and thread locking problems ignored
     const oldEntries = await this.readTodaysLog(feed)
@@ -70,7 +70,7 @@ export class PublishLog {
 
   // Follows the Extended Log File Format from the W3C https://www.w3.org/TR/WD-logfile.html
   // but uses ISO timestamps formats
-  private async writeTodaysLog(feed: Bucket, entries: LogEntry[]): Promise<void> {
+  private async writeTodaysLog(feed: FeedBucket, entries: LogEntry[]): Promise<void> {
     const rawDirectives = '#Version: 1.0\n#Fields: x-iso-timestamp x-action x-message\n'
     const rawEntries = entries.flatMap((entry: LogEntry) => {
       const timestamp = formatISO(entry.timestamp, { format: 'extended', representation: 'complete' })
@@ -80,7 +80,7 @@ export class PublishLog {
     await feed.putObject(key, rawDirectives + rawEntries)
   }
 
-  private async readTodaysLog(feed: Bucket): Promise<LogEntry[]> {
+  private async readTodaysLog(feed: FeedBucket): Promise<LogEntry[]> {
     const logName = this.todaysLogKey()
     const exists = await feed.doesObjectExist(logName)
     if (exists) {

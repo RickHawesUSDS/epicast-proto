@@ -12,7 +12,7 @@ import { db } from './utils/db'
 import { S3Bucket } from './utils/S3Bucket'
 import { resetStorage } from './controllers/resetSystem'
 import { StateCaseTimeSeries } from './models/StateCaseTimeSeries'
-import { Bucket } from '@/models/Bucket'
+import { FeedBucket } from '@/models/FeedBucket'
 import { CDCCaseTimeSeries } from './models/CDCCaseTimeSeries'
 import { FeedSubscriber } from './models/FeedSubscriber'
 
@@ -24,7 +24,7 @@ class App {
   public stateCaseTimeSeries = new StateCaseTimeSeries()
   public cdcCaseTimeSeries = new CDCCaseTimeSeries()
   public feedSubscriber = new FeedSubscriber(this.cdcCaseTimeSeries)
-  public bucket: Bucket = new S3Bucket()
+  public bucket: FeedBucket = new S3Bucket()
 
   constructor() {
     this.app = express()

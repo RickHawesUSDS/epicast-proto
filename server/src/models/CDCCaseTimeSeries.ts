@@ -43,7 +43,7 @@ export class CDCCaseTimeSeries implements TimeSeries, TimeSeriesMutator {
     organizationId: 'epicast',
     systemId: 'demoserver',
     feedId: 'feed1',
-    validFrom: new Date(2022, 10, 1),
+    validFrom: new Date(1900, 1, 1), // Early date
     elements: []
   }
 
@@ -54,7 +54,7 @@ export class CDCCaseTimeSeries implements TimeSeries, TimeSeriesMutator {
   updateEvents(events: TimeSeriesEvent[]): void {
     throw new Error('Method not implemented.')
   }
-  
+
   initialize(newSchema: FeedSchema, newEvents: TimeSeriesEvent[]): void {
     throw new Error('Method not implemented.')
   }

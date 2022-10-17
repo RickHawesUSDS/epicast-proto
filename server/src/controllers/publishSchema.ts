@@ -3,7 +3,7 @@ import { getLogger } from 'log4js'
 import { formatISO } from 'date-fns'
 import { compile } from 'handlebars'
 
-import { Bucket } from '@/models/Bucket'
+import { FeedBucket } from '@/models/FeedBucket'
 import { PublishLog } from './PublishLog'
 import { FeedSchema } from '@/models/FeedSchema'
 
@@ -12,7 +12,7 @@ export const SCHEMA_FOLDER = 'schema'
 export const SCHEMA_EXTENSION = 'yaml'
 const SCHEMA_TEMPLATE_PATH = './src/public/epicast-demoserver-feed1-schema.handlebars'
 
-export async function publishSchema(bucket: Bucket, schema: FeedSchema, log: PublishLog): Promise<void> {
+export async function publishSchema(bucket: FeedBucket, schema: FeedSchema, log: PublishLog): Promise<void> {
   const schemaKey = formSchemaKey(schema)
   if (!await bucket.doesObjectExist(schemaKey)) {
     logger.info('publishing schema')

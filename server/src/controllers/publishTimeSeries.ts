@@ -2,7 +2,7 @@ import { max as maxDate, isAfter, isWithinInterval, differenceInMonths, isFuture
 import { stringify } from 'csv-string'
 import pathPosix from 'node:path/posix'
 
-import { Bucket, BucketObject } from '@/models/Bucket'
+import { FeedBucket, BucketObject } from '@/models/FeedBucket'
 import { PublishLog } from './PublishLog'
 import { getLogger } from '@/utils/loggers'
 import { Period } from '@/utils/Period'
@@ -16,7 +16,7 @@ const CSV_EXT = 'csv'
 
 const logger = getLogger('PUBLISH_TIME_SERIES_SERVICE')
 
-export async function publishTimeseries(toBucket: Bucket, timeseries: TimeSeries, log: PublishLog): Promise<void> {
+export async function publishTimeseries(toBucket: FeedBucket, timeseries: TimeSeries, log: PublishLog): Promise<void> {
   logger.info(`publishing timeseries: ${timeseries.schema.organizationId}-${timeseries.schema.organizationId}`)
   const publisher = new TimeSeriesPublisher(toBucket, timeseries, log)
   await publisher.publish()
@@ -28,11 +28,11 @@ interface CasePartion {
 }
 
 class TimeSeriesPublisher {
-  bucket: Bucket
+  bucket: FeedBucket
   timeseries: TimeSeries
   log: PublishLog
 
-  constructor(toBucket: Bucket, timeseries: TimeSeries, log: PublishLog) {
+  constructor(toBucket: FeedBucket, timeseries: TimeSeries, log: PublishLog) {
     this.bucket = toBucket
     this.timeseries = timeseries
     this.log = log

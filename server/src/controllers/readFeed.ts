@@ -1,6 +1,6 @@
-import { Bucket } from "@/models/Bucket";
+import { FeedBucket } from "@/models/FeedBucket";
 import { TimeSeriesMutator } from "@/models/TimeSeries";
 
-export async function readFeed(fromBucket: Bucket, timeSeries: TimeSeriesMutator ): Promise<void> {
+export async function readFeed(fromBucket: FeedBucket, timeSeries: TimeSeriesMutator): Promise<void> {
 
 }

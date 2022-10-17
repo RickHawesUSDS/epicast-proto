@@ -1,5 +1,5 @@
 import { StateCaseTimeSeries } from '@/models/StateCaseTimeSeries'
-import { Bucket } from '@/models/Bucket'
+import { FeedBucket } from '@/models/FeedBucket'
 import { Sequelize } from 'sequelize-typescript'
 import { CDCCaseTimeSeries } from '@/models/CDCCaseTimeSeries'
 import { FeedSubscriber } from '@/models/FeedSubscriber'
@@ -12,7 +12,7 @@ declare global {
       stateCaseTimeSeries: StateCaseTimeSeries
       cdcCaseTimeSeries: CDCCaseTimeSeries
       feedSubscriber: FeedSubscriber
-      bucket: Bucket
+      bucket: FeedBucket
     }
   }
 }
