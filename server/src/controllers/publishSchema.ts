@@ -4,16 +4,15 @@ import { formatISO } from 'date-fns'
 import { compile } from 'handlebars'
 
 import { FeedBucket } from '@/models/FeedBucket'
+import { formSchemaKey } from "@/models/feedBucketKeys"
 import { PublishLog } from './PublishLog'
 import { FeedSchema } from '@/models/FeedSchema'
 
 const logger = getLogger('PUBLISH_SCHEMA_SERVICE')
-export const SCHEMA_FOLDER = 'schema'
-export const SCHEMA_EXTENSION = 'yaml'
 const SCHEMA_TEMPLATE_PATH = './src/public/epicast-demoserver-feed1-schema.handlebars'
 
 export async function publishSchema(bucket: FeedBucket, schema: FeedSchema, log: PublishLog): Promise<void> {
-  const schemaKey = formSchemaKey(schema)
+  const schemaKey = formSchemaKey(schema.organizationId, schema.systemId, schema.feedId, schema.validFrom)
   if (!await bucket.doesObjectExist(schemaKey)) {
     logger.info('publishing schema')
     const schemaTemplate = readFileSync(SCHEMA_TEMPLATE_PATH, { encoding: 'utf8' })
@@ -23,11 +22,6 @@ export async function publishSchema(bucket: FeedBucket, schema: FeedSchema, log:
     await bucket.putObject(schemaKey, rawSchema)
     log.add(schemaKey)
   }
-}
-
-export function formSchemaKey(schema: FeedSchema): string {
-  const validFrom = formatISO(schema.validFrom, { format: 'basic', representation: 'complete' })
-  return `${SCHEMA_FOLDER}/${schema.organizationId}-${schema.systemId}-${schema.feedId}-${validFrom}.${SCHEMA_EXTENSION}`
 }
 
 function formTemplateContext(schema: FeedSchema): any {

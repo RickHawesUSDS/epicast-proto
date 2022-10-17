@@ -1,8 +1,9 @@
 import { max as maxDate, isAfter, isWithinInterval, differenceInMonths, isFuture, endOfDay, formatISO } from 'date-fns'
 import { stringify } from 'csv-string'
-import pathPosix from 'node:path/posix'
+
 
 import { FeedBucket, BucketObject } from '@/models/FeedBucket'
+import { formTimeSeriesKey, periodFromTimeSeriesKey, TIMESERIES_FOLDER} from "@/models/feedBucketKeys"
 import { PublishLog } from './PublishLog'
 import { getLogger } from '@/utils/loggers'
 import { Period } from '@/utils/Period'
@@ -10,9 +11,7 @@ import { Frequency } from "@/utils/Frequency"
 import { TimeSeries, TimeSeriesEvent } from '../models/TimeSeries'
 import { FeedElement } from '../models/FeedElement'
 
-const TIMESERIES_FOLDER = 'time_series'
 const DESIRED_MAX_PER_PERIOD = 10000
-const CSV_EXT = 'csv'
 
 const logger = getLogger('PUBLISH_TIME_SERIES_SERVICE')
 
@@ -50,7 +49,7 @@ class TimeSeriesPublisher {
     const lastPublishDate = this.calcMaxLastModified(publishedObjects)
 
     for (const publishedObject of publishedObjects) {
-      const period = this.periodFromObjectKey(publishedObject.key)
+      const period = periodFromTimeSeriesKey(publishedObject.key)
       const isPeriodUpdated = await this.hasUpdates(period, lastPublishDate)
       if (isPeriodUpdated) {
         const periodCases = await this.timeseries.findEvents({ interval: period.interval })
@@ -74,7 +73,7 @@ class TimeSeriesPublisher {
   }
 
   async updatePartition(period: Period, periodEvents: TimeSeriesEvent[]): Promise<void> {
-    const key = this.objectKeyFromPeriod(period)
+    const key = formTimeSeriesKey(period)
     await this.putPartition(key, periodEvents)
     this.log.update(key)
   }
@@ -88,11 +87,11 @@ class TimeSeriesPublisher {
     const partitions = this.makeCasePartions(events, publishedPeriod.start, endDate, Frequency.DAILY)
     const newKeys: string[] = []
     for (const partition of partitions) {
-      const key = this.objectKeyFromPeriod(partition.period)
+      const key = formTimeSeriesKey(partition.period)
       await this.putPartition(key, partition.cases)
       newKeys.push(key)
     }
-    const oldKey = this.objectKeyFromPeriod(publishedPeriod)
+    const oldKey = formTimeSeriesKey(publishedPeriod)
     await this.bucket.deleteObject(oldKey)
     this.log.replace(oldKey, newKeys)
   }
@@ -121,7 +120,7 @@ class TimeSeriesPublisher {
     }
     const partitions = this.makeCasePartions(events, startDate, endDate, frequency)
     for (const partition of partitions) {
-      const key = this.objectKeyFromPeriod(partition.period)
+      const key = formTimeSeriesKey(partition.period)
       await this.putPartition(key, partition.cases)
       this.log.add(key)
     }
@@ -187,21 +186,6 @@ class TimeSeriesPublisher {
     return events.filter(event => { return isWithinInterval(event.eventAt, period.interval) })
   }
 
-  periodFromObjectKey(key: string | undefined): Period {
-    if (key === undefined) throw Error('Object key is undefined')
-    const periodPart = pathPosix.parse(key).name
-    return Period.parse(periodPart)
-  }
-
-  fileNameFromPeriod(period: Period): string {
-    return `${period.toString()}.${CSV_EXT}`
-  }
-
-  objectKeyFromPeriod(period: Period): string {
-    const fileName = this.fileNameFromPeriod(period)
-    return `${TIMESERIES_FOLDER}/${fileName}`
-  }
-
   calcMaxLastModified(objects: BucketObject[]): Date | undefined {
     if (objects.length === 0) return undefined
     const modifiedDates = objects.map((object) => { return object.lastModified })
@@ -210,9 +194,9 @@ class TimeSeriesPublisher {
 
   calcLastPeriod(publishedObjects: BucketObject[]): Period | undefined {
     if (publishedObjects.length === 0) return undefined
-    let lastPeriod = this.periodFromObjectKey(publishedObjects.at(0)?.key)
+    let lastPeriod = periodFromTimeSeriesKey(publishedObjects[0].key)
     for (const publishedObject of publishedObjects) {
-      const period = this.periodFromObjectKey(publishedObject.key)
+      const period = periodFromTimeSeriesKey(publishedObject.key)
       if (isAfter(period.start, lastPeriod.start)) {
         lastPeriod = period
       }

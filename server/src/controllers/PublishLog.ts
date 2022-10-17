@@ -1,8 +1,7 @@
 import { FeedBucket } from '@/models/FeedBucket'
+import { formLogKey } from "@/models/feedBucketKeys"
 import { compareAsc, formatISO, parseISO } from 'date-fns'
 
-const LOG_FOLDER = 'logs'
-const LOG_EXTENSION = 'log'
 
 type LogEntryAction = 'ADD' | 'UPDATE' | 'REPLACE' | 'DELETE' | 'NOTE'
 
@@ -76,12 +75,11 @@ export class PublishLog {
       const timestamp = formatISO(entry.timestamp, { format: 'extended', representation: 'complete' })
       return `${timestamp} ${entry.action} "${entry.message}"`
     }).join('\n')
-    const key = this.todaysLogKey()
-    await feed.putObject(key, rawDirectives + rawEntries)
+    await feed.putObject(formLogKey(), rawDirectives + rawEntries)
   }
 
   private async readTodaysLog(feed: FeedBucket): Promise<LogEntry[]> {
-    const logName = this.todaysLogKey()
+    const logName = formLogKey()
     const exists = await feed.doesObjectExist(logName)
     if (exists) {
       const rawLog = await feed.getObject(logName)
@@ -110,10 +108,5 @@ export class PublishLog {
       const message = messagePart.substring(1, messagePart.length - 2)
       return { timestamp: time, action, message }
     }
-  }
-
-  private todaysLogKey(): string {
-    const today = formatISO(new Date(), { format: 'basic', representation: 'date' })
-    return `${LOG_FOLDER}/${today}.${LOG_EXTENSION}`
   }
 }
