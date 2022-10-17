@@ -56,9 +56,10 @@ The prototype should be support a demonstration of these concepts.
 - [ ] Show only published elements in State table
 - [x] Start CDCCase (model, cdcCaseTimeSeries, cdccases route)
 - [x] Define /cdccase/subscriber { lastCheckedAt: , automatic: true }
-- [ ] Read schema from feed (readSchema)
+- [x] Read schema from feed (readSchema)
 - [ ] readTimeSeries, readCDCfeed
 - [ ] automatic receive
+- [ ] CDC page (table and refresh)
 - [ ] Show only what is CDC elements in CDC table
 
 
