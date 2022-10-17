@@ -8,8 +8,18 @@ export class FeedSubscriber {
     this.timeSeries = timeSeries
   }
 
-  update(newModel: FeedSubscriberModel): FeedSubscriberModel {
+  set(newModel: FeedSubscriberModel): FeedSubscriberModel {
     this.model = newModel
+    return this.model
+  }
+
+  setLastChecked(): FeedSubscriberModel {
+    this.model = { automatic: this.model.automatic, lastChecked: new Date()}
+    return this.model
+  }
+
+  setAutomatic(automatic: boolean): FeedSubscriberModel {
+    this.model = { automatic: automatic, lastChecked: this.model.lastChecked }
     return this.model
   }
 }

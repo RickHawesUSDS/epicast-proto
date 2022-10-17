@@ -5,7 +5,8 @@ import pathPosix from 'node:path/posix'
 import { Bucket, BucketObject } from '@/models/Bucket'
 import { PublishLog } from './PublishLog'
 import { getLogger } from '@/utils/loggers'
-import { Period, Frequency } from '@/utils/Period'
+import { Period } from '@/utils/Period'
+import { Frequency } from "@/utils/Frequency"
 import { TimeSeries, TimeSeriesEvent } from '../models/TimeSeries'
 import { FeedElement } from '../models/FeedElement'
 

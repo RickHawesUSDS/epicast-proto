@@ -1,6 +1,7 @@
 import express from 'express'
 import asyncHandler from 'express-async-handler'
 import { getLogger } from '@/utils/loggers'
+import { readFeed } from '@/controllers/readFeed'
 
 const router = express.Router()
 const logger = getLogger('CDC_CASES_ROUTE')
@@ -22,9 +23,12 @@ router.get('/subscriber', asyncHandler(async (req, res, _next) => {
   res.send(req.feedSubscriber.model)
 }))
 
-router.post('/subscriber', asyncHandler(async (req, res, _next) => {
-  logger.info('Post subscriber')
-  req.feedSubscriber.update(req.body)
+router.post('/subscriber/once', asyncHandler(async (req, res, _next) => {
+  logger.info('Read feed')
 
+  readFeed(req.bucket, req.cdcCaseTimeSeries)
+  req.feedSubscriber.setLastChecked()
   res.send(req.feedSubscriber.model)
 }))
+
+export default router

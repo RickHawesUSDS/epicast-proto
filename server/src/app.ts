@@ -7,6 +7,7 @@ import { getLogger } from './utils/loggers'
 import indexRouter from './routes/index'
 import systemRouter from './routes/system'
 import stateCaseRouter from './routes/stateCases'
+import cdcCaseRouter from './routes/cdcCases'
 import { db } from './utils/db'
 import { S3Bucket } from './utils/S3Bucket'
 import { resetStorage } from './controllers/resetSystem'
@@ -52,6 +53,7 @@ class App {
     this.app.use('/', indexRouter)
     this.app.use('/api/system', systemRouter)
     this.app.use('/api/stateCases', stateCaseRouter)
+    this.app.use('/api/cdcCases', cdcCaseRouter)
   }
 
   private async databaseSetup(): Promise<void> {

@@ -14,4 +14,15 @@ POST http://localhost:3001/api/stateCases/random?numOfDays=5&numPerDay=3000
 POST http://localhost:3001/api/stateCases/publish
 
 ### Get the schema
-GET http://localhost:3001/api/stateCases/schema 
+GET http://localhost:3001/api/stateCases/schema
+
+### Get the cdcCases
+GET http://localhost:3001/api/cdcCases
+
+### Get the subscriber
+GET http://localhost:3001/api/cdcCases/subscriber
+
+### Read the feed once
+POST http://localhost:3001/api/cdcCases/subscriber/once
+
+
