@@ -6,8 +6,8 @@ import { StateCase } from '@/models/sequelizeModels/StateCase'
 import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesEvent, TimeSeriesMetadata } from './TimeSeries'
 import { stateCaseTimeSeriesSchemaV1 } from './stateCaseElements'
 
-export class StateCaseTimeSeries implements TimeSeries {
-  async findEvents (options: TimeSeriesFindOptions): Promise<TimeSeriesEvent[]> {
+export class StateCaseTimeSeries implements TimeSeries<StateCase> {
+  async findEvents (options: TimeSeriesFindOptions): Promise<StateCase[]> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -20,8 +20,7 @@ export class StateCaseTimeSeries implements TimeSeries {
       where.updatedAt = { [Op.gt]: options.updatedAfter }
     }
     const order: Order = [['caseDate', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']]
-    const stateCases = await StateCase.findAll({ where, order })
-    return stateCases.map((c) => new StateCaseTimeSeriesEvent(c))
+    return await StateCase.findAll({ where, order })
   }
 
   async countEvents (options: TimeSeriesCountOptions): Promise<number> {
@@ -45,6 +44,10 @@ export class StateCaseTimeSeries implements TimeSeries {
     const lastCase = await StateCase.findOne({ order: [['caseAt', 'DESC']] })
     if (lastCase === null) return null
     return { lastUpdatedAt: lastUpdated.updatedAt,  lastEventAt: lastCase.caseDate }
+  }
+
+  makeTimeSeriesEvent(event: StateCase): TimeSeriesEvent<StateCase> {
+    return new StateCaseTimeSeriesEvent(event)
   }
 
   schema = stateCaseTimeSeriesSchemaV1
@@ -105,7 +108,7 @@ export class StateCaseTimeSeries implements TimeSeries {
   }
 }
 
-export class StateCaseTimeSeriesEvent implements TimeSeriesEvent {
+export class StateCaseTimeSeriesEvent implements TimeSeriesEvent<StateCase> {
   #stateCase: StateCase
 
   constructor (stateCase: StateCase) {
@@ -122,6 +125,10 @@ export class StateCaseTimeSeriesEvent implements TimeSeriesEvent {
 
   get eventUpdatedAt (): Date {
     return this.#stateCase.updatedAt
+  }
+
+  get model(): StateCase {
+    return this.#stateCase
   }
 
   getValue (name: string): any {

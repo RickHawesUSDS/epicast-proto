@@ -4,6 +4,7 @@ import { getLogger } from '@/utils/loggers'
 import { FeedBucket, BucketObject } from '@/models/FeedBucket'
 import { ReadStream } from 'fs'
 import { Readable } from 'stream'
+import { parseISO } from 'date-fns'
 
 const logger = getLogger('BUCKET')
 export const REGION = 'us-west-1'
@@ -20,7 +21,7 @@ function getS3Client(): S3Client {
 export class S3Bucket implements FeedBucket {
   private readonly s3Client = getS3Client()
 
-  name = BUCKET_NAME    
+  name = BUCKET_NAME
 
   private async handleError(description: string): Promise<never> {
     logger.error(description)

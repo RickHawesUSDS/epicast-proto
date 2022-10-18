@@ -53,13 +53,14 @@ The prototype should be support a demonstration of these concepts.
 - [x] Timeseries read interface (id, at, lastModifiedAt, enumerate elements)
 - [x] Schema publishing (enumerate elements), define Member interface
 - [x] /statecases/schema route & read in State table
-- [ ] Show only published elements in State table
 - [x] Start CDCCase (model, cdcCaseTimeSeries, cdccases route)
 - [x] Define /cdccase/subscriber { lastCheckedAt: , automatic: true }
 - [x] Read schema from feed (readSchema)
-- [ ] readTimeSeries, readCDCfeed
+- [x] readTimeSeries, readCDCfeed
 - [ ] automatic receive
 - [ ] CDC page (table and refresh)
+- [ ] Random change methods and button
+- [ ] Show only published elements in State table
 - [ ] Show only what is CDC elements in CDC table
 
 

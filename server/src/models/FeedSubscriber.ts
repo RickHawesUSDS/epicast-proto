@@ -1,10 +1,10 @@
-import { TimeSeries, TimeSeriesMutator } from "@/models/TimeSeries"
+import { MutableTimeSeries } from "@/models/TimeSeries"
 
 export class FeedSubscriber<T> {
   model: FeedSubscriberModel = { automatic: false }
-  timeSeries: TimeSeries & TimeSeriesMutator<T>
+  timeSeries: MutableTimeSeries<T>
 
-  constructor(timeSeries: TimeSeries & TimeSeriesMutator<T>) {
+  constructor(timeSeries: MutableTimeSeries<T>) {
     this.timeSeries = timeSeries
   }
 

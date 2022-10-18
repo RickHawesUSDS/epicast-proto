@@ -1,12 +1,16 @@
 import { Op, Order, WhereOptions } from 'sequelize'
+import { db } from '@/utils/db'
 
 import { CDCCase } from '@/models/sequelizeModels/CDCCase'
 import { FeedSchema } from './FeedSchema'
-import { TimeSeries, TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata, TimeSeriesMutator } from './TimeSeries'
+import { TimeSeries, TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata, MutableTimeSeries  } from './TimeSeries'
 import { assert } from 'console'
+import { getLogger } from 'log4js'
 
-export class CDCCaseTimeSeries implements TimeSeries, TimeSeriesMutator<CDCCase> {
-  async findEvents (options: TimeSeriesFindOptions): Promise<TimeSeriesEvent[]> {
+const logger = getLogger('CDC_CASE_TIME_SERIES')
+
+export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
+  async findEvents (options: TimeSeriesFindOptions): Promise<CDCCase[]> {
     const where: WhereOptions<CDCCase> = {}
     if (options.interval !== undefined) {
       where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -19,8 +23,7 @@ export class CDCCaseTimeSeries implements TimeSeries, TimeSeriesMutator<CDCCase>
       where.updatedAt = { [Op.gt]: options.updatedAfter }
     }
     const order: Order = [['caseDate', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']]
-    const cdcCases = await CDCCase.findAll({ where, order })
-    return cdcCases.map((c) => new CDCCaseTimeSeriesEvent(c))
+    return await CDCCase.findAll({ where, order })
   }
 
   async countEvents (options: TimeSeriesCountOptions): Promise<number> {
@@ -41,9 +44,13 @@ export class CDCCaseTimeSeries implements TimeSeries, TimeSeriesMutator<CDCCase>
   async fetchMetadata(): Promise<TimeSeriesMetadata | null> {
     const lastUpdated = await CDCCase.findOne({ order: [['updatedAt', 'DESC']] })
     if (lastUpdated === null) return null
-    const lastCase = await CDCCase.findOne({ order: [['caseAt', 'DESC']] })
+    const lastCase = await CDCCase.findOne({ order: [['caseDate', 'DESC']] })
     if (lastCase === null) return null
     return { lastUpdatedAt: lastUpdated.updatedAt,  lastEventAt: lastCase.caseDate }
+  }
+
+  makeTimeSeriesEvent(event: CDCCase): TimeSeriesEvent<CDCCase> {
+      return new CDCCaseTimeSeriesEvent(event)
   }
 
   schema: FeedSchema = {
@@ -61,21 +68,32 @@ export class CDCCaseTimeSeries implements TimeSeries, TimeSeriesMutator<CDCCase>
 
   async upsertEvents(events: CDCCase[]): Promise<void> {
     for (const event of events) {
-      await CDCCase.upsert(event)
+      // TODO: for some reason cannot get upsert to insert the optional fields of the object
+      await db.transaction(async transaction => {
+        const current = await CDCCase.findByPk(event.caseId, {transaction: transaction})
+        if (current === null) {
+          logger.debug('about to insert')
+          await event.save({transaction: transaction})
+        } else {
+          logger.debug('about to update')
+          current.set(event)
+          await current.save({transaction: transaction})
+        }
+      })
     }
   }
 
   createEvent(names: string[], values: any[]): CDCCase {
     assert(names.length === values.length)
-    const cdcCase = new CDCCase()
-    for(let i = 0; i < names.length; i++) {
-      cdcCase.set(names[i] as keyof CDCCase, values[i])
+    let record: any = {}
+    for (let i = 0; i < names.length; i++) {
+      record[names[i]] = values[i]
     }
-    return cdcCase
+    return CDCCase.build(record)
   }
 }
 
-export class CDCCaseTimeSeriesEvent implements TimeSeriesEvent {
+export class CDCCaseTimeSeriesEvent implements TimeSeriesEvent<CDCCase> {
   #cdcCase: CDCCase
 
   constructor (cdcCase: CDCCase) {
@@ -92,6 +110,10 @@ export class CDCCaseTimeSeriesEvent implements TimeSeriesEvent {
 
   get eventUpdatedAt (): Date {
     return this.#cdcCase.updatedAt
+  }
+
+  get model(): CDCCase {
+    return this.#cdcCase
   }
 
   getValue (name: string): any {

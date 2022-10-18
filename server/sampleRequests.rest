@@ -16,7 +16,7 @@ POST http://localhost:3001/api/stateCases/publish
 ### Get the schema
 GET http://localhost:3001/api/stateCases/schema
 
-### Get the cdcCases
+### Get all the cdcCases
 GET http://localhost:3001/api/cdcCases
 
 ### Get the subscriber

@@ -2,7 +2,7 @@ import YAML from "yaml";
 import { isAfter } from 'date-fns'
 import { getLogger } from "log4js";
 
-import { TimeSeries, TimeSeriesMutator } from "@/models/TimeSeries";
+import { MutableTimeSeries } from "@/models/TimeSeries";
 import { FeedBucket } from "@/models/FeedBucket";
 import { FeedSchema } from '@/models/FeedSchema';
 import { SCHEMA_FOLDER } from "@/models/feedBucketKeys";
@@ -10,7 +10,7 @@ import { SCHEMA_FOLDER } from "@/models/feedBucketKeys";
 
 const logger = getLogger('READ_SCHEMA_SERVICE')
 
-export async function readSchema<T>(fromBucket: FeedBucket, mutatingTimeSeries: TimeSeries & TimeSeriesMutator<T>): Promise<void> {
+export async function readSchema<T>(fromBucket: FeedBucket, mutatingTimeSeries: MutableTimeSeries<T>): Promise<void> {
   const publishedBlobKey = await findLastSchemaKey(fromBucket, mutatingTimeSeries.schema.validFrom)
   if (publishedBlobKey === null) return
   logger.info('Reading schema: $0', publishedBlobKey)
