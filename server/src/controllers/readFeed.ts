@@ -1,8 +1,9 @@
 import { FeedBucket } from "@/models/FeedBucket"
 import { TimeSeries, TimeSeriesMutator } from "@/models/TimeSeries";
-import { readSchema } from "./readSchema";
+import { readSchema } from "./readSchema"
+import { readTimeSeries } from "./readTimeSeries";
 
-export async function readFeed(fromBucket: FeedBucket, timeSeries: TimeSeries & TimeSeriesMutator): Promise<void> {
+export async function readFeed<T>(fromBucket: FeedBucket, timeSeries: TimeSeries & TimeSeriesMutator<T>): Promise<void> {
   await readSchema(fromBucket, timeSeries)
-
+  await readTimeSeries(fromBucket, timeSeries)
 }

@@ -3,7 +3,7 @@ import { addDays, endOfDay, startOfDay } from 'date-fns'
 import { Op, Order, WhereOptions } from 'sequelize'
 
 import { StateCase } from '@/models/sequelizeModels/StateCase'
-import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesEvent } from './TimeSeries'
+import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesEvent, TimeSeriesMetadata } from './TimeSeries'
 import { stateCaseTimeSeriesSchemaV1 } from './stateCaseElements'
 
 export class StateCaseTimeSeries implements TimeSeries {
@@ -37,6 +37,14 @@ export class StateCaseTimeSeries implements TimeSeries {
       where.updatedAt = { [Op.gt]: options.updatedAfter }
     }
     return await StateCase.count({ where })
+  }
+
+  async fetchMetadata(): Promise<TimeSeriesMetadata | null> {
+    const lastUpdated = await StateCase.findOne({ order: [['updatedAt', 'DESC']] })
+    if (lastUpdated === null) return null
+    const lastCase = await StateCase.findOne({ order: [['caseAt', 'DESC']] })
+    if (lastCase === null) return null
+    return { lastUpdatedAt: lastUpdated.updatedAt,  lastEventAt: lastCase.caseDate }
   }
 
   schema = stateCaseTimeSeriesSchemaV1

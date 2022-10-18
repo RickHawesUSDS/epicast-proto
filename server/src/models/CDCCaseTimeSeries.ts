@@ -2,10 +2,10 @@ import { Op, Order, WhereOptions } from 'sequelize'
 
 import { CDCCase } from '@/models/sequelizeModels/CDCCase'
 import { FeedSchema } from './FeedSchema'
-import { TimeSeries, TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMutator } from './TimeSeries'
+import { TimeSeries, TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata, TimeSeriesMutator } from './TimeSeries'
+import { assert } from 'console'
 
-export class CDCCaseTimeSeries implements TimeSeries, TimeSeriesMutator {
-
+export class CDCCaseTimeSeries implements TimeSeries, TimeSeriesMutator<CDCCase> {
   async findEvents (options: TimeSeriesFindOptions): Promise<TimeSeriesEvent[]> {
     const where: WhereOptions<CDCCase> = {}
     if (options.interval !== undefined) {
@@ -38,6 +38,14 @@ export class CDCCaseTimeSeries implements TimeSeries, TimeSeriesMutator {
     return await CDCCase.count({ where })
   }
 
+  async fetchMetadata(): Promise<TimeSeriesMetadata | null> {
+    const lastUpdated = await CDCCase.findOne({ order: [['updatedAt', 'DESC']] })
+    if (lastUpdated === null) return null
+    const lastCase = await CDCCase.findOne({ order: [['caseAt', 'DESC']] })
+    if (lastCase === null) return null
+    return { lastUpdatedAt: lastUpdated.updatedAt,  lastEventAt: lastCase.caseDate }
+  }
+
   schema: FeedSchema = {
     epicastVersion: 1.0,
     organizationId: 'epicast',
@@ -51,12 +59,19 @@ export class CDCCaseTimeSeries implements TimeSeries, TimeSeriesMutator {
     this.schema = newSchema
   }
 
-  updateEvents(events: TimeSeriesEvent[]): void {
-    throw new Error('Method not implemented.')
+  async upsertEvents(events: CDCCase[]): Promise<void> {
+    for (const event of events) {
+      await CDCCase.upsert(event)
+    }
   }
 
-  initialize(newSchema: FeedSchema, newEvents: TimeSeriesEvent[]): void {
-    throw new Error('Method not implemented.')
+  createEvent(names: string[], values: any[]): CDCCase {
+    assert(names.length === values.length)
+    const cdcCase = new CDCCase()
+    for(let i = 0; i < names.length; i++) {
+      cdcCase.set(names[i] as keyof CDCCase, values[i])
+    }
+    return cdcCase
   }
 }
 

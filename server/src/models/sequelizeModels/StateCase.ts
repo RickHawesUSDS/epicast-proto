@@ -1,4 +1,4 @@
-import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, AutoIncrement } from 'sequelize-typescript'
+import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, AutoIncrement, Index } from 'sequelize-typescript'
 
 @Table({ tableName: 'stateCases' })
 export class StateCase extends Model<StateCase> {
@@ -7,6 +7,7 @@ export class StateCase extends Model<StateCase> {
   @Column
     caseId!: number
 
+  @Index
   @Column
     caseDate!: Date
 
@@ -14,6 +15,7 @@ export class StateCase extends Model<StateCase> {
   @Column
     createdAt!: Date
 
+  @Index
   @UpdatedAt
   @Column
     updatedAt!: Date

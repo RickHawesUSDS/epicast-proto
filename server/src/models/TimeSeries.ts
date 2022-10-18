@@ -2,6 +2,7 @@ import { Interval } from 'date-fns'
 import { FeedSchema } from './FeedSchema'
 
 export interface TimeSeries {
+  fetchMetadata(): Promise<TimeSeriesMetadata | null>
   findEvents(options: TimeSeriesFindOptions): Promise<TimeSeriesEvent[]>
   countEvents(options: TimeSeriesCountOptions): Promise<number>
 
@@ -27,11 +28,16 @@ export interface TimeSeriesEvent {
   get eventAt(): Date
   get eventId(): number
   get eventUpdatedAt(): Date
-  getValue: (name: string) => any
+  getValue(name: string): any
 }
 
-export interface TimeSeriesMutator {
+export interface TimeSeriesMetadata {
+  lastUpdatedAt: Date,
+  lastEventAt: Date,
+}
+
+export interface TimeSeriesMutator<T> {
   updateSchema(newSchema: FeedSchema): void
-  updateEvents(events: TimeSeriesEvent[]): void
-  initialize(newSchema: FeedSchema, newEvents: TimeSeriesEvent[]): void
+  upsertEvents(events: T[]): void
+  createEvent(names: string[], values: any[]): T
 }

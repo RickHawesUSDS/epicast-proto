@@ -20,6 +20,8 @@ function getS3Client(): S3Client {
 export class S3Bucket implements FeedBucket {
   private readonly s3Client = getS3Client()
 
+  name = BUCKET_NAME    
+
   private async handleError(description: string): Promise<never> {
     logger.error(description)
     return await Promise.reject(new Error(description))

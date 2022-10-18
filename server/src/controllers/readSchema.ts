@@ -1,5 +1,6 @@
 import YAML from "yaml";
 import { isAfter } from 'date-fns'
+import { getLogger } from "log4js";
 
 import { TimeSeries, TimeSeriesMutator } from "@/models/TimeSeries";
 import { FeedBucket } from "@/models/FeedBucket";
@@ -7,9 +8,12 @@ import { FeedSchema } from '@/models/FeedSchema';
 import { SCHEMA_FOLDER } from "@/models/feedBucketKeys";
 
 
-export async function readSchema(fromBucket: FeedBucket, mutatingTimeSeries: TimeSeries & TimeSeriesMutator): Promise<void> {
+const logger = getLogger('READ_SCHEMA_SERVICE')
+
+export async function readSchema<T>(fromBucket: FeedBucket, mutatingTimeSeries: TimeSeries & TimeSeriesMutator<T>): Promise<void> {
   const publishedBlobKey = await findLastSchemaKey(fromBucket, mutatingTimeSeries.schema.validFrom)
   if (publishedBlobKey === null) return
+  logger.info('Reading schema: $0', publishedBlobKey)
 
   const publishedBlob = await fromBucket.getObject(publishedBlobKey)
   const newSchema = YAML.parse(publishedBlob) as FeedSchema
