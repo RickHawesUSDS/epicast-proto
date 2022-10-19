@@ -8,6 +8,7 @@ import { formSchemaKey } from "@/models/feedBucketKeys"
 import { PublishLog } from './PublishLog'
 import { FeedSchema } from '@/models/FeedSchema'
 
+
 const logger = getLogger('PUBLISH_SCHEMA_SERVICE')
 const SCHEMA_TEMPLATE_PATH = './src/public/epicast-demoserver-feed1-schema.handlebars'
 

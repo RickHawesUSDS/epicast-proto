@@ -4,7 +4,6 @@ import HeroSection2 from './../components/HeroSection2'
 import StateCasesTable from '../features/stateCases/StateCasesTable'
 import { Button, ButtonGroup, Container, makeStyles } from '@material-ui/core'
 import { useAddRandomStateCasesMutation, usePublishStateCasesMutation } from '../features/api/apiSlice'
-import { ArrowRight } from '@material-ui/icons'
 
 function StatePage(props) {
   const [addRandomStateCase] = useAddRandomStateCasesMutation()

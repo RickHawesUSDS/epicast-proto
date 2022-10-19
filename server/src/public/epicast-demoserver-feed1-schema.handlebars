@@ -31,7 +31,7 @@ elements:
 {{#each elements}}
 - name: {{ this.name }}
   {{#if this.displayName }}
-  displayName: {{ this }}
+  displayName: {{ this.displayName }}
   {{/if}}
   {{#if this.description }}
   description: {{this.description}}

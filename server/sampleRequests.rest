@@ -19,6 +19,9 @@ GET http://localhost:3001/api/stateCases/schema
 ### Get all the cdcCases
 GET http://localhost:3001/api/cdcCases
 
+### Get CDC caseCases schema
+GET http://localhost:3001/api/cdcCases/schema
+
 ### Get the subscriber
 GET http://localhost:3001/api/cdcCases/subscriber
 

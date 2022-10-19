@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
-  tagTypes: ['StateCase', 'StateCaseSchema'],
+  tagTypes: ['StateCase', 'StateCaseSchema', 'CDCCase', 'CDCCaseSchema'],
   endpoints: (builder) => ({
 
     resetSystem: builder.mutation({
@@ -43,7 +43,17 @@ export const apiSlice = createApi({
         body: ''
       }),
       invalidatesTags: []
-    })
+    }),
+
+    getAllCDCCases: builder.query({
+      query: (sort) => `cdcCases?sort=${sort}`,
+      providesTags: ['CDCCase']
+    }),
+
+    getCDCCaseSchema: builder.query({
+      query: () => `cdcCases/schema`,
+      providesTags: ['CDCCaseSchema']
+    }),
   })
 })
 
@@ -54,5 +64,7 @@ export const {
   useGetAllStateCasesQuery,
   useAddRandomStateCasesMutation,
   usePublishStateCasesMutation,
-  useGetStateCaseSchemaQuery
+  useGetStateCaseSchemaQuery,
+  useGetAllCDCCasesQuery,
+  useGetCDCCaseSchemaQuery,
 } = apiSlice

@@ -1,5 +1,5 @@
 import CaseTable from '../../components/CaseTable'
-import { useGetAllStateCasesQuery, useGetStateCaseSchemaQuery } from '../api/apiSlice'
+import { useGetAllCDCCasesQuery, useGetCDCCaseSchemaQuery } from '../api/apiSlice'
 import { CircularProgress } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 
@@ -25,14 +25,14 @@ function makeColumns(schema) {
   })
 }
 
-export default function StateCasesTable () {
+export default function CDCCasesTable () {
   const {
     data: schema = undefined,
     isLoading: isSchemaLoading,
     isSuccess: isSchemaSucccesful,
     isError: isSchemaFailed,
     error: schemaError
-  } = useGetStateCaseSchemaQuery()
+  } = useGetCDCCaseSchemaQuery()
 
   const {
     data: cases = [],
@@ -40,7 +40,7 @@ export default function StateCasesTable () {
     isSuccess: isCasesSucccesful,
     isError: isCasesFailed,
     error: casesError
-  } = useGetAllStateCasesQuery('desc')
+  } = useGetAllCDCCasesQuery('desc')
 
   let content = ''
 
@@ -65,9 +65,17 @@ export default function StateCasesTable () {
     )
   } else if (isCasesSucccesful && isSchemaSucccesful) {
     const columns = makeColumns(schema)
-    content = (
-      <CaseTable fetchRows={() => cases} columns={columns} />
-    )
+    if (columns.length === 0) {
+      content = (
+      <Alert severity='info'>
+        No table published in feed
+      </Alert>
+      )
+    } else {
+      content = (
+        <CaseTable fetchRows={() => cases} columns={columns} />
+      )
+    }
   }
 
   return (

@@ -16,6 +16,11 @@ router.get('/', asyncHandler(async (req, res, _next) => {
   res.send(cases)
 }))
 
+router.get('/schema', asyncHandler(async (req, res, _next) => {
+  logger.info(`Get CDC Schema`)
+  res.send(req.cdcCaseTimeSeries.schema)
+}))
+
 /* GET subscriber */
 router.get('/subscriber', asyncHandler(async (req, res, _next) => {
   logger.info('Get subscriber')

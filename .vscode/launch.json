@@ -10,10 +10,10 @@
             "cwd": "${workspaceFolder}/server"
         },
         {
-            "name": "Attach to Edge",
+            "name": "Attach to Chrome",
             "port": 9222,
             "request": "attach",
-            "type": "msedge",
+            "type": "chrome",
             "webRoot": "${workspaceFolder}"
         },
         {
