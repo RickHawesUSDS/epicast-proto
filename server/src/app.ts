@@ -11,10 +11,12 @@ import cdcCaseRouter from './routes/cdcCases'
 import { db } from './utils/db'
 import { S3Bucket } from './utils/S3Bucket'
 import { resetStorage } from './controllers/resetSystem'
+import { updateFeedSubscriber } from './controllers/updateFeedSubscriber'
 import { StateCaseTimeSeries } from './models/StateCaseTimeSeries'
 import { FeedBucket } from '@/models/FeedBucket'
 import { CDCCaseTimeSeries } from './models/CDCCaseTimeSeries'
 import { FeedSubscriber } from './models/FeedSubscriber'
+
 
 const logger = getLogger('APP')
 
@@ -23,8 +25,8 @@ class App {
   public db = db
   public stateCaseTimeSeries = new StateCaseTimeSeries()
   public cdcCaseTimeSeries = new CDCCaseTimeSeries()
-  public feedSubscriber = new FeedSubscriber(this.cdcCaseTimeSeries)
   public bucket: FeedBucket = new S3Bucket()
+  public feedSubscriber = new FeedSubscriber(this.bucket, this.cdcCaseTimeSeries)
 
   constructor() {
     this.app = express()
@@ -32,6 +34,7 @@ class App {
     this.databaseSetup().catch((error) => { logger.error(error) })
     this.storageSetup().catch((error) => { logger.error(error) })
     this.routerSetup()
+    this.setupBackground()
   }
 
   private config(): void {
@@ -62,6 +65,10 @@ class App {
 
   private async storageSetup(): Promise<void> {
     await resetStorage(this.bucket)
+  }
+
+  private setupBackground(): void {
+    updateFeedSubscriber(this.feedSubscriber, {automatic: true})
   }
 }
 

@@ -26,6 +26,16 @@ GET http://localhost:3001/api/cdcCases/schema
 GET http://localhost:3001/api/cdcCases/subscriber
 
 ### Read the feed once
-POST http://localhost:3001/api/cdcCases/subscriber/once
+POST http://localhost:3001/api/cdcCases/subscriber/once'
 
+### Start automatic feed reading
+POST http://localhost:3001/api/cdcCases/subscriber
+content-type: application/json
 
+{ "automatic": true }
+
+### Stop automatic feed reading
+POST http://localhost:3001/api/cdcCases/subscriber
+content-type: application/json
+
+{ "automatic": false }
