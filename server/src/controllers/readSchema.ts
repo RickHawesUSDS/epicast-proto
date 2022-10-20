@@ -22,14 +22,20 @@ export async function readSchema<T>(fromBucket: FeedBucket, mutatingTimeSeries: 
 }
 
 async function findLastSchemaKey(fromBucket: FeedBucket, afterDate: Date | null): Promise<string | null> {
+  logger.debug(`schema after ${afterDate}`)
   let objects = await fromBucket.listObjects(SCHEMA_FOLDER)
   if (objects.length === 0) return null
-
+  if (objects.length === 1) {
+    return objects[0].key
+  }
+  // bugs after here
+  logger.debug(`objects  ${objects.at(0)?.lastModified}`)
   if (afterDate !== null) {
     objects = objects.filter((object) => isAfter(object.lastModified, afterDate))
   }
   if (objects.length === 0) return null
 
+  logger.debug(`objects  ${objects.at(0)?.lastModified}`)
   const lastSchema = objects.reduce((a, b) => isAfter(a.lastModified, b.lastModified) ? a : b)
   return lastSchema.key
 }

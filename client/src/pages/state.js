@@ -18,7 +18,7 @@ function StatePage(props) {
   }
 
   async function onAdd15KCasesClick() {
-    await addRandomStateCase({ numOfDays: 50, numPerDay: 300 })
+    await addRandomStateCase({ numOfDays: 5, numPerDay: 3000 })
   }
 
   async function onPublishCasesClick() {

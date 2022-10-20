@@ -44,8 +44,9 @@ export class S3Bucket implements FeedBucket {
       Prefix: prefix
     }))
     if (listResponse.$metadata.httpStatusCode === 200) {
-      return listResponse.Contents?.map(_obj => {
-        return { key: _obj.Key ?? '', lastModified: _obj.LastModified ?? new Date() }
+      return listResponse.Contents?.map(obj => {
+        const lastModified = obj.LastModified ? parseISO(obj.LastModified.toISOString()) : new Date()
+        return { key: obj.Key ?? '', lastModified: lastModified }
       }) ?? []
     } else {
       return await this.handleError(`List objects for: ${prefix}, ${listResponse.$metadata.httpStatusCode ?? 0}`)

@@ -9,7 +9,7 @@ import { getLogger } from '@/utils/loggers'
 import { Period } from '@/utils/Period'
 import { Frequency } from "@/utils/Frequency"
 import { TimeSeries, TimeSeriesEvent, TimeSeriesFindOptions } from '../models/TimeSeries'
-import { FeedElement } from '../models/FeedElement'
+import { FeedElement, filterElements } from '../models/FeedElement'
 
 const DESIRED_MAX_PER_PERIOD = 10000
 
@@ -53,7 +53,9 @@ class TimeSeriesPublisher<T> {
       const isPeriodUpdated = await this.hasUpdates(period, lastPublishDate)
       if (isPeriodUpdated) {
         const periodCases = await this.findEvents({ interval: period.interval })
+        logger.debug(`updating partition: ${publishedObject.key} with ${periodCases.length} cases`)
         if (period.frequency === Frequency.MONTHLY && periodCases.length > DESIRED_MAX_PER_PERIOD) {
+          logger.debug(`splitting partition: ${publishedObject.key}`)
           await this.replaceMonthlyWithDaily(period, periodCases)
         } else {
           await this.updatePartition(period, periodCases)
@@ -158,7 +160,8 @@ class TimeSeriesPublisher<T> {
       return csv.join('')
     }
 
-    const report = createCSV(events, this.timeseries.schema.elements)
+    const deidentifiedElements = filterElements(this.timeseries.schema.elements, 'pii')
+    const report = createCSV(events, deidentifiedElements)
     await this.bucket.putObject(key, report)
   }
 

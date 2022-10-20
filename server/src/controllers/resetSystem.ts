@@ -2,6 +2,7 @@ import { StateCase } from '@/models/sequelizeModels/StateCase'
 import { StateCaseTimeSeries } from '../models/StateCaseTimeSeries'
 import { getLogger } from '@/utils/loggers'
 import { FeedBucket } from '@/models/FeedBucket'
+import { CDCCase } from '@/models/sequelizeModels/CDCCase'
 
 const logger = getLogger('RESET_SYSTEM')
 const daysOfFakeCasesOnReset = 3
@@ -10,6 +11,9 @@ const fakesPerDayOnReset = 5
 export async function resetSystem(timeseries: StateCaseTimeSeries, feed: FeedBucket): Promise<void> {
   logger.debug('Resetting the database')
   await StateCase.destroy({
+    truncate: true
+  })
+  await CDCCase.destroy({
     truncate: true
   })
   await resetStorage(feed)

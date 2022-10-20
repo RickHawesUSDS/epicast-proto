@@ -2,7 +2,7 @@ import { getLogger } from 'log4js'
 import { FeedSubscriber, FeedSubscriberModel } from '@/models/FeedSubscriber'
 import { readFeed } from './readFeed'
 
-export const FIRST_TIMEOUT = 100
+export const FIRST_TIMEOUT = 5000
 export const REPEAT_TIMEOUT = 10000
 const logger = getLogger('FEED_SUBSCRIBER_CONTROLLER')
 

@@ -7,6 +7,7 @@ import { FeedBucket } from '@/models/FeedBucket'
 import { formSchemaKey } from "@/models/feedBucketKeys"
 import { PublishLog } from './PublishLog'
 import { FeedSchema } from '@/models/FeedSchema'
+import { filterElements } from '@/models/FeedElement'
 
 
 const logger = getLogger('PUBLISH_SCHEMA_SERVICE')
@@ -26,12 +27,13 @@ export async function publishSchema(bucket: FeedBucket, schema: FeedSchema, log:
 }
 
 function formTemplateContext(schema: FeedSchema): any {
+  const deidentifiedElements = filterElements(schema.elements, 'pii')
   // format stuff in the way that the YAML file wants
   return {
     organizationId: schema.organizationId,
     systemId: schema.systemId,
     feedId: schema.feedId,
     validFrom: formatISO(schema.validFrom),
-    elements: schema.elements
+    elements: deidentifiedElements
   }
 }
