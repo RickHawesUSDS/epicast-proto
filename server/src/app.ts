@@ -68,7 +68,7 @@ class App {
   }
 
   private setupBackground(): void {
-    updateFeedSubscriber(this.feedSubscriber, {automatic: true})
+    // for now updateFeedSubscriber(this.feedSubscriber, {automatic: true})
   }
 }
 

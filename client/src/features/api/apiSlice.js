@@ -14,7 +14,7 @@ export const apiSlice = createApi({
         method: 'POST',
         body: ''
       }),
-      invalidatesTags: ['StateCase']
+      invalidatesTags: ['StateCase', 'CDCCase', 'CDCCaseSchema', 'StateCaseSchema']
     }),
 
     getAllStateCases: builder.query({
@@ -54,6 +54,15 @@ export const apiSlice = createApi({
       query: () => `cdcCases/schema`,
       providesTags: ['CDCCaseSchema']
     }),
+
+    readCDCCaseFeed: builder.mutation({
+      query: () => ({
+        url: `cdcCases/subscriber/once`,
+        method: 'POST',
+        body: ''
+      }),
+      invalidatesTags: ['CDCCase', 'CDCCaseSchema']
+    }),
   })
 })
 
@@ -67,4 +76,5 @@ export const {
   useGetStateCaseSchemaQuery,
   useGetAllCDCCasesQuery,
   useGetCDCCaseSchemaQuery,
+  useReadCDCCaseFeedMutation,
 } = apiSlice

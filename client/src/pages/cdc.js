@@ -3,13 +3,18 @@ import Meta from './../components/Meta'
 import HeroSection2 from './../components/HeroSection2'
 import CDCCasesTable from '../features/cdcCases/CDCCasesTable'
 import { Container, Button, makeStyles } from '@material-ui/core'
-import { useGetAllCDCCasesQuery } from '../features/api/apiSlice'
+import { useReadCDCCaseFeedMutation, useGetAllCDCCasesQuery } from '../features/api/apiSlice'
 
 function CdcPage (props) {
   const { refetch } = useGetAllCDCCasesQuery('desc')
+  const [readCDCCaseFeed] = useReadCDCCaseFeedMutation()
 
   async function onRefreshClick() {
     refetch()
+  }
+
+  async function onReadFeedClick() {
+    await readCDCCaseFeed()
   }
 
   const useButtonStyles = makeStyles((theme) => ({
@@ -37,7 +42,8 @@ function CdcPage (props) {
         </Container>
         <CDCCasesTable />
         <div className={buttonClasses.root} align='right'>
-          <Button onClick={() => onRefreshClick()} color='primary' variant='outlined'>Refresh</Button>
+          <Button onClick={() => onRefreshClick()} color='primary' variant='outlined'>Refresh Table</Button>
+          <Button onClick={() => onReadFeedClick()} color='primary' variant='outlined'>Read Feed</Button>
         </div>
       </HeroSection2>
     </>
