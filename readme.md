@@ -57,9 +57,16 @@ The prototype should be support a demonstration of these concepts.
 - [x] Define /cdccase/subscriber { lastCheckedAt: , automatic: true }
 - [x] Read schema from feed (readSchema)
 - [x] readTimeSeries, readCDCfeed
-- [ ] automatic receive
-- [ ] CDC page (table and refresh)
+- [x] automatic receive
+- [x] CDC page (table and refresh)
+- [ ] Change algorithm to only change at the first of the month or day. Elminate delete of object. Make large add start on the month.
+- [ ] Update state to last published
+- [ ] Update cdc to show when stuff is being read and last read.
+- [ ] Change schemas dialog in state. Options for new CDC data element, a new other state element and local element
+- [ ] Upgrade DB tables
 - [ ] Random change methods and button
+- [ ] Random duplicates. Add deduplicate button. replacedBy column.
+
 - [ ] Show only published elements in State table
 - [ ] Show only what is CDC elements in CDC table
 
