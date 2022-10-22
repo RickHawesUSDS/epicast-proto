@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { addDays, endOfDay, startOfDay } from 'date-fns'
+import { addDays, addMonths, endOfDay, startOfDay, startOfMonth } from 'date-fns'
 import { Op, Order, WhereOptions } from 'sequelize'
 
 import { StateCase } from '@/models/sequelizeModels/StateCase'
@@ -38,15 +38,15 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return await StateCase.count({ where })
   }
 
-  async fetchMetadata(): Promise<TimeSeriesMetadata | null> {
+  async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
     const lastUpdated = await StateCase.findOne({ order: [['updatedAt', 'DESC']] })
     if (lastUpdated === null) return null
     const lastCase = await StateCase.findOne({ order: [['caseAt', 'DESC']] })
     if (lastCase === null) return null
-    return { lastUpdatedAt: lastUpdated.updatedAt,  lastEventAt: lastCase.caseDate }
+    return { lastUpdatedAt: lastUpdated.updatedAt, lastEventAt: lastCase.caseDate }
   }
 
-  makeTimeSeriesEvent(event: StateCase): TimeSeriesEvent<StateCase> {
+  makeTimeSeriesEvent (event: StateCase): TimeSeriesEvent<StateCase> {
     return new StateCaseTimeSeriesEvent(event)
   }
 
@@ -55,6 +55,9 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
   async insertFakeStateCases (numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
     const decideOnDate = async (): Promise<Date> => {
       const now = new Date()
+      if (numberOfDays * numberPerDay > 10000) {
+        return startOfMonth(addMonths(now, 1))
+      }
       const stateCase = await StateCase.findOne({
         order: [
           ['caseDate', 'DESC']
@@ -127,7 +130,7 @@ export class StateCaseTimeSeriesEvent implements TimeSeriesEvent<StateCase> {
     return this.#stateCase.updatedAt
   }
 
-  get model(): StateCase {
+  get model (): StateCase {
     return this.#stateCase
   }
 

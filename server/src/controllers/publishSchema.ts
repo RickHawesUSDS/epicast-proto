@@ -4,16 +4,15 @@ import { formatISO } from 'date-fns'
 import { compile } from 'handlebars'
 
 import { FeedBucket } from '@/models/FeedBucket'
-import { formSchemaKey } from "@/models/feedBucketKeys"
+import { formSchemaKey } from '@/models/feedBucketKeys'
 import { PublishLog } from './PublishLog'
 import { FeedSchema } from '@/models/FeedSchema'
 import { filterElements } from '@/models/FeedElement'
 
-
 const logger = getLogger('PUBLISH_SCHEMA_SERVICE')
 const SCHEMA_TEMPLATE_PATH = './src/public/epicast-demoserver-feed1-schema.handlebars'
 
-export async function publishSchema(bucket: FeedBucket, schema: FeedSchema, log: PublishLog): Promise<void> {
+export async function publishSchema (bucket: FeedBucket, schema: FeedSchema, log: PublishLog): Promise<void> {
   const schemaKey = formSchemaKey(schema.organizationId, schema.systemId, schema.feedId, schema.validFrom)
   if (!await bucket.doesObjectExist(schemaKey)) {
     logger.info('publishing schema')
@@ -26,7 +25,7 @@ export async function publishSchema(bucket: FeedBucket, schema: FeedSchema, log:
   }
 }
 
-function formTemplateContext(schema: FeedSchema): any {
+function formTemplateContext (schema: FeedSchema): any {
   const deidentifiedElements = filterElements(schema.elements, 'pii')
   // format stuff in the way that the YAML file wants
   return {

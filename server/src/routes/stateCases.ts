@@ -30,7 +30,7 @@ router.post('/random', asyncHandler(async (req, res, _next) => {
 /* POST publish all cases */
 router.post('/publish', asyncHandler(async (req, res, _next) => {
   logger.info('publish state cases')
-  publishFeed(req.bucket, req.stateCaseTimeSeries)
+  await publishFeed(req.bucket, req.stateCaseTimeSeries)
   res.send('success')
 }))
 

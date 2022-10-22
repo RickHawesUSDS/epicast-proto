@@ -1,16 +1,15 @@
-import YAML from "yaml";
+import YAML from 'yaml'
 import { isAfter } from 'date-fns'
-import { getLogger } from "log4js";
+import { getLogger } from 'log4js'
 
-import { MutableTimeSeries } from "@/models/TimeSeries";
-import { FeedBucket } from "@/models/FeedBucket";
-import { FeedSchema } from '@/models/FeedSchema';
-import { SCHEMA_FOLDER } from "@/models/feedBucketKeys";
-
+import { MutableTimeSeries } from '@/models/TimeSeries'
+import { FeedBucket } from '@/models/FeedBucket'
+import { FeedSchema } from '@/models/FeedSchema'
+import { SCHEMA_FOLDER } from '@/models/feedBucketKeys'
 
 const logger = getLogger('READ_SCHEMA_SERVICE')
 
-export async function readSchema<T>(fromBucket: FeedBucket, mutatingTimeSeries: MutableTimeSeries<T>): Promise<void> {
+export async function readSchema<T> (fromBucket: FeedBucket, mutatingTimeSeries: MutableTimeSeries<T>): Promise<void> {
   const publishedBlobKey = await findLastSchemaKey(fromBucket, mutatingTimeSeries.schema.validFrom)
   if (publishedBlobKey === null) return
   logger.info('Reading schema: $0', publishedBlobKey)
@@ -21,21 +20,20 @@ export async function readSchema<T>(fromBucket: FeedBucket, mutatingTimeSeries: 
   mutatingTimeSeries.updateSchema(newSchema)
 }
 
-async function findLastSchemaKey(fromBucket: FeedBucket, afterDate: Date | null): Promise<string | null> {
-  logger.debug(`schema after ${afterDate}`)
+async function findLastSchemaKey (fromBucket: FeedBucket, afterDate: Date | null): Promise<string | null> {
   let objects = await fromBucket.listObjects(SCHEMA_FOLDER)
   if (objects.length === 0) return null
   if (objects.length === 1) {
     return objects[0].key
   }
   // bugs after here
-  logger.debug(`objects  ${objects.at(0)?.lastModified}`)
+  logger.debug(`objects  ${objects[0].lastModified.toISOString()}`)
   if (afterDate !== null) {
     objects = objects.filter((object) => isAfter(object.lastModified, afterDate))
   }
   if (objects.length === 0) return null
 
-  logger.debug(`objects  ${objects.at(0)?.lastModified}`)
+  logger.debug(`objects  ${objects[0].lastModified.toISOString()}`)
   const lastSchema = objects.reduce((a, b) => isAfter(a.lastModified, b.lastModified) ? a : b)
   return lastSchema.key
 }

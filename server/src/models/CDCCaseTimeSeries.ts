@@ -3,7 +3,7 @@ import { db } from '@/utils/db'
 
 import { CDCCase } from '@/models/sequelizeModels/CDCCase'
 import { FeedSchema } from './FeedSchema'
-import { TimeSeries, TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata, MutableTimeSeries  } from './TimeSeries'
+import { TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata, MutableTimeSeries } from './TimeSeries'
 import { assert } from 'console'
 import { getLogger } from 'log4js'
 
@@ -41,16 +41,16 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     return await CDCCase.count({ where })
   }
 
-  async fetchMetadata(): Promise<TimeSeriesMetadata | null> {
+  async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
     const lastUpdated = await CDCCase.findOne({ order: [['updatedAt', 'DESC']] })
     if (lastUpdated === null) return null
     const lastCase = await CDCCase.findOne({ order: [['caseDate', 'DESC']] })
     if (lastCase === null) return null
-    return { lastUpdatedAt: lastUpdated.updatedAt,  lastEventAt: lastCase.caseDate }
+    return { lastUpdatedAt: lastUpdated.updatedAt, lastEventAt: lastCase.caseDate }
   }
 
-  makeTimeSeriesEvent(event: CDCCase): TimeSeriesEvent<CDCCase> {
-      return new CDCCaseTimeSeriesEvent(event)
+  makeTimeSeriesEvent (event: CDCCase): TimeSeriesEvent<CDCCase> {
+    return new CDCCaseTimeSeriesEvent(event)
   }
 
   schema: FeedSchema = {
@@ -66,26 +66,26 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     this.schema = newSchema
   }
 
-  async upsertEvents(events: CDCCase[]): Promise<void> {
+  async upsertEvents (events: CDCCase[]): Promise<void> {
     for (const event of events) {
       // TODO: for some reason cannot get upsert to insert the optional fields of the object
       await db.transaction(async transaction => {
-        const current = await CDCCase.findByPk(event.caseId, {transaction: transaction})
+        const current = await CDCCase.findByPk(event.caseId, { transaction })
         if (current === null) {
           logger.debug('about to insert')
-          await event.save({transaction: transaction})
+          await event.save({ transaction })
         } else {
           logger.debug('about to update')
           current.set(event)
-          await current.save({transaction: transaction})
+          await current.save({ transaction })
         }
       })
     }
   }
 
-  createEvent(names: string[], values: any[]): CDCCase {
+  createEvent (names: string[], values: any[]): CDCCase {
     assert(names.length === values.length)
-    let record: any = {}
+    const record: any = {}
     for (let i = 0; i < names.length; i++) {
       record[names[i]] = values[i]
     }
@@ -112,7 +112,7 @@ export class CDCCaseTimeSeriesEvent implements TimeSeriesEvent<CDCCase> {
     return this.#cdcCase.updatedAt
   }
 
-  get model(): CDCCase {
+  get model (): CDCCase {
     return this.#cdcCase
   }
 

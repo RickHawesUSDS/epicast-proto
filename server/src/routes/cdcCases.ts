@@ -19,7 +19,7 @@ router.get('/', asyncHandler(async (req, res, _next) => {
 
 /* GET get all schema */
 router.get('/schema', asyncHandler(async (req, res, _next) => {
-  logger.info(`Get CDC Schema`)
+  logger.info('Get CDC Schema')
   res.send(req.cdcCaseTimeSeries.schema)
 }))
 
@@ -38,7 +38,7 @@ router.post('/subscriber', (req, res, _next) => {
 router.post('/subscriber/once', asyncHandler(async (req, res, _next) => {
   logger.info('Read feed')
 
-  readFeed(req.bucket, req.cdcCaseTimeSeries)
+  await readFeed(req.bucket, req.cdcCaseTimeSeries)
   req.feedSubscriber.setLastChecked()
   res.send(req.feedSubscriber.model)
 }))

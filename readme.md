@@ -59,7 +59,7 @@ The prototype should be support a demonstration of these concepts.
 - [x] readTimeSeries, readCDCfeed
 - [x] automatic receive
 - [x] CDC page (table and refresh)
-- [ ] Change algorithm to only change at the first of the month or day. Elminate delete of object. Make large add start on the month.
+- [x] Change algorithm to only change at the first of the month or day. Elminate delete of object. Make large add start on the month.
 - [ ] Update state to last published
 - [ ] Update cdc to show when stuff is being read and last read.
 - [ ] Change schemas dialog in state. Options for new CDC data element, a new other state element and local element

@@ -1,4 +1,4 @@
-import { Period } from '@/utils/Period';
+import { Period } from '@/utils/Period'
 import { formatISO } from 'date-fns'
 import pathPosix from 'node:path/posix'
 
@@ -25,17 +25,17 @@ export const periodFromTimeSeriesKey = (key: string): Period => {
   return Period.parse(periodPart)
 }
 
-export const SCHEMA_FOLDER = 'schema';
-export const SCHEMA_EXTENSION = 'yaml';
-export const formSchemaKey = (organizationId: string, systemId: string, feedId: string, validFrom: Date) => {
-    return `${SCHEMA_FOLDER}/${[organizationId, systemId, feedId, formatISO(validFrom)].join(FILE_NAME_SEPERATOR)}.${SCHEMA_EXTENSION}`;
+export const SCHEMA_FOLDER = 'schema'
+export const SCHEMA_EXTENSION = 'yaml'
+export const formSchemaKey = (organizationId: string, systemId: string, feedId: string, validFrom: Date): string => {
+  return `${SCHEMA_FOLDER}/${[organizationId, systemId, feedId, formatISO(validFrom)].join(FILE_NAME_SEPERATOR)}.${SCHEMA_EXTENSION}`
 }
 export const splitSchemaKey = (key: string): string[] => {
-    const fileName = pathPosix.parse(key).name
-    return fileName.split(FILE_NAME_SEPERATOR, 4);
+  const fileName = pathPosix.parse(key).name
+  return fileName.split(FILE_NAME_SEPERATOR, 4)
 }
 
-export const FILE_NAME_SEPERATOR = '-';
-export const formFeedName = (organizationId: string, systemId: string, feedId: string) => {
-    return [organizationId, systemId, feedId].join(FILE_NAME_SEPERATOR);
-};
+export const FILE_NAME_SEPERATOR = '-'
+export const formFeedName = (organizationId: string, systemId: string, feedId: string): string => {
+  return [organizationId, systemId, feedId].join(FILE_NAME_SEPERATOR)
+}

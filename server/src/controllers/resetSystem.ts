@@ -8,7 +8,7 @@ const logger = getLogger('RESET_SYSTEM')
 const daysOfFakeCasesOnReset = 3
 const fakesPerDayOnReset = 5
 
-export async function resetSystem(timeseries: StateCaseTimeSeries, feed: FeedBucket): Promise<void> {
+export async function resetSystem (timeseries: StateCaseTimeSeries, feed: FeedBucket): Promise<void> {
   logger.debug('Resetting the database')
   await StateCase.destroy({
     truncate: true
@@ -21,7 +21,7 @@ export async function resetSystem(timeseries: StateCaseTimeSeries, feed: FeedBuc
   await timeseries.insertFakeStateCases(daysOfFakeCasesOnReset, fakesPerDayOnReset)
 }
 
-export async function resetStorage(feed: FeedBucket): Promise<void> {
+export async function resetStorage (feed: FeedBucket): Promise<void> {
   logger.info('Resetting storage')
   const bucketObjects = await feed.listObjects('')
   for (const bucketObject of bucketObjects) {
