@@ -14,7 +14,7 @@ export const apiSlice = createApi({
         method: 'POST',
         body: ''
       }),
-      invalidatesTags: ['StateCase', 'CDCCase', 'CDCCaseSchema', 'StateCaseSchema']
+      invalidatesTags: ['StateCase', 'CDCCase', 'CDCCaseSchema', 'CDCCaseSubscriber', 'StateCaseSchema']
     }),
 
     getAllStateCases: builder.query({
@@ -23,7 +23,7 @@ export const apiSlice = createApi({
     }),
 
     getStateCaseSchema: builder.query({
-      query: () => `stateCases/schema`,
+      query: () => 'stateCases/schema',
       providesTags: ['StateCaseSchema']
     }),
 
@@ -38,7 +38,7 @@ export const apiSlice = createApi({
 
     publishStateCases: builder.mutation({
       query: () => ({
-        url: `stateCases/publish`,
+        url: 'stateCases/publish',
         method: 'POST',
         body: ''
       }),
@@ -51,18 +51,24 @@ export const apiSlice = createApi({
     }),
 
     getCDCCaseSchema: builder.query({
-      query: () => `cdcCases/schema`,
+      query: () => 'cdcCases/schema',
       providesTags: ['CDCCaseSchema']
+    }),
+
+    getCDCCaseSubscriber: builder.query({
+      query: () => 'cdcCases/subscriber',
+      polling: 1000,
+      providesTags: ['CDCCaseSubscriber']
     }),
 
     readCDCCaseFeed: builder.mutation({
       query: () => ({
-        url: `cdcCases/subscriber/once`,
+        url: 'cdcCases/subscriber/once',
         method: 'POST',
         body: ''
       }),
       invalidatesTags: ['CDCCase', 'CDCCaseSchema']
-    }),
+    })
   })
 })
 
@@ -77,4 +83,5 @@ export const {
   useGetAllCDCCasesQuery,
   useGetCDCCaseSchemaQuery,
   useReadCDCCaseFeedMutation,
+  useGetCDCCaseSubscriberQuery
 } = apiSlice

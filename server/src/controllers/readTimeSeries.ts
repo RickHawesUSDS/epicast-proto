@@ -1,4 +1,4 @@
-import { isAfter, parseISO } from 'date-fns'
+import { isAfter, min, parseISO } from 'date-fns'
 import { parse } from 'csv-string'
 import { strict as assert } from 'node:assert'
 
@@ -11,9 +11,9 @@ import { FeedSchema } from '@/models/FeedSchema'
 
 const logger = getLogger('READ_TIME_SERIES_CONTROLLER')
 
-export async function readTimeSeries<T> (fromBucket: FeedBucket, toTimeSeries: MutableTimeSeries<T>): Promise<void> {
+export async function readTimeSeries<T> (fromBucket: FeedBucket, toTimeSeries: MutableTimeSeries<T>): Promise<Date | undefined> {
   const reader = new TimeSeriesReader(fromBucket, toTimeSeries)
-  await reader.read()
+  return await reader.read()
 }
 
 class TimeSeriesReader<T> {
@@ -25,9 +25,11 @@ class TimeSeriesReader<T> {
     this.timeSeries = toTimeSeries
   }
 
-  async read (): Promise<void> {
+  async read (): Promise<Date | undefined> {
     logger.info(`Reading: ${this.bucket.name}`)
     let publishedObjects = await this.bucket.listObjects(TIMESERIES_FOLDER)
+    if (publishedObjects.length === 0) return
+    const lastPublished = this.lastModifiedOf(publishedObjects)
     const metadata = await this.timeSeries.fetchMetadata()
     if (metadata !== null) {
       publishedObjects = publishedObjects.filter((object) => isAfter(object.lastModified, metadata.lastUpdatedAt))
@@ -35,6 +37,7 @@ class TimeSeriesReader<T> {
     logger.debug(`${this.bucket.name} has ${publishedObjects.length} objects to read`)
     const events = await this.fetchEvents(publishedObjects)
     await this.timeSeries.upsertEvents(events)
+    return lastPublished
   }
 
   async fetchEvents (publishedObjects: BucketObject[]): Promise<T[]> {
@@ -76,5 +79,9 @@ class TimeSeriesReader<T> {
     })
     const names = elements.map((element) => element.name)
     return this.timeSeries.createEvent(names, values)
+  }
+
+  lastModifiedOf (objects: BucketObject[]): Date {
+    return min(objects.map((o) => o.lastModified))
   }
 }

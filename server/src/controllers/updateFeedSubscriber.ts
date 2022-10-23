@@ -19,10 +19,12 @@ export function updateFeedSubscriber<T> (feedSubscriber: FeedSubscriber<T>, newV
 
 function automaticReadFeed<T> (feedSubscriber: FeedSubscriber<T>): void {
   logger.info('Reading timeSeries automatically')
-  readFeed(feedSubscriber.bucket, feedSubscriber.timeSeries).then(() => {
+  feedSubscriber.setReading(true)
+  readFeed(feedSubscriber.bucket, feedSubscriber.timeSeries).then((lastPublished) => {
     const timer = setTimeout(automaticReadFeed, REPEAT_TIMEOUT, feedSubscriber)
     feedSubscriber
       .setLastChecked()
+      .setReading(false, lastPublished)
       .startAutomatic(timer)
     logger.debug('Feed reading success')
   }).catch((reason) => {
