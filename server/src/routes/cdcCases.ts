@@ -38,8 +38,8 @@ router.post('/subscriber', (req, res, _next) => {
 router.post('/subscriber/once', asyncHandler(async (req, res, _next) => {
   logger.info('Read feed')
 
-  await readFeed(req.bucket, req.cdcCaseTimeSeries)
-  req.feedSubscriber.setLastChecked()
+  const lastPublished = await readFeed(req.bucket, req.cdcCaseTimeSeries)
+  req.feedSubscriber.setLastChecked(lastPublished)
   res.send(req.feedSubscriber.model)
 }))
 

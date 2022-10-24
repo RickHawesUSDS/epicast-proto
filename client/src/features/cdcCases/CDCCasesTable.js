@@ -11,10 +11,10 @@ const customWidths = {
   personPostalCode: 140,
   personAddress: 200,
   personPhone: 200,
-  personEmail: 200,
+  personEmail: 200
 }
 
-function makeColumns(schema) {
+function makeColumns (schema) {
   return schema.elements.map((element) => {
     return {
       id: element.name,
@@ -67,9 +67,9 @@ export default function CDCCasesTable () {
     const columns = makeColumns(schema)
     if (columns.length === 0) {
       content = (
-      <Alert severity='info'>
-        No table published in feed
-      </Alert>
+        <Alert severity='info'>
+          No table published in feed
+        </Alert>
       )
     } else {
       content = (

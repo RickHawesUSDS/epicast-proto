@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
-  tagTypes: ['StateCase', 'StateCaseSchema', 'CDCCase', 'CDCCaseSchema'],
+  tagTypes: ['StateCase', 'StateCaseSchema', 'CDCCase', 'CDCCaseSchema', 'CDCCaseSubscriber'],
   endpoints: (builder) => ({
 
     resetSystem: builder.mutation({
@@ -67,7 +67,7 @@ export const apiSlice = createApi({
         method: 'POST',
         body: ''
       }),
-      invalidatesTags: ['CDCCase', 'CDCCaseSchema']
+      invalidatesTags: ['CDCCase', 'CDCCaseSchema', 'CDCCaseSubscriber']
     })
   })
 })

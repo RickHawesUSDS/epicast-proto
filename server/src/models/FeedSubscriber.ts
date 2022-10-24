@@ -2,7 +2,7 @@ import { MutableTimeSeries } from '@/models/TimeSeries'
 import { FeedBucket } from './FeedBucket'
 
 export class FeedSubscriber<T> {
-  model: FeedSubscriberModel = { automatic: false, lastChecked: undefined, reading: false, lastPublished: undefined}
+  model: FeedSubscriberModel = { automatic: false, lastChecked: undefined, reading: false, lastPublished: undefined }
   bucket: FeedBucket
   timeSeries: MutableTimeSeries<T>
   timer: NodeJS.Timeout | undefined
@@ -12,8 +12,11 @@ export class FeedSubscriber<T> {
     this.timeSeries = toTimeSeries
   }
 
-  setLastChecked (): FeedSubscriber<T> {
+  setLastChecked (newLastPublished?: Date): FeedSubscriber<T> {
     this.model = { ...this.model, lastChecked: new Date() }
+    if (newLastPublished !== undefined) {
+      this.model = { ...this.model, lastPublished: newLastPublished }
+    }
     return this
   }
 
