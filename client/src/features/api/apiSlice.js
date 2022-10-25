@@ -47,7 +47,8 @@ export const apiSlice = createApi({
 
     getAllCDCCases: builder.query({
       query: (sort) => `cdcCases?sort=${sort}`,
-      providesTags: ['CDCCase']
+      providesTags: ['CDCCase'],
+      
     }),
 
     getCDCCaseSchema: builder.query({
@@ -57,7 +58,6 @@ export const apiSlice = createApi({
 
     getCDCCaseSubscriber: builder.query({
       query: () => 'cdcCases/subscriber',
-      polling: 1000,
       providesTags: ['CDCCaseSubscriber']
     }),
 

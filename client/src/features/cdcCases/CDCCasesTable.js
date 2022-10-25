@@ -40,7 +40,7 @@ export default function CDCCasesTable () {
     isSuccess: isCasesSucccesful,
     isError: isCasesFailed,
     error: casesError
-  } = useGetAllCDCCasesQuery('desc')
+  } = useGetAllCDCCasesQuery({ sort: 'desc' }, { pollingInterval: 5000 })
 
   let content = ''
 

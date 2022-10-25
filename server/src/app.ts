@@ -11,7 +11,7 @@ import cdcCaseRouter from './routes/cdcCases'
 import { db } from './utils/db'
 import { S3Bucket } from './utils/S3Bucket'
 import { resetStorage } from './controllers/resetSystem'
-// import { updateFeedSubscriber } from './controllers/updateFeedSubscriber'
+import { updateFeedSubscriber } from './controllers/updateFeedSubscriber'
 import { StateCaseTimeSeries } from './models/StateCaseTimeSeries'
 import { FeedBucket } from '@/models/FeedBucket'
 import { CDCCaseTimeSeries } from './models/CDCCaseTimeSeries'
@@ -67,7 +67,7 @@ class App {
   }
 
   private setupBackground (): void {
-    // for now updateFeedSubscriber(this.feedSubscriber, {automatic: true})
+    updateFeedSubscriber(this.feedSubscriber, {automatic: true})
   }
 }
 

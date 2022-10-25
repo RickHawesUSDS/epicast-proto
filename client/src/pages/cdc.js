@@ -13,7 +13,7 @@ function CdcPage (props) {
     isSuccess: isSubscriberQuerySucccesful,
     isError: isSubscriberQueryFailed,
     error: subscriberQueryError
-  } = useGetCDCCaseSubscriberQuery()
+  } = useGetCDCCaseSubscriberQuery({}, { pollingInterval: 5000 })
 
   async function onRefreshClick () {
     refetch()
@@ -37,10 +37,9 @@ function CdcPage (props) {
   if (isSubscriberQuerySucccesful && subscriberQueryData.reading) {
     subscriberStatus = 'reading...'
   } else if (isSubscriberQuerySucccesful && !subscriberQueryData.reading) {
-    const automatic = subscriberQueryData.automatic ? 'auto-checking' : ''
-    const lastChecked = subscriberQueryData.lastChecked !== undefined ? subscriberQueryData.lastChecked : 'na'
+    const automatic = subscriberQueryData.automatic ? 'automatic subscription' : ''
     const lastPublished = subscriberQueryData.lastPublished !== undefined ? subscriberQueryData.lastPublished : 'na'
-    subscriberStatus = `Last Published: ${lastPublished}; Last Checked: ${lastChecked} ${automatic}`
+    subscriberStatus = `Last Published: ${lastPublished}; ${automatic}`
   } else if (isSubscriberQueryFailed) {
     subscriberStatus = `Query Error: ${subscriberQueryError}`
   }
