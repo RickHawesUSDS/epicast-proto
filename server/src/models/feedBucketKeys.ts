@@ -5,6 +5,7 @@ import pathPosix from 'node:path/posix'
 //
 // Define where to put objects and how to name them in the bucket
 //
+export const VERSION_MARKER = "version.json"
 
 export const LOG_FOLDER = 'logs'
 export const LOG_EXTENSION = 'log'
@@ -38,4 +39,8 @@ export const splitSchemaKey = (key: string): string[] => {
 export const FILE_NAME_SEPERATOR = '-'
 export const formFeedName = (organizationId: string, systemId: string, feedId: string): string => {
   return [organizationId, systemId, feedId].join(FILE_NAME_SEPERATOR)
+}
+
+export const formVersionMarker = (version: number, updating: boolean): string => {
+  return `{ "version": ${version}, "updating": ${updating} }`
 }
