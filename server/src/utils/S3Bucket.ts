@@ -53,7 +53,7 @@ export class S3Bucket implements FeedBucket {
     }
   }
 
-  async putObject (name: string, body: string | ReadStream): Promise<void> {
+  async putObject (name: string, body: string | ReadStream): Promise<BucketObject> {
     logger.debug(`put object: ${name}`)
     const putResponse = await this.s3Client.send(new PutObjectCommand({
       Bucket: BUCKET_NAME,
@@ -63,12 +63,14 @@ export class S3Bucket implements FeedBucket {
     if (putResponse.$metadata.httpStatusCode !== 200) {
       return await this.handleError(`put error: ${name}, ${putResponse.$metadata.httpStatusCode ?? 0}`)
     }
+    return { key: name, versionId: putResponse.VersionId, lastModified: new Date() }
   }
 
-  async getObject (name: string): Promise<string> {
+  async getObject (name: string, versionId?: string): Promise<string> {
     const getResponse = await this.s3Client.send(new GetObjectCommand({
       Bucket: BUCKET_NAME,
-      Key: name
+      Key: name,
+      VersionId: versionId
     }))
     if (getResponse.$metadata.httpStatusCode === 200) {
       const readableStream = getResponse.Body as Readable

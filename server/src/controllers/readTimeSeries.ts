@@ -2,39 +2,40 @@ import { isAfter, min, parseISO } from 'date-fns'
 import { parse } from 'csv-string'
 import { strict as assert } from 'node:assert'
 
-import { FeedBucket, BucketObject } from '@/models/FeedBucket'
+import { BucketObject } from '@/models/FeedBucket'
 import { TIMESERIES_FOLDER } from '@/models/feedBucketKeys'
 import { getLogger } from '@/utils/loggers'
 import { MutableTimeSeries } from '../models/TimeSeries'
 import { FeedElement } from '../models/FeedElement'
 import { FeedSchema } from '@/models/FeedSchema'
+import { Snapshot } from '@/models/Snapshot'
 
 const logger = getLogger('READ_TIME_SERIES_CONTROLLER')
 
-export async function readTimeSeries<T> (fromBucket: FeedBucket, toTimeSeries: MutableTimeSeries<T>): Promise<Date | undefined> {
-  const reader = new TimeSeriesReader(fromBucket, toTimeSeries)
+export async function readTimeSeries<T> (fromSnapshot: Snapshot, toTimeSeries: MutableTimeSeries<T>): Promise<Date | undefined> {
+  const reader = new TimeSeriesReader(fromSnapshot, toTimeSeries)
   return await reader.read()
 }
 
 class TimeSeriesReader<T> {
-  bucket: FeedBucket
+  snapshot: Snapshot
   timeSeries: MutableTimeSeries<T>
 
-  constructor (fromBucket: FeedBucket, toTimeSeries: MutableTimeSeries<T>) {
-    this.bucket = fromBucket
+  constructor (fromSnapshot: Snapshot, toTimeSeries: MutableTimeSeries<T>) {
+    this.snapshot = fromSnapshot
     this.timeSeries = toTimeSeries
   }
 
   async read (): Promise<Date | undefined> {
-    logger.info(`Reading: ${this.bucket.name}`)
-    let publishedObjects = await this.bucket.listObjects(TIMESERIES_FOLDER)
+    logger.info(`Reading: ${this.snapshot.name}`)
+    let publishedObjects = await this.snapshot.listObjects(TIMESERIES_FOLDER)
     if (publishedObjects.length === 0) return
     const lastPublished = this.lastModifiedOf(publishedObjects)
     const metadata = await this.timeSeries.fetchMetadata()
     if (metadata !== null) {
       publishedObjects = publishedObjects.filter((object) => isAfter(object.lastModified, metadata.lastUpdatedAt))
     }
-    logger.debug(`${this.bucket.name} has ${publishedObjects.length} objects to read`)
+    logger.debug(`${this.snapshot.name} has ${publishedObjects.length} objects to read`)
     const events = await this.fetchEvents(publishedObjects)
     await this.timeSeries.upsertEvents(events)
     return lastPublished
@@ -60,7 +61,7 @@ class TimeSeriesReader<T> {
       return elements
     }
 
-    const csv = await this.bucket.getObject(publishedObject.key)
+    const csv = await this.snapshot.getObject(publishedObject.key)
     const rows = parse(csv)
     if (rows.length === 0) throw new Error('invalid object')
 

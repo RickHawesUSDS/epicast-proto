@@ -3,25 +3,23 @@ import { getLogger } from 'log4js'
 import { formatISO } from 'date-fns'
 import { compile } from 'handlebars'
 
-import { FeedBucket } from '@/models/FeedBucket'
 import { formSchemaKey } from '@/models/feedBucketKeys'
-import { PublishLog } from './PublishLog'
 import { FeedSchema } from '@/models/FeedSchema'
 import { filterElements } from '@/models/FeedElement'
+import { MutableSnapshot } from '@/models/Snapshot'
 
 const logger = getLogger('PUBLISH_SCHEMA_SERVICE')
 const SCHEMA_TEMPLATE_PATH = './src/public/epicast-demoserver-feed1-schema.handlebars'
 
-export async function publishSchema (bucket: FeedBucket, schema: FeedSchema, log: PublishLog): Promise<void> {
+export async function publishSchema (toSnapshot: MutableSnapshot, schema: FeedSchema): Promise<void> {
   const schemaKey = formSchemaKey(schema.organizationId, schema.systemId, schema.feedId, schema.validFrom)
-  if (!await bucket.doesObjectExist(schemaKey)) {
+  if (!toSnapshot.doesObjectExist(schemaKey)) {
     logger.info('publishing schema')
     const schemaTemplate = readFileSync(SCHEMA_TEMPLATE_PATH, { encoding: 'utf8' })
     const compiledSchemaTemplate = compile(schemaTemplate)
     const templateContext = formTemplateContext(schema)
     const rawSchema = compiledSchemaTemplate(templateContext)
-    await bucket.putObject(schemaKey, rawSchema)
-    log.add(schemaKey)
+    await toSnapshot.putObject(schemaKey, rawSchema)
   }
 }
 

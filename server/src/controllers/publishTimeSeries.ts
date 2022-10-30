@@ -1,23 +1,23 @@
-import { max as maxDate, isAfter, isWithinInterval, formatISO, isFirstDayOfMonth, addDays, isBefore, startOfDay, differenceInDays } from 'date-fns'
+import { max as maxDate, isAfter, isWithinInterval, formatISO, isFirstDayOfMonth, addDays, isBefore, startOfDay, differenceInDays, endOfDay } from 'date-fns'
 import { stringify } from 'csv-string'
 
-import { FeedBucket, BucketObject } from '@/models/FeedBucket'
+import { BucketObject } from '@/models/FeedBucket'
 import { formTimeSeriesKey, periodFromTimeSeriesKey, TIMESERIES_FOLDER } from '@/models/feedBucketKeys'
-import { PublishLog } from './PublishLog'
 import { getLogger } from '@/utils/loggers'
 import { Period } from '@/utils/Period'
 import { Frequency } from '@/utils/Frequency'
 import { TimeSeries, TimeSeriesEvent, TimeSeriesFindOptions } from '../models/TimeSeries'
 import { FeedElement, filterElements } from '../models/FeedElement'
 import { assert } from 'console'
+import { MutableSnapshot } from '@/models/Snapshot'
 
 const DESIRED_MAX_MONTHLY_COUNT = 10000 / 30
 
 const logger = getLogger('PUBLISH_TIME_SERIES_SERVICE')
 
-export async function publishTimeseries<T> (toBucket: FeedBucket, timeseries: TimeSeries<T>, log: PublishLog): Promise<void> {
+export async function publishTimeseries<T> (toSnapshot: MutableSnapshot, timeseries: TimeSeries<T>): Promise<void> {
   logger.info(`publishing timeseries: ${timeseries.schema.organizationId}-${timeseries.schema.organizationId}`)
-  const publisher = new TimeSeriesPublisher(toBucket, timeseries, log)
+  const publisher = new TimeSeriesPublisher(toSnapshot, timeseries)
   await publisher.publish()
 }
 
@@ -27,14 +27,12 @@ interface CasePartition<T> {
 }
 
 class TimeSeriesPublisher<T> {
-  bucket: FeedBucket
+  snapshot: MutableSnapshot
   timeseries: TimeSeries<T>
-  log: PublishLog
 
-  constructor (toBucket: FeedBucket, timeseries: TimeSeries<T>, log: PublishLog) {
-    this.bucket = toBucket
+  constructor (toSnapshot: MutableSnapshot, timeseries: TimeSeries<T>) {
+    this.snapshot = toSnapshot
     this.timeseries = timeseries
-    this.log = log
   }
 
   async publish (): Promise<void> {
@@ -43,7 +41,7 @@ class TimeSeriesPublisher<T> {
   }
 
   async updatePublishedPartions (): Promise<void> {
-    const publishedObjects = await this.bucket.listObjects(TIMESERIES_FOLDER)
+    const publishedObjects = await this.snapshot.listObjects(TIMESERIES_FOLDER)
     if (publishedObjects.length === 0) return // early shortcut
     const lastPublishDate = this.calcMaxLastModified(publishedObjects)
 
@@ -71,11 +69,10 @@ class TimeSeriesPublisher<T> {
   async updatePartition (period: Period, periodEvents: Array<TimeSeriesEvent<T>>): Promise<void> {
     const key = formTimeSeriesKey(period)
     await this.putPartition(key, periodEvents)
-    this.log.update(key)
   }
 
   async findLastPublishedPeriod (): Promise<Period | undefined> {
-    const publishedObjects = await this.bucket.listObjects(TIMESERIES_FOLDER)
+    const publishedObjects = await this.snapshot.listObjects(TIMESERIES_FOLDER)
     return this.calcLastPeriod(publishedObjects)
   }
 
@@ -87,19 +84,18 @@ class TimeSeriesPublisher<T> {
     const lastPublishedPeriod = await this.findLastPublishedPeriod()
     if (lastPublishedPeriod === undefined) {
       events = await this.findEvents({})
-      startDate = this.firstEventDate(events) ?? new Date()
-      endDate = this.lastEventDate(events) ?? new Date()
+      startDate = startOfDay(this.firstEventDate(events) ?? new Date())
+      endDate = endOfDay(this.lastEventDate(events) ?? new Date())
     } else {
       startDate = lastPublishedPeriod.nextPeriod().start
       events = await this.findEvents({ after: startDate })
-      endDate = this.lastEventDate(events) ?? new Date()
+      endDate = endOfDay(this.lastEventDate(events) ?? new Date())
     }
     if (events.length === 0) return // short circuit
     const partitions = await this.makeRightSizedPartitions(events, startDate, endDate, lastPublishedPeriod)
     for (const partition of partitions) {
       const key = formTimeSeriesKey(partition.period)
       await this.putPartition(key, partition.cases)
-      this.log.add(key)
     }
   }
 
@@ -164,7 +160,7 @@ class TimeSeriesPublisher<T> {
 
     const deidentifiedElements = filterElements(this.timeseries.schema.elements, 'pii')
     const report = createCSV(events, deidentifiedElements)
-    await this.bucket.putObject(key, report)
+    await this.snapshot.putObject(key, report)
   }
 
   makeCasePartions (events: Array<TimeSeriesEvent<T>>, startDate: Date, endDate: Date, frequency: Frequency): Array<CasePartition<T>> {

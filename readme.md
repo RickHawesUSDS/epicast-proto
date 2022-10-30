@@ -2,7 +2,8 @@
 
 This is a repository for rhawes@cdc.gov to explore concepts about the EpiCast protocol.
 
-## EpiCast aims to...
+## EpiCast aims to
+
 A proposed technical solution to for public health programs to share case information with CDC, each other and the public.
 
 * **Human and machine readable** - Simple enough for humans to read, structured and standardized enough that machines can acess the data.
@@ -26,6 +27,7 @@ In broad sense, EpiCast supports the CDC's NorthStar architecture, the open data
 * Use S3 Buckets and Azure Blobs as the base protocol because all cloud vendors can support these protocols
 
 ## A demo script
+
 The prototype should be support a demonstration of these concepts.
 
 1. Simple case
@@ -36,40 +38,38 @@ The prototype should be support a demonstration of these concepts.
 2. Pandemic spike
     1. Add 15000 cases
     2. Look at logs
-    6. Show published folder and the higher partitioning
+    3. Show published folder and the higher partitioning
 3. Show a schema change
     1. Reset to remove all the pandemic records
     2. Explain column colors (common, cdc, local)
     3. Add a cdc and local elements
-    3. Show the schema change
-    3. Show the receive table
+    4. Show the schema change
+    5. Show the receive table
 
 ## TODO
-- [x] Demo website
-- [x] State page
-- [x] Publish a timeseries
-- [x] Publish a log
-- [x] Define bucket, schema, element, schema for StateCases
-- [x] Timeseries read interface (id, at, lastModifiedAt, enumerate elements)
-- [x] Schema publishing (enumerate elements), define Member interface
-- [x] /statecases/schema route & read in State table
-- [x] Start CDCCase (model, cdcCaseTimeSeries, cdccases route)
-- [x] Define /cdccase/subscriber { lastCheckedAt: , automatic: true }
-- [x] Read schema from feed (readSchema)
-- [x] readTimeSeries, readCDCfeed
-- [x] automatic receive
-- [x] CDC page (table and refresh)
-- [x] Change algorithm to only change at the first of the month or day. Elminate delete of object. Make large add start on the month.
-- [x] Update state to last published
-- [x] Update cdc to show when stuff is being read and last read.
-- [ ] Versioned buckets and consistent reads
-- [ ] Change schemas dialog in state. Options for new CDC data element, a new other state element and local element
-- [ ] Upgrade DB tables
-- [ ] Random change methods and button
-- [ ] Random duplicates. Add deduplicate button. replacedBy column.
 
-- [ ] Show only published elements in State table
-- [ ] Show only what is CDC elements in CDC table
-
-
-
+* [x] Demo website
+* [x] State page
+* [x] Publish a timeseries
+* [x] Publish a log
+* [x] Define bucket, schema, element, schema for StateCases
+* [x] Timeseries read interface (id, at, lastModifiedAt, enumerate elements)
+* [x] Schema publishing (enumerate elements), define Member interface
+* [x] /statecases/schema route & read in State table
+* [x] Start CDCCase (model, cdcCaseTimeSeries, cdccases route)
+* [x] Define /cdccase/subscriber { lastCheckedAt: , automatic: true }
+* [x] Read schema from feed (readSchema)
+* [x] readTimeSeries, readCDCfeed
+* [x] automatic receive
+* [x] CDC page (table and refresh)
+* [x] Change algorithm to only change at the first of the month or day. Elminate delete of object. Make large add start on the month.
+* [x] Update state to last published
+* [x] Update cdc to show when stuff is being read and last read.
+* [x] Versioned buckets, publish snapshots, use snapshots consistent reads
+* [ ] Change schemas dialog in state. Options for new CDC data element, a new other state element and local element
+* [ ] Upgrade DB tables
+* [ ] Random change methods and button
+* [ ] Random duplicates. Add deduplicate button. replacedBy column.
+* [ ] Show only published elements in State table
+* [ ] Show only what is CDC elements in CDC table
+* [ ] Allow two people to run the demo at the same time. Locking publishers needed.
