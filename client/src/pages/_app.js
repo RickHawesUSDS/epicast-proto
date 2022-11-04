@@ -3,7 +3,6 @@ import Navbar from './../components/Navbar'
 import IndexPage from './index'
 import AboutPage from './about'
 import FaqPage from './faq'
-import DemoPage from './demo'
 import ResetPage from './reset'
 import StatePage from './state'
 import FeedPage from './feed'
@@ -31,15 +30,13 @@ function App (props) {
 
             <Route exact path='/faq' component={FaqPage} />
 
-            <Route exact path='/demo' component={DemoPage} />
+            <Route exact path='/reset' component={ResetPage} />
 
-            <Route exact path='/demo/reset' component={ResetPage} />
+            <Route exact path='/state' component={StatePage} />
 
-            <Route exact path='/demo/state' component={StatePage} />
+            <Route exact path='/feed' component={FeedPage} />
 
-            <Route exact path='/demo/feed' component={FeedPage} />
-
-            <Route exact path='/demo/cdc' component={CdcPage} />
+            <Route exact path='/cdc' component={CdcPage} />
 
             <Route component={NotFoundPage} />
           </Switch>
