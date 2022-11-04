@@ -4,6 +4,7 @@ import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
 import Section from './Section'
 import SectionHeader from './SectionHeader'
+import EpiCastFlows from './EpiCastFlows'
 import { Link } from '../util/router'
 
 function HeroSection (props) {
@@ -22,7 +23,7 @@ function HeroSection (props) {
             size={4}
           />
           <div>
-            <img src='epicast-flow.svg' alt='EpiCast Flow' />
+            <EpiCastFlows/>
           </div>
           <Button
             component={Link}
