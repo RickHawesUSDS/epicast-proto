@@ -25,6 +25,10 @@ function StatePage(props) {
     await publishStateCases()
   }
 
+  async function onChangeSchemaClick() {
+    console.log('change schema click')
+  }
+
   const useButtonStyles = makeStyles((theme) => ({
     root: {
       '& > *': {
@@ -56,6 +60,7 @@ function StatePage(props) {
             <Button onClick={() => onAdd15CasesClick()}>Add 15 Case</Button>
             <Button onClick={() => onAdd15KCasesClick()}>Add 15000 Cases</Button>
           </ButtonGroup>
+          <Button onClick={() => onChangeSchemaClick()} color='primary' variant='outlined'>Change Data Dictionary</Button>
           <Button onClick={() => onPublishCasesClick()} color='primary' variant='outlined'>Publish</Button>
         </div>
       </HeroSection2>
