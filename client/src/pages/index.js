@@ -13,9 +13,9 @@ function IndexPage (props) {
         bgImageOpacity={1}
         title='EpiCast Demonstration'
         subtitle='EpiCast is new way from states to transmit case data to the CDC'
-        buttonText='Start Demo'
+        buttonText='Reset Demo'
         buttonColor='primary'
-        buttonPath='/demo'
+        buttonPath='/reset'
       />
     </>
   )
