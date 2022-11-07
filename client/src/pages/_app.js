@@ -11,6 +11,7 @@ import { Switch, Route, Router } from './../util/router'
 import NotFoundPage from './404'
 import Footer from './../components/Footer'
 import { ThemeProvider } from './../util/theme'
+import CentralPage from './central'
 
 function App (props) {
   return (
@@ -37,6 +38,8 @@ function App (props) {
             <Route exact path='/feed' component={FeedPage} />
 
             <Route exact path='/cdc' component={CdcPage} />
+
+            <Route exact path='/central' component={CentralPage} />
 
             <Route component={NotFoundPage} />
           </Switch>
