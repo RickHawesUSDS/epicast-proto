@@ -1,7 +1,9 @@
 import CaseTable from '../../components/CaseTable'
-import { useGetAllStateCasesQuery, useGetStateCaseSchemaQuery } from '../api/apiSlice'
+import { fetchAllStateCases, fetchStateCaseSchema } from '../../features/api/api'
 import { CircularProgress } from '@material-ui/core'
+import { useQuery } from '@tanstack/react-query'
 import { Alert } from '@material-ui/lab'
+import { stateCases, stateCasesSchema } from './stateCasesKeys'
 
 const customWidths = {
   personFirstName: 140,
@@ -25,48 +27,35 @@ function makeColumns(schema) {
   })
 }
 
-export default function StateCasesTable () {
-  const {
-    data: schema = undefined,
-    isLoading: isSchemaLoading,
-    isSuccess: isSchemaSucccesful,
-    isError: isSchemaFailed,
-    error: schemaError
-  } = useGetStateCaseSchemaQuery()
-
-  const {
-    data: cases = [],
-    isLoading: isCasesLoading,
-    isSuccess: isCasesSucccesful,
-    isError: isCasesFailed,
-    error: casesError
-  } = useGetAllStateCasesQuery('desc')
+export default function StateCasesTable() {
+  const schemaQuery = useQuery([stateCasesSchema], async () => { return await fetchStateCaseSchema() }, {})
+  const casesQuery = useQuery([stateCases], async () => { return await fetchAllStateCases('desc') }, {})
 
   let content = ''
 
-  if (isCasesFailed || isSchemaFailed) {
-    if (isCasesFailed) {
+  if (schemaQuery.isError || casesQuery.isError) {
+    if (casesQuery.isError) {
       content = (
         <Alert severity='error'>
-          Get state cases api error: {casesError.status + ': ' + casesError.error}
+          Get state cases api error: {casesQuery.error}
         </Alert>
       )
     }
-    if (isSchemaFailed) {
+    if (schemaQuery.isError) {
       content = (
         <Alert severity='error'>
-          Get state cases schema api error: {schemaError.status + ': ' + schemaError.error}
+          Get state cases schema api error: {schemaQuery.error}
         </Alert>
       )
     }
-  } else if (isCasesLoading || isSchemaLoading) {
+  } else if (casesQuery.isLoading || schemaQuery.isLoading) {
     content = (
       <CircularProgress />
     )
-  } else if (isCasesSucccesful && isSchemaSucccesful) {
-    const columns = makeColumns(schema)
+  } else if (casesQuery.isFetched && schemaQuery.isFetched) {
+    const columns = makeColumns(schemaQuery.data)
     content = (
-      <CaseTable fetchRows={() => cases} columns={columns} />
+      <CaseTable fetchRows={() => casesQuery.data} columns={columns} />
     )
   }
 

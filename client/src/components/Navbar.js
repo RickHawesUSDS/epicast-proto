@@ -48,7 +48,7 @@ function SimpleBreadcrumbs () {
                   </Typography>
                   )
                 : (
-                  <RouterLink to='/' key='/' class='MuiTypography-root MuiLink-root MuiLink-underlineHover'>
+                  <RouterLink to='/' key='/' className='MuiTypography-root MuiLink-root MuiLink-underlineHover'>
                     <Typography variant={typographyVariant}>
                       EpiCast
                     </Typography>
@@ -66,7 +66,7 @@ function SimpleBreadcrumbs () {
                   </Typography>
                   )
                 : (
-                  <RouterLink to={to} key={to} class='MuiTypography-root MuiLink-root MuiLink-underlineHover'>
+                  <RouterLink to={to} key={to} className='MuiTypography-root MuiLink-root MuiLink-underlineHover'>
                     <Typography key={to} variant={typographyVariant}>
                       {value}
                     </Typography>

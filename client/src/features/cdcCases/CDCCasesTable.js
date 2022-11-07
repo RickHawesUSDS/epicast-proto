@@ -1,7 +1,10 @@
 import CaseTable from '../../components/CaseTable'
-import { useGetAllCDCCasesQuery, useGetCDCCaseSchemaQuery } from '../api/apiSlice'
+import { fetchAllCDCCases, fetchCDCCaseSchema } from '../../features/api/api'
+import { cdcCases, cdcCasesSchema } from './cdcCasesKeys'
+
 import { CircularProgress } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
+import { useQuery } from '@tanstack/react-query'
 
 const customWidths = {
   personFirstName: 140,
@@ -14,7 +17,7 @@ const customWidths = {
   personEmail: 200
 }
 
-function makeColumns (schema) {
+function makeColumns(schema) {
   return schema.elements.map((element) => {
     return {
       id: element.name,
@@ -25,46 +28,45 @@ function makeColumns (schema) {
   })
 }
 
-export default function CDCCasesTable () {
-  const {
-    data: schema = undefined,
-    isLoading: isSchemaLoading,
-    isSuccess: isSchemaSucccesful,
-    isError: isSchemaFailed,
-    error: schemaError
-  } = useGetCDCCaseSchemaQuery()
+export default function CDCCasesTable() {
+  const getCDCSchemaQuery = useQuery(
+    [cdcCasesSchema],
+    fetchCDCCaseSchema,
+    {
+    }
+  )
 
-  const {
-    data: cases = [],
-    isLoading: isCasesLoading,
-    isSuccess: isCasesSucccesful,
-    isError: isCasesFailed,
-    error: casesError
-  } = useGetAllCDCCasesQuery({ sort: 'desc' }, { pollingInterval: 5000 })
+  const getCDCCasesQuery = useQuery(
+    [cdcCases],
+    async () => { return await fetchAllCDCCases('desc') },
+    {
+      refetchInterval: 5000 //ms
+    }
+  )
 
   let content = ''
 
-  if (isCasesFailed || isSchemaFailed) {
-    if (isCasesFailed) {
+  if (getCDCCasesQuery.isError || getCDCSchemaQuery.isError) {
+    if (getCDCCasesQuery.isError) {
       content = (
         <Alert severity='error'>
-          Get state cases api error: {casesError.status + ': ' + casesError.error}
+          Get state cases api error: {getCDCCasesQuery.error}
         </Alert>
       )
     }
-    if (isSchemaFailed) {
+    if (getCDCSchemaQuery.isError) {
       content = (
         <Alert severity='error'>
-          Get state cases schema api error: {schemaError.status + ': ' + schemaError.error}
+          Get state cases schema api error: {getCDCSchemaQuery.error}
         </Alert>
       )
     }
-  } else if (isCasesLoading || isSchemaLoading) {
+  } else if (getCDCCasesQuery.isLoading || getCDCSchemaQuery.isLoading) {
     content = (
       <CircularProgress />
     )
-  } else if (isCasesSucccesful && isSchemaSucccesful) {
-    const columns = makeColumns(schema)
+  } else if (getCDCCasesQuery.isFetched && getCDCSchemaQuery.isFetched) {
+    const columns = makeColumns(getCDCSchemaQuery.data)
     if (columns.length === 0) {
       content = (
         <Alert severity='info'>
@@ -73,7 +75,7 @@ export default function CDCCasesTable () {
       )
     } else {
       content = (
-        <CaseTable fetchRows={() => cases} columns={columns} />
+        <CaseTable fetchRows={() => getCDCCasesQuery.data} columns={columns} />
       )
     }
   }

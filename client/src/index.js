@@ -1,14 +1,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './pages/_app'
-import store from './store'
-import { Provider } from 'react-redux'
 import * as serviceWorker from './serviceWorker'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 ReactDOM.render(
-  <Provider store={store}>
+  <QueryClientProvider client={queryClient}>
     <App />
-  </Provider>,
+  </QueryClientProvider>,
   document.getElementById('root')
 )
 

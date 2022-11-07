@@ -3,16 +3,21 @@ import Meta from './../components/Meta'
 import HeroSection2 from './../components/HeroSection2'
 import { Container, Button } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
-import { useResetSystemMutation } from '../features/api/apiSlice'
+import { resetSystem } from '../features/api/api'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { cdcCases, cdcCasesSchema, cdcCasesSubscriber } from '../features/cdcCases/cdcCasesKeys'
+import { stateCases, stateCasesSchema } from '../features/stateCases/stateCasesKeys'
 
-function ResetPage (props) {
+function ResetPage(props) {
   const history = useHistory()
-  const [resetSystem] = useResetSystemMutation()
-
-  async function onReset () {
-    await resetSystem()
-    history.push('/demo')
-  }
+  const queryClient = useQueryClient()
+  const resetSystemMutation = useMutation({
+    mutationFn: async () => { await resetSystem() },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [cdcCases, cdcCasesSchema, cdcCasesSubscriber, stateCasesSchema, stateCases] })
+      history.push('/demo')
+    }
+  })
 
   return (
     <>
@@ -30,9 +35,7 @@ function ResetPage (props) {
           variant='contained'
           size='large'
           color='primary'
-          onClick={() => {
-            onReset()
-          }}
+          onClick={() => { resetSystemMutation.mutate() }}
         >
           Reset
         </Button>
