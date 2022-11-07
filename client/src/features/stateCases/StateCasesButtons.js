@@ -1,9 +1,9 @@
 import React from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button, ButtonGroup, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField, makeStyles } from '@material-ui/core'
+import { Button, ButtonGroup, Checkbox, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormControl, FormGroup, FormLabel, FormControlLabel, makeStyles } from '@material-ui/core'
 
 import { stateCases } from './stateCasesKeys'
-import { addRandomStateCases, publishStateCases  } from '../api/api'
+import { addRandomStateCases, publishStateCases } from '../api/api'
 
 
 export default function StateCasesButtons(props) {
@@ -36,6 +36,10 @@ export default function StateCasesButtons(props) {
       '& > *': {
         margin: theme.spacing(1),
       },
+      width: '100%'
+    },
+    formControl: {
+      margin: theme.spacing(3),
     },
   }));
 
@@ -44,34 +48,55 @@ export default function StateCasesButtons(props) {
   return (
     <div className={buttonClasses.root} align='right'>
       <ButtonGroup color='primary'>
-        <Button disabled={addCasesMutation.isLoading} onClick={() => addCasesMutation.mutate({numOfDays: 1, numPerDay: 1})}>Add 1 Case</Button>
-        <Button disabled={addCasesMutation.isLoading} onClick={() => addCasesMutation.mutate({numOfDays: 1, numPerDay: 15})}>Add 15 Case</Button>
-        <Button disabled={addCasesMutation.isLoading} onClick={() => addCasesMutation.mutate({numOfDays: 30, numPerDay: 500})}>Add 15000 Cases</Button>
+        <Button disabled={addCasesMutation.isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 1, numPerDay: 1 })}>Add 1 Case</Button>
+        <Button disabled={addCasesMutation.isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 1, numPerDay: 15 })}>Add 15 Case</Button>
+        <Button disabled={addCasesMutation.isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 30, numPerDay: 500 })}>Add 15000 Cases</Button>
       </ButtonGroup>
       <Button onClick={() => onChangeSchemaClick()} color='primary' variant='outlined'>Change Data Dictionary</Button>
       <Button disabled={publishStateCasesMutation.isLoading} onClick={() => publishStateCasesMutation.mutate()} color='primary' variant='outlined'>Publish</Button>
-      <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+      <Dialog open={open} onClose={handleClose} maxWidth="" fullWidth="" aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">Change Data Dictionary</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            To subscribe to this website, please enter your email address here. We will send updates
-            occasionally.
+            Update the data dictionary used for this case type using questions from a national and a local question bank.
           </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Email Address"
-            type="email"
-            fullWidth
-          />
+          <FormControl component="fieldset" className={buttonClasses.formControl}>
+            <FormLabel component="legend">Local Questions</FormLabel>
+            <FormGroup>
+              <FormControlLabel
+                control={<Checkbox name="gilad" />}
+                label="Local question"
+              />
+              <FormControlLabel
+                control={<Checkbox  name="jason" />}
+                label="Nice local question"
+              />
+              <FormControlLabel
+                control={<Checkbox name="antoine" />}
+                label="Another local question"
+              />
+            </FormGroup>
+          </FormControl>
+          <FormControl component="fieldset" className={buttonClasses.formControl}>
+            <FormLabel component="legend">From CDC</FormLabel>
+            <FormGroup>
+              <FormControlLabel
+                control={<Checkbox name="gilad" />}
+                label="New national data element"
+              />
+              <FormControlLabel
+                control={<Checkbox  name="jason" />}
+                label="National data element 2"
+              />
+            </FormGroup>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
           <Button onClick={handleClose} color="primary">
-            Subscribe
+            Update
           </Button>
         </DialogActions>
       </Dialog>
