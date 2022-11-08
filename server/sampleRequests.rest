@@ -16,6 +16,22 @@ POST http://localhost:3001/api/stateCases/publish
 ### Get the schema
 GET http://localhost:3001/api/stateCases/schema
 
+### Change the schema
+PUT http://localhost:3001/api/stateCases/schema/localGoodQuestion
+content-type: application/json
+
+{
+  "name": "localGoodQuestion",
+  "type": "string",
+  "tags": [],
+  "memberOfSchemas": ["state"],
+  "displayName": "Good Local Question",
+  "description": "pretend good local question",
+}
+
+###
+DELETE http://localhost:3001/api/stateCases/schema/localGoodQuestion
+
 ### Get all the cdcCases
 GET http://localhost:3001/api/cdcCases
 
