@@ -17,6 +17,8 @@ export async function resetSystem (timeseries: StateCaseTimeSeries, feed: FeedBu
     truncate: true
   })
   await resetStorage(feed)
+  logger.info('Reseting the state schema')
+  timeseries.resetSchema()
   logger.info('Adding a few fakes')
   await timeseries.insertFakeStateCases(daysOfFakeCasesOnReset, fakesPerDayOnReset)
 }

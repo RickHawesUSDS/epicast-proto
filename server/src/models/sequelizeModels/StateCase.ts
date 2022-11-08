@@ -70,4 +70,28 @@ export class StateCase extends Model<StateCase> {
 
   @Column
     localQuestion1?: string
+
+  @Column
+    localQuestion2?: string
+
+  @Column
+    localQuestion3?: string
+
+  @Column
+    cdcQuestion1?: string
+
+  @Column
+    cdcQuestion2?: string
+
+  @Column
+    cdcQuestion3?: string
+
+  @Column
+    neighborQuestion1?: string
+
+  @Column
+    neighborQuestion2?: string
+
+  @Column
+    neighborQuestion3?: string
 }

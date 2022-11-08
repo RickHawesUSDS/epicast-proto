@@ -143,3 +143,9 @@ export const stateCaseTimeSeriesSchemaV1: FeedSchema = {
     }
   ]
 }
+
+export const variableSchemaElementNames = [
+  'localQuestion1', 'localQuestion2', 'localQuestion3',
+  'cdcQuestion1', 'cdcQuestion2', 'cdcQuestion3',
+  'neighborQuestion1', 'neighborQuestion2', 'neighborQuestion3'
+]

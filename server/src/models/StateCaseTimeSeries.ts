@@ -4,7 +4,7 @@ import { Op, Order, WhereOptions } from 'sequelize'
 
 import { StateCase } from '@/models/sequelizeModels/StateCase'
 import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesEvent, TimeSeriesMetadata } from './TimeSeries'
-import { stateCaseTimeSeriesSchemaV1 } from './stateCaseElements'
+import { stateCaseTimeSeriesSchemaV1, variableSchemaElementNames } from './stateCaseElements'
 import { MutableFeedSchema } from './FeedSchema'
 import { FeedElement } from './FeedElement'
 
@@ -62,6 +62,10 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return this.schema.deleteElement(name)
   }
 
+  resetSchema (): void {
+    this.schema = new MutableFeedSchema(stateCaseTimeSeriesSchemaV1)
+  }
+
   async insertFakeStateCases (numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
     const decideOnDate = async (): Promise<Date> => {
       const now = new Date()
@@ -86,7 +90,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
       const newCaseDate = addDays(firstDate, day)
       for (let i = 0; i < numberPerDay; i++) {
         const stateCase = new StateCase()
-        StateCaseTimeSeries.fakeStateCase(stateCase, newCaseDate)
+        this.fakeStateCase(stateCase, newCaseDate)
         await stateCase.save()
         casesAdded.push(stateCase)
       }
@@ -94,15 +98,15 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return casesAdded
   }
 
-  private static fakeStateCase (stateCase: StateCase, caseDate: Date): void {
+  private fakeStateCase (stateCase: StateCase, caseDate: Date): void {
     stateCase.personFirstName = faker.name.firstName()
     stateCase.personLastName = faker.name.lastName()
     stateCase.personAddress = faker.address.streetAddress()
     stateCase.personCity = faker.address.city()
     stateCase.personState = 'CA'
-    stateCase.personRace = this.sample(['White', 'Black or African American', 'American Indian or Alaska Native', 'Asian', 'Native Hawaiian'])
-    stateCase.personSexAtBirth = this.sample(['Male', 'Female'])
-    stateCase.personEthnicity = this.sample(['Hispanic or Latino', 'Not Hispanic or Latino'])
+    stateCase.personRace = StateCaseTimeSeries.sample(['White', 'Black or African American', 'American Indian or Alaska Native', 'Asian', 'Native Hawaiian'])
+    stateCase.personSexAtBirth = StateCaseTimeSeries.sample(['Male', 'Female'])
+    stateCase.personEthnicity = StateCaseTimeSeries.sample(['Hispanic or Latino', 'Not Hispanic or Latino'])
     stateCase.personPostalCode = faker.address.zipCodeByState('CA')
     stateCase.personPhone = faker.phone.number()
     stateCase.personEmail = faker.internet.email()
@@ -113,6 +117,13 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     stateCase.onsetOfSymptoms = caseDate
 
     stateCase.caseDate = caseDate
+
+    for (const variableElementName of variableSchemaElementNames) {
+      const index = this.schema.elements.findIndex(e => e.name === variableElementName)
+      if (index !== -1) {
+        stateCase.set(variableElementName as keyof StateCase, 'fake response')
+      }
+    }
   }
 
   private static sample (codeset: string[]): string {
