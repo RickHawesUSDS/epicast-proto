@@ -5,6 +5,8 @@ import { Op, Order, WhereOptions } from 'sequelize'
 import { StateCase } from '@/models/sequelizeModels/StateCase'
 import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesEvent, TimeSeriesMetadata } from './TimeSeries'
 import { stateCaseTimeSeriesSchemaV1 } from './stateCaseElements'
+import { MutableFeedSchema } from './FeedSchema'
+import { FeedElement } from './FeedElement'
 
 export class StateCaseTimeSeries implements TimeSeries<StateCase> {
   async findEvents (options: TimeSeriesFindOptions): Promise<StateCase[]> {
@@ -50,7 +52,15 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return new StateCaseTimeSeriesEvent(event)
   }
 
-  schema = stateCaseTimeSeriesSchemaV1
+  schema = new MutableFeedSchema(stateCaseTimeSeriesSchemaV1)
+
+  addFeedElement (element: FeedElement): boolean {
+    return this.schema.addElement(element)
+  }
+
+  deleteFeedElement (name: string): boolean {
+    return this.schema.deleteElement(name)
+  }
 
   async insertFakeStateCases (numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
     const decideOnDate = async (): Promise<Date> => {

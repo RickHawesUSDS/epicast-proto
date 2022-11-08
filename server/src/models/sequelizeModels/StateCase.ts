@@ -67,4 +67,7 @@ export class StateCase extends Model<StateCase> {
 
   @Column
     subjectDied?: string
+
+  @Column
+    localQuestion1?: string
 }

@@ -40,4 +40,26 @@ router.get('/schema', asyncHandler(async (req, res, _next) => {
   res.send(req.stateCaseTimeSeries.schema)
 }))
 
+/* PUT feed element */
+router.put('/schema/:elementName', (req, res, _next) => {
+  const elementName = req.params.elementName
+  const timeSeries = req.stateCaseTimeSeries
+  logger.info(`put the schema element: ${elementName}`)
+  const created = timeSeries.addFeedElement(req.body)
+  if (created) {
+    res.status(201).send(timeSeries.schema.elements.find(e => e.name === elementName))
+  } else {
+    res.send(timeSeries.schema.elements.find(e => e.name === elementName))
+  }
+})
+
+/* DELETE feed element */
+router.delete('/schema/:elementName', (req, res, _next) => {
+  const elementName = req.params.elementName
+  const timeSeries = req.stateCaseTimeSeries
+  logger.info(`delete the schema element: ${elementName}`)
+  timeSeries.deleteFeedElement(elementName)
+  res.status(204).send()
+})
+
 export default router
