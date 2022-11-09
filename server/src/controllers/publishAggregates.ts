@@ -54,6 +54,7 @@ class AggregatesPublisher<T> {
     await this.snapshot.putObject(key, report)
   }
 
+  // Modern JavaScript will have a group operator that will replace this work
   groupByYear(partitions: TimeSeriesPartition<T>[]): Map<number, TimeSeriesPartition<T>[]> {
     const map = new Map<number, TimeSeriesPartition<T>[]>();
     partitions.forEach(p => {

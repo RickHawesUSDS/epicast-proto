@@ -66,10 +66,11 @@ The prototype should be support a demonstration of these concepts.
 * [x] Update state to last published
 * [x] Update cdc to show when stuff is being read and last read.
 * [x] Versioned buckets, publish snapshots, use snapshots consistent reads
-* [ ] Change schemas dialog in state. Options for new CDC data element, a new other state element and local element
-* [ ] Upgrade DB tables
+* [x] Change schemas dialog in state. Options for new CDC data element, a new other state element and local element
+* [x] Aggregates published
 * [ ] Random change methods and button
-* [ ] Random duplicates. Add deduplicate button. replacedBy column.
+* [ ] Random duplicates. Add deduplicate button. replaceBy column. replacedBy log.
+* [ ] Validator service
 * [ ] Show only published elements in State table
 * [ ] Show only what is CDC elements in CDC table
 * [ ] Allow two people to run the demo at the same time. Locking publishers needed.
