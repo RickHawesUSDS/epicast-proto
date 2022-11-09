@@ -5,7 +5,7 @@ import { FeedBucket } from '@/models/FeedBucket'
 import { CDCCase } from '@/models/sequelizeModels/CDCCase'
 
 const logger = getLogger('RESET_SYSTEM')
-const daysOfFakeCasesOnReset = 3
+const daysOfFakeCasesOnReset = 1
 const fakesPerDayOnReset = 5
 
 export async function resetSystem (timeseries: StateCaseTimeSeries, feed: FeedBucket): Promise<void> {

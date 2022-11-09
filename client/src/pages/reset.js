@@ -15,7 +15,7 @@ function ResetPage(props) {
     mutationFn: async () => { await resetSystem() },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [cdcCases, cdcCasesSchema, cdcCasesSubscriber, stateCasesSchema, stateCases] })
-      history.push('/demo')
+      history.push('/')
     }
   })
 

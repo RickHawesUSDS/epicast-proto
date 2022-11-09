@@ -2,21 +2,16 @@ import React from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, ButtonGroup, Checkbox, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormControl, FormGroup, FormLabel, FormControlLabel, makeStyles } from '@material-ui/core'
 
-import { stateCases } from './stateCasesKeys'
-import { addRandomStateCases, publishStateCases } from '../api/api'
+import { stateCases, stateCasesSchema } from './stateCasesKeys'
+import { addRandomStateCases, addStateCaseElement, deleteStateCaseElement, fetchCDCCaseSchema, fetchStateCaseSchema, publishStateCases } from '../api/api'
+import { variableStateCaseElements, localQuestion1, localQuestion2, localQuestion3, neighborQuestion1, neighborQuestion2, cdcQuestion1, cdcQuestion2 } from './variableStateCaseElements'
+import { de } from 'date-fns/locale'
 
 
 export default function StateCasesButtons(props) {
   const queryClient = useQueryClient()
-  const [open, setOpen] = React.useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  }
-
-  const handleClose = () => {
-    setOpen(false);
-  }
+  const [open, setOpen] = React.useState(false)
+  const [checked, setChecked] = React.useState(new Set())
 
   const addCasesMutation = useMutation({
     mutationFn: async (params) => { return await addRandomStateCases(params.numOfDays, params.numPerDay) },
@@ -26,6 +21,53 @@ export default function StateCasesButtons(props) {
   const publishStateCasesMutation = useMutation({
     mutationFn: async () => { return await publishStateCases() }
   })
+
+  const updateStateSchemaMutation = useMutation({
+    mutationFn: async () => {
+      for (let element of variableStateCaseElements) {
+        if (checked.has(element.name)) {
+          await addStateCaseElement(element)
+        } else {
+          await deleteStateCaseElement(element.name)
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [stateCases, stateCasesSchema] })
+    }
+  })
+
+  const handleClickOpen = async () => {
+    const schema = await fetchStateCaseSchema()
+    const newChecked = new Set()
+    for (let element of variableStateCaseElements) {
+      if (schema.elements.findIndex( e => e.name === element.name) !== -1) {
+        newChecked.add(element.name)
+      }
+    }
+    setChecked(newChecked)
+    setOpen(true);
+  }
+
+  const handleClose = () => {
+    setOpen(false);
+  }
+
+  const handleUpdate = async () => {
+    await updateStateSchemaMutation.mutateAsync()
+    setOpen(false);
+  }
+
+  const handleCheckboxChange = (event) => {
+    const newChecked = new Set(checked)
+    const name = event.target.name
+    if (event.target.checked) {
+      newChecked.add(name)
+    } else {
+      newChecked.delete(name)
+    }
+    setChecked(newChecked)
+  }
 
   function onChangeSchemaClick() {
     handleClickOpen()
@@ -41,9 +83,20 @@ export default function StateCasesButtons(props) {
     formControl: {
       margin: theme.spacing(3),
     },
-  }));
+  }))
 
   const buttonClasses = useButtonStyles()
+
+  const createCheckboxes = (questions) => (
+    questions.map((question) => (
+      <FormControlLabel
+        control={
+          <Checkbox name={question.name} checked={checked.has(question.name)} onChange={handleCheckboxChange}/>
+        }
+        label={question.displayName}
+      />
+    ))
+  )
 
   return (
     <div className={buttonClasses.root} align='right'>
@@ -63,31 +116,19 @@ export default function StateCasesButtons(props) {
           <FormControl component="fieldset" className={buttonClasses.formControl}>
             <FormLabel component="legend">Local Questions</FormLabel>
             <FormGroup>
-              <FormControlLabel
-                control={<Checkbox name="gilad" />}
-                label="Local question"
-              />
-              <FormControlLabel
-                control={<Checkbox  name="jason" />}
-                label="Nice local question"
-              />
-              <FormControlLabel
-                control={<Checkbox name="antoine" />}
-                label="Another local question"
-              />
+              {createCheckboxes([localQuestion1, localQuestion2, localQuestion3])}
+            </FormGroup>
+          </FormControl>
+          <FormControl component="fieldset" className={buttonClasses.formControl}>
+            <FormLabel component="legend">From Neighbor State</FormLabel>
+            <FormGroup>
+              {createCheckboxes([neighborQuestion1, neighborQuestion2])}
             </FormGroup>
           </FormControl>
           <FormControl component="fieldset" className={buttonClasses.formControl}>
             <FormLabel component="legend">From CDC</FormLabel>
             <FormGroup>
-              <FormControlLabel
-                control={<Checkbox name="gilad" />}
-                label="New national data element"
-              />
-              <FormControlLabel
-                control={<Checkbox  name="jason" />}
-                label="National data element 2"
-              />
+              {createCheckboxes([cdcQuestion1, cdcQuestion2])}
             </FormGroup>
           </FormControl>
         </DialogContent>
@@ -95,7 +136,7 @@ export default function StateCasesButtons(props) {
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleClose} color="primary">
+          <Button disable={updateStateSchemaMutation.isLoading} onClick={handleUpdate} color="primary">
             Update
           </Button>
         </DialogActions>

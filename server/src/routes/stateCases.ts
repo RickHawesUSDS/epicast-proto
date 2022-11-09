@@ -44,7 +44,8 @@ router.get('/schema', asyncHandler(async (req, res, _next) => {
 router.put('/schema/:elementName', (req, res, _next) => {
   const elementName = req.params.elementName
   const timeSeries = req.stateCaseTimeSeries
-  logger.info(`put the schema element: ${elementName}`)
+  logger.info(`put schema element: ${elementName}`)
+  logger.debug(`put element ${JSON.stringify(req.body)}`)
   const created = timeSeries.addFeedElement(req.body)
   if (created) {
     res.status(201).send(timeSeries.schema.elements.find(e => e.name === elementName))

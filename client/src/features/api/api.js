@@ -14,6 +14,16 @@ export async function fetchStateCaseSchema() {
   return response.data
 }
 
+export async function addStateCaseElement(element) {
+  const response = await axios.put(`/api/stateCases/schema/${element.name}`, element)
+  return response.data
+}
+
+export async function deleteStateCaseElement(name) {
+  const response = await axios.delete(`/api/stateCases/schema/${name}`)
+  return response.data
+}
+
 export async function addRandomStateCases(numOfDays, numPerDay) {
   const response = await axios.post(`/api/stateCases/random?numOfDays=${numOfDays}&numPerDay=${numPerDay}`)
   return response.data
