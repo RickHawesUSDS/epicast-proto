@@ -4,7 +4,7 @@ export const stateCaseTimeSeriesSchemaV1: FeedSchema = {
   epicastVersion: 1.0,
   subjectId: 'epicast',
   reporterId: 'demoserver',
-  feedId: 'feed1',
+  topicId: 'feed1',
   validFrom: new Date(2022, 10, 1),
   elements: [
     {

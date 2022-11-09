@@ -1,16 +1,17 @@
 # version of the epicast that is used
 epicastVersion: 0.1
 
-# Subject ID represent of the reporting. The state or the organization that is reporting.
-# In this case, epicast is used to represent organization
-# Note: CDC is the organization behind EpiCast at the current time
+# Subject ID represent of the reporting subject.
+# For cases, the jurisdiction or the population that is the subject of the reporting.
+# In this demo, epicast is used to represent jurisdition
 subjectId: {{ subjectId }}
 
-# The reporter is the system or facility reporting on behafe of the subject.
+# The reporter is the organization, system or facility reporting on the subject.
+# For cases, this will likely be a name of a public health agency
 reporterId: {{ reporterId }}
 
-# The name of the feed from this publishing system
-feedId: {{ feedId }}
+# The topic of the feed. For cases, this will be something like 'covid_19_cases' 
+topicId: {{ topicId }}
 
 # The date that this schema was used in this feed
 validFrom: {{ validFrom }}

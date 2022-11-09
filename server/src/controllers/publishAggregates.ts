@@ -9,7 +9,7 @@ import { formatISO } from 'date-fns'
 
 const logger = getLogger('PUBLISH_AGREGATES_SERVICE')
 
-export async function publishAggregates<T> (toSnapshot: MutableSnapshot, fromTimeSeries: TimeSeries<T>): Promise<void> {
+export async function publishAggregates<T>(toSnapshot: MutableSnapshot, fromTimeSeries: TimeSeries<T>): Promise<void> {
   const publisher = new AggregatesPublisher(toSnapshot, fromTimeSeries)
   await publisher.publish()
 }
@@ -18,12 +18,12 @@ class AggregatesPublisher<T> {
   snapshot: MutableSnapshot
   timeSeries: TimeSeries<T>
 
-  constructor (toSnapshot: MutableSnapshot, fromTimeSeries: TimeSeries<T>) {
+  constructor(toSnapshot: MutableSnapshot, fromTimeSeries: TimeSeries<T>) {
     this.snapshot = toSnapshot
     this.timeSeries = fromTimeSeries
   }
 
-  async publish (): Promise<void> {
+  async publish(): Promise<void> {
     logger.info('Publishing an aggregate')
     const events = await this.timeSeries.findEvents({ sortDescending: false })
     if (events.length === 0) return
@@ -38,18 +38,19 @@ class AggregatesPublisher<T> {
   async publishDailyCounts<T>(year: number, partitions: Array<TimeSeriesPartition<T>>): Promise<void> {
     const subject = this.timeSeries.schema.subjectId
     const reporter = this.timeSeries.schema.reporterId
+    const feed = this.timeSeries.schema.topicId
 
-    function createCSV (partitions: Array<TimeSeriesPartition<T>>): string {
+    function createCSV(partitions: Array<TimeSeriesPartition<T>>): string {
       const csv = partitions.map(partition => {
-        const values = [subject, reporter, formatISO(partition.period.start), formatISO(partition.period.end), partition.events.length]
+        const values = [subject, reporter, feed, formatISO(partition.period.start), formatISO(partition.period.end), partition.events.length]
         return stringify(values)
       })
-      csv.unshift(stringify(['subject', 'reporter', 'period-start', 'period-end', 'count']))
+      csv.unshift(stringify(['subject', 'reporter', 'feed', 'period-start', 'period-end', 'count']))
       return csv.join('')
     }
 
     const schema = this.timeSeries.schema
-    const key = formAggregatesKey(schema.subjectId, schema.reporterId, schema.feedId, year)
+    const key = formAggregatesKey(schema.subjectId, schema.reporterId, schema.topicId, year)
     const report = createCSV(partitions)
     await this.snapshot.putObject(key, report)
   }
@@ -61,7 +62,7 @@ class AggregatesPublisher<T> {
       const year = p.period.start.getFullYear()
       const yearPartition = map.get(year);
       if (yearPartition === undefined) {
-          map.set(year, [p]);
+        map.set(year, [p]);
       } else {
         yearPartition.push(p);
       }
