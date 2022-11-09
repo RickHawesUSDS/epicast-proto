@@ -24,16 +24,18 @@ class AggregatesPublisher<T> {
   }
 
   async publish (): Promise<void> {
-    // TODO: do the work to partition move to yearly aggregates
     logger.info('Publishing an aggregate')
     const events = await this.timeSeries.findEvents({ sortDescending: false })
     if (events.length === 0) return
     const timeSeriesEvents = events.map(e => this.timeSeries.makeTimeSeriesEvent(e))
     const partitions = makeCasePartions(timeSeriesEvents, Frequency.DAILY)
-    await this.publishDailyCounts(partitions)
+    const partitionsByYear = this.groupByYear(partitions)
+    for (let [year, yearPartition] of partitionsByYear) {
+      await this.publishDailyCounts(year, yearPartition)
+    }
   }
 
-  async publishDailyCounts<T>(partitions: Array<TimeSeriesPartition<T>>): Promise<void> {
+  async publishDailyCounts<T>(year: number, partitions: Array<TimeSeriesPartition<T>>): Promise<void> {
     const subject = this.timeSeries.schema.subjectId
     const reporter = this.timeSeries.schema.reporterId
 
@@ -47,9 +49,22 @@ class AggregatesPublisher<T> {
     }
 
     const schema = this.timeSeries.schema
-    const year = partitions[0].period.start.getUTCFullYear()
     const key = formAggregatesKey(schema.subjectId, schema.reporterId, schema.feedId, year)
     const report = createCSV(partitions)
     await this.snapshot.putObject(key, report)
+  }
+
+  groupByYear(partitions: TimeSeriesPartition<T>[]): Map<number, TimeSeriesPartition<T>[]> {
+    const map = new Map<number, TimeSeriesPartition<T>[]>();
+    partitions.forEach(p => {
+      const year = p.period.start.getFullYear()
+      const yearPartition = map.get(year);
+      if (yearPartition === undefined) {
+          map.set(year, [p]);
+      } else {
+        yearPartition.push(p);
+      }
+    })
+    return map;
   }
 }
