@@ -27,8 +27,8 @@ export const periodFromTimeSeriesKey = (key: string): Period => {
 
 export const SCHEMA_FOLDER = 'schema'
 export const SCHEMA_EXTENSION = 'yaml'
-export const formSchemaKey = (organizationId: string, systemId: string, feedId: string, validFrom: Date): string => {
-  return `${SCHEMA_FOLDER}/${[organizationId, systemId, feedId, formatISO(validFrom)].join(FILE_NAME_SEPERATOR)}.${SCHEMA_EXTENSION}`
+export const formSchemaKey = (subjectId: string, reporterId: string, feedId: string, validFrom: Date): string => {
+  return `${SCHEMA_FOLDER}/${[subjectId, reporterId, feedId, formatISO(validFrom)].join(FILE_NAME_SEPERATOR)}.${SCHEMA_EXTENSION}`
 }
 export const splitSchemaKey = (key: string): string[] => {
   const fileName = pathPosix.parse(key).name
@@ -36,8 +36,8 @@ export const splitSchemaKey = (key: string): string[] => {
 }
 
 export const FILE_NAME_SEPERATOR = '-'
-export const formFeedName = (organizationId: string, systemId: string, feedId: string): string => {
-  return [organizationId, systemId, feedId].join(FILE_NAME_SEPERATOR)
+export const formFeedName = (subjectId: string, reporterId: string, feedId: string): string => {
+  return [subjectId, reporterId, feedId].join(FILE_NAME_SEPERATOR)
 }
 
 export const SNAPSHOT_FOLDER = 'snapshots'
@@ -48,4 +48,10 @@ export const formSnapshotKey = (version: number): string => {
 export const versionFromSnapshotKey = (key: string): number => {
   const fileName = pathPosix.parse(key).name
   return parseInt(fileName)
+}
+
+export const AGGREGATES_FOLDER = 'aggregates'
+export const AGGREGATES_EXTENSION = 'csv'
+export const formAggregatesKey = (subjectId: string, reporterId: string, feedId: string, year: number): string => {
+  return `${AGGREGATES_FOLDER}/${subjectId}-${reporterId}-${feedId}-${year}.${AGGREGATES_EXTENSION}`
 }

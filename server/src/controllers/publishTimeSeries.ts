@@ -1,4 +1,4 @@
-import { max as maxDate, isAfter, isWithinInterval, formatISO, isFirstDayOfMonth, addDays, isBefore, startOfDay, differenceInDays, endOfDay } from 'date-fns'
+import { max as maxDate, isAfter, formatISO, isFirstDayOfMonth, addDays, isBefore, startOfDay, differenceInDays, endOfDay } from 'date-fns'
 import { stringify } from 'csv-string'
 
 import { BucketObject } from '@/models/FeedBucket'
@@ -10,22 +10,17 @@ import { TimeSeries, TimeSeriesEvent, TimeSeriesFindOptions } from '../models/Ti
 import { FeedElement, filterElements } from '../models/FeedElement'
 import { assert } from 'console'
 import { MutableSnapshot } from '@/models/Snapshot'
+import { TimeSeriesPartition, makeCasePartions } from '../models/TimeSeriesPartition'
 
 const DESIRED_MAX_MONTHLY_COUNT = 10000 / 30
 
 const logger = getLogger('PUBLISH_TIME_SERIES_SERVICE')
 
 export async function publishTimeseries<T> (toSnapshot: MutableSnapshot, timeseries: TimeSeries<T>): Promise<void> {
-  logger.info(`publishing timeseries: ${timeseries.schema.organizationId}-${timeseries.schema.organizationId}`)
+  logger.info(`publishing timeseries: ${timeseries.schema.subjectId}-${timeseries.schema.reporterId}`)
   const publisher = new TimeSeriesPublisher(toSnapshot, timeseries)
   await publisher.publish()
 }
-
-interface CasePartition<T> {
-  period: Period
-  cases: Array<TimeSeriesEvent<T>>
-}
-
 class TimeSeriesPublisher<T> {
   snapshot: MutableSnapshot
   timeseries: TimeSeries<T>
@@ -95,11 +90,11 @@ class TimeSeriesPublisher<T> {
     const partitions = await this.makeRightSizedPartitions(events, startDate, endDate, lastPublishedPeriod)
     for (const partition of partitions) {
       const key = formTimeSeriesKey(partition.period)
-      await this.putPartition(key, partition.cases)
+      await this.putPartition(key, partition.events)
     }
   }
 
-  async makeRightSizedPartitions (events: Array<TimeSeriesEvent<T>>, startDate: Date, endDate: Date, lastPublishedPeriod?: Period): Promise<Array<CasePartition<T>>> {
+  async makeRightSizedPartitions (events: Array<TimeSeriesEvent<T>>, startDate: Date, endDate: Date, lastPublishedPeriod?: Period): Promise<Array<TimeSeriesPartition<T>>> {
     assert(isBefore(startDate, endDate), 'end before start date')
     assert(
       lastPublishedPeriod === undefined ||
@@ -110,8 +105,8 @@ class TimeSeriesPublisher<T> {
     if (events.length === 0) return []
 
     // This code basically decides between daily and monthly partitions based on partition size.
-    let partitions: Array<CasePartition<T>> = []
-    const monthlyPartitions = this.makeCasePartions(events, startDate, endDate, Frequency.MONTHLY)
+    let partitions: Array<TimeSeriesPartition<T>> = []
+    const monthlyPartitions = makeCasePartions(events, Frequency.MONTHLY, startDate, endDate)
     // look at each monthly partition and decide if it is too large
     for (let index = 0; index < monthlyPartitions.length; index++) {
       const monthlyPartition = monthlyPartitions[index]
@@ -119,13 +114,13 @@ class TimeSeriesPublisher<T> {
       if (index === 0) {
         count = await this.timeseries.countEvents({ after: startOfDay(addDays(monthlyPartition.period.end, -30)), before: monthlyPartition.period.end })
       } else {
-        count = monthlyPartition.cases.length
+        count = monthlyPartition.events.length
       }
       const lengthOfPeriod = Math.min(differenceInDays(monthlyPartition.period.end, monthlyPartition.period.start), 1)
       if ((count / lengthOfPeriod) < DESIRED_MAX_MONTHLY_COUNT) {
         partitions = partitions.concat(monthlyPartition)
       } else {
-        const dailyPartitions = this.makeCasePartions(events, monthlyPartition.period.start, monthlyPartition.period.end, Frequency.DAILY)
+        const dailyPartitions = makeCasePartions(events, Frequency.DAILY, monthlyPartition.period.start, monthlyPartition.period.end)
         partitions = partitions.concat(dailyPartitions)
       }
     }
@@ -163,27 +158,12 @@ class TimeSeriesPublisher<T> {
     await this.snapshot.putObject(key, report)
   }
 
-  makeCasePartions (events: Array<TimeSeriesEvent<T>>, startDate: Date, endDate: Date, frequency: Frequency): Array<CasePartition<T>> {
-    const partions: Array<CasePartition<T>> = []
-    let partitionPeriod = new Period(startDate, frequency)
-    while (!isAfter(partitionPeriod.start, endDate)) {
-      const partitionCases = this.findCasesForPeriod(events, partitionPeriod)
-      partions.push({ period: partitionPeriod, cases: partitionCases })
-      partitionPeriod = partitionPeriod.nextPeriod()
-    }
-    return partions
-  }
-
   firstEventDate (events: Array<TimeSeriesEvent<T>>): Date | undefined {
     return events.at(0)?.eventAt
   }
 
   lastEventDate (events: Array<TimeSeriesEvent<T>>): Date | undefined {
     return events.at(-1)?.eventAt
-  }
-
-  findCasesForPeriod (events: Array<TimeSeriesEvent<T>>, period: Period): Array<TimeSeriesEvent<T>> {
-    return events.filter((event) => { return isWithinInterval(event.eventAt, period.interval) })
   }
 
   calcMaxLastModified (objects: BucketObject[]): Date | undefined {

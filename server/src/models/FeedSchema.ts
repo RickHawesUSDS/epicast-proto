@@ -2,8 +2,8 @@ import { FeedElement } from './FeedElement'
 
 export interface FeedSchema {
   readonly epicastVersion: number
-  readonly organizationId: string
-  readonly systemId: string
+  readonly subjectId: string
+  readonly reporterId: string
   readonly feedId: string
   readonly validFrom: Date
   readonly elements: FeedElement[]
@@ -11,16 +11,16 @@ export interface FeedSchema {
 
 export class MutableFeedSchema implements FeedSchema {
   epicastVersion: number
-  organizationId: string
-  systemId: string
+  subjectId: string
+  reporterId: string
   feedId: string
   validFrom: Date
   elements: FeedElement[]
 
   constructor (initSchema: FeedSchema) {
     this.epicastVersion = initSchema.epicastVersion
-    this.organizationId = initSchema.organizationId
-    this.systemId = initSchema.systemId
+    this.subjectId = initSchema.subjectId
+    this.reporterId = initSchema.reporterId
     this.feedId = initSchema.feedId
     this.validFrom = initSchema.validFrom
     this.elements = initSchema.elements

@@ -55,8 +55,8 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
 
   schema: FeedSchema = {
     epicastVersion: 1.0,
-    organizationId: 'epicast',
-    systemId: 'demoserver',
+    subjectId: 'epicast',
+    reporterId: 'demoserver',
     feedId: 'feed1',
     validFrom: new Date(1900, 1, 1), // Early date
     elements: []

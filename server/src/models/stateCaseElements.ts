@@ -2,8 +2,8 @@ import { FeedSchema } from './FeedSchema'
 
 export const stateCaseTimeSeriesSchemaV1: FeedSchema = {
   epicastVersion: 1.0,
-  organizationId: 'epicast',
-  systemId: 'demoserver',
+  subjectId: 'epicast',
+  reporterId: 'demoserver',
   feedId: 'feed1',
   validFrom: new Date(2022, 10, 1),
   elements: [

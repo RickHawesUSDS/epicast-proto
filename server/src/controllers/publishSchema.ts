@@ -12,7 +12,7 @@ const logger = getLogger('PUBLISH_SCHEMA_SERVICE')
 const SCHEMA_TEMPLATE_PATH = './src/public/epicast-demoserver-feed1-schema.handlebars'
 
 export async function publishSchema (toSnapshot: MutableSnapshot, schema: FeedSchema): Promise<void> {
-  const schemaKey = formSchemaKey(schema.organizationId, schema.systemId, schema.feedId, schema.validFrom)
+  const schemaKey = formSchemaKey(schema.subjectId, schema.reporterId, schema.feedId, schema.validFrom)
   if (!toSnapshot.doesObjectExist(schemaKey)) {
     logger.info('publishing schema')
     const schemaTemplate = readFileSync(SCHEMA_TEMPLATE_PATH, { encoding: 'utf8' })
@@ -27,8 +27,8 @@ function formTemplateContext (schema: FeedSchema): any {
   const deidentifiedElements = filterElements(schema.elements, 'pii')
   // format stuff in the way that the YAML file wants
   return {
-    organizationId: schema.organizationId,
-    systemId: schema.systemId,
+    subjectId: schema.subjectId,
+    reporterId: schema.reporterId,
     feedId: schema.feedId,
     validFrom: formatISO(schema.validFrom),
     elements: deidentifiedElements

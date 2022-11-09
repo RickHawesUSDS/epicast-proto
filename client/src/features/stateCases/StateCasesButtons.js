@@ -5,7 +5,6 @@ import { Button, ButtonGroup, Checkbox, Dialog, DialogTitle, DialogContent, Dial
 import { stateCases, stateCasesSchema } from './stateCasesKeys'
 import { addRandomStateCases, addStateCaseElement, deleteStateCaseElement, fetchCDCCaseSchema, fetchStateCaseSchema, publishStateCases } from '../api/api'
 import { variableStateCaseElements, localQuestion1, localQuestion2, localQuestion3, neighborQuestion1, neighborQuestion2, cdcQuestion1, cdcQuestion2 } from './variableStateCaseElements'
-import { de } from 'date-fns/locale'
 
 
 export default function StateCasesButtons(props) {
