@@ -17,7 +17,7 @@ export class MutableFeedSchema implements FeedSchema {
   validFrom: Date
   elements: FeedElement[]
 
-  constructor(initSchema: FeedSchema) {
+  constructor (initSchema: FeedSchema) {
     this.epicastVersion = initSchema.epicastVersion
     this.subjectId = initSchema.subjectId
     this.reporterId = initSchema.reporterId
@@ -26,7 +26,7 @@ export class MutableFeedSchema implements FeedSchema {
     this.elements = initSchema.elements
   }
 
-  addElement(element: FeedElement): boolean {
+  addElement (element: FeedElement): boolean {
     this.validFrom = new Date()
     const copy = [...this.elements]
     const index = this.elements.findIndex(e => e.name === element.name)
@@ -39,7 +39,7 @@ export class MutableFeedSchema implements FeedSchema {
     return index === -1
   }
 
-  deleteElement(name: string): boolean {
+  deleteElement (name: string): boolean {
     const index = this.elements.findIndex(e => e.name === name)
     if (index === -1) return false
 
