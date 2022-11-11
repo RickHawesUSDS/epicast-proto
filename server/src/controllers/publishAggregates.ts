@@ -43,10 +43,18 @@ class AggregatesPublisher<T> {
 
     function createCSV (partitions: Array<TimeSeriesPartition<T>>): string {
       const csv = partitions.map(partition => {
-        const values = [subject, reporter, feed, formatISO(partition.period.start), formatISO(partition.period.end), partition.events.length]
-        return stringify(values)
+        let rows: string[] = []
+        const genderGrouping = groupBy(partition.events, (e) => e.getValue('personSexAtBirth'))
+        for (let [gender, events] of genderGrouping) {
+          const row = stringify(([subject, reporter, feed, formatISO(partition.period.start), formatISO(partition.period.end), 'gender', gender, events.length]))
+          rows.push(row)
+        }
+        const totalRow = stringify([subject, reporter, feed, formatISO(partition.period.start), formatISO(partition.period.end), '', '', partition.events.length])
+        rows.push(totalRow)
+        return rows.join('')
+        
       })
-      csv.unshift(stringify(['subject', 'reporter', 'feed', 'period-start', 'period-end', 'count']))
+      csv.unshift(stringify(['subject', 'reporter', 'feed', 'period-start', 'period-end', 'stratifier', 'stratum', 'count']))
       return csv.join('')
     }
 
