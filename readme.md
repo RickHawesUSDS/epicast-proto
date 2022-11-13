@@ -2,12 +2,22 @@
 
 This is a repository for rhawes@cdc.gov to explore concepts about the EpiCast protocol.
 
-## EpiCast aims to
+## EpiCast is
 
 A proposed technical solution to for public health programs to share case information with CDC, each other and the public.
 
+EpiCast is a follow-up project to the earlier Case Surviellance Discover sprint that the CDC/USDS conducted to create a NNDSS sytem that was:
+
+1. Excellent on new and emerging diseases and conditions
+2. Supported current standards and facilited the emergence of new standards
+3. Supported bidirection/multidirectional collaboration between states and cdc
+4. Built on cloud-first and DMI principles
+5. Free from syncronization and aggregate total errors
+
+EpiCast supports the construction of such a system with reasonable costs.
+
 * **Human and machine readable** - Simple enough for humans to read, structured and standardized enough that machines can acess the data.
-* **Flexible** - able to handle data element changes, local and national, that occur in an new outbreak.
+* **Flexible** - Data dictionaries to handle data element changes, local and national, that occur in an new outbreak.
 * **Scalable** - Support pandemic scale. From 1 to 1M data items per month.
 * **Sustainable** - Standardized, open-source reference implementations, free tooling and services.
 * **Secure** - Support both public and private feeds.
@@ -45,6 +55,9 @@ The prototype should be support a demonstration of these concepts.
     3. Add a cdc and local elements
     4. Show the schema change
     5. Show the receive table
+4. Show special features
+    1. Aggregates table
+    2. Validation markers
 
 ## TODO
 
