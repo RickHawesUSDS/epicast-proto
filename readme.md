@@ -70,7 +70,8 @@ The prototype should be support a demonstration of these concepts.
 * [x] Aggregates published
 * [ ] Random change methods and button
 * [ ] Random duplicates. Add deduplicate button. replaceBy column. replacedBy log.
-* [ ] Validator service
+* [ ] Reorganize code around domains (senders, receivers, feed, server, utils) and CUPID
+* [ ] Validator service. watcher domain to validate and provide webhooks.
 * [ ] Show only published elements in State table
 * [ ] Show only what is CDC elements in CDC table
 * [ ] Allow two people to run the demo at the same time. Locking publishers needed.
