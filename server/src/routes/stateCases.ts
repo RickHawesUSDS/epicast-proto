@@ -63,4 +63,9 @@ router.delete('/schema/:elementName', (req, res, _next) => {
   res.status(204).send()
 })
 
+/* Deduplicate */
+router.post('/deduplicate', asyncHandler(async (req, res, _next) => {
+
+}))
+
 export default router

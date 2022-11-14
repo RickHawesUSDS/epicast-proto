@@ -7,6 +7,9 @@ GET http://localhost:3001/api/stateCases?sort=desc
 ### Add a random case
 POST http://localhost:3001/api/stateCases/random
 
+### Add a 20 random cases
+POST http://localhost:3001/api/stateCases/random?numOfDays=2&numPerDay=10
+
 ### Add multiple random cases
 POST http://localhost:3001/api/stateCases/random?numOfDays=5&numPerDay=3000
 
@@ -55,3 +58,7 @@ POST http://localhost:3001/api/cdcCases/subscriber
 content-type: application/json
 
 { "automatic": false }
+
+
+### Deduplicate the state feed
+POST http://localhost:3001/api/stateCases/deduplicate

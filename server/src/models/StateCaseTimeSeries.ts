@@ -7,9 +7,12 @@ import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesEv
 import { stateCaseTimeSeriesSchemaV1, variableSchemaElementNames } from './stateCaseElements'
 import { MutableFeedSchema } from './FeedSchema'
 import { FeedElement } from './FeedElement'
+import { getLogger } from '@/utils/loggers'
+
+const logger = getLogger('STATE_CASE_TIME_SERIES')
 
 export class StateCaseTimeSeries implements TimeSeries<StateCase> {
-  async findEvents (options: TimeSeriesFindOptions): Promise<StateCase[]> {
+  async findEvents(options: TimeSeriesFindOptions): Promise<StateCase[]> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -25,7 +28,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return await StateCase.findAll({ where, order })
   }
 
-  async countEvents (options: TimeSeriesCountOptions): Promise<number> {
+  async countEvents(options: TimeSeriesCountOptions): Promise<number> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -40,7 +43,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return await StateCase.count({ where })
   }
 
-  async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
+  async fetchMetadata(): Promise<TimeSeriesMetadata | null> {
     const lastUpdated = await StateCase.findOne({ order: [['updatedAt', 'DESC']] })
     if (lastUpdated === null) return null
     const lastCase = await StateCase.findOne({ order: [['caseAt', 'DESC']] })
@@ -48,25 +51,25 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return { lastUpdatedAt: lastUpdated.updatedAt, lastEventAt: lastCase.caseDate }
   }
 
-  makeTimeSeriesEvent (event: StateCase): TimeSeriesEvent<StateCase> {
+  makeTimeSeriesEvent(event: StateCase): TimeSeriesEvent<StateCase> {
     return new StateCaseTimeSeriesEvent(event)
   }
 
   schema = new MutableFeedSchema(stateCaseTimeSeriesSchemaV1)
 
-  addFeedElement (element: FeedElement): boolean {
+  addFeedElement(element: FeedElement): boolean {
     return this.schema.addElement(element)
   }
 
-  deleteFeedElement (name: string): boolean {
+  deleteFeedElement(name: string): boolean {
     return this.schema.deleteElement(name)
   }
 
-  resetSchema (): void {
+  resetSchema(): void {
     this.schema = new MutableFeedSchema(stateCaseTimeSeriesSchemaV1)
   }
 
-  async insertFakeStateCases (numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
+  async insertFakeStateCases(numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
     const decideOnDate = async (): Promise<Date> => {
       const now = new Date()
       if (numberOfDays * numberPerDay > 10000) {
@@ -84,21 +87,35 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
       return adjustedCaseDate
     }
 
+    const generateNewCase = (newCaseDate: Date, lastCase?: StateCase): StateCase => {
+      let stateCase: StateCase
+      if (lastCase !== undefined && Math.random() < 0.2) {
+        logger.debug('duplicate')
+        stateCase = new StateCase()
+        this.setStateCase(stateCase, lastCase)
+      } else {
+        stateCase = new StateCase()
+        this.fakeStateCase(stateCase, newCaseDate)
+      }
+      return stateCase
+    }
+
     const firstDate = await decideOnDate()
     const casesAdded: StateCase[] = []
     for (let day = 0; day < numberOfDays; day++) {
       const newCaseDate = addDays(firstDate, day)
+      let lastCase: StateCase | undefined
       for (let i = 0; i < numberPerDay; i++) {
-        const stateCase = new StateCase()
-        this.fakeStateCase(stateCase, newCaseDate)
+        const stateCase = generateNewCase(newCaseDate, lastCase)
         await stateCase.save()
         casesAdded.push(stateCase)
+        lastCase = stateCase
       }
     }
     return casesAdded
   }
 
-  private fakeStateCase (stateCase: StateCase, caseDate: Date): void {
+  private fakeStateCase(stateCase: StateCase, caseDate: Date): void {
     stateCase.personFirstName = faker.name.firstName()
     stateCase.personLastName = faker.name.lastName()
     stateCase.personAddress = faker.address.streetAddress()
@@ -117,7 +134,10 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     stateCase.onsetOfSymptoms = caseDate
 
     stateCase.caseDate = caseDate
+    this.fakeVariableElements(stateCase)
+  }
 
+  private fakeVariableElements(stateCase: StateCase) {
     for (const variableElementName of variableSchemaElementNames) {
       const index = this.schema.elements.findIndex(e => e.name === variableElementName)
       if (index !== -1) {
@@ -126,7 +146,27 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     }
   }
 
-  private static sample (codeset: string[]): string {
+  private setStateCase(to: StateCase, from: StateCase) {
+    to.personFirstName = from.personFirstName
+    to.personLastName = from.personLastName
+    to.personAddress = from.personAddress
+    to.personCity = from.personCity
+    to.personState = from.personState
+    to.personRace = from.personRace
+    to.personSexAtBirth = from.personSexAtBirth
+    to.personEthnicity = from.personEthnicity
+    to.personPostalCode = from.personPostalCode
+    to.personPhone = from.personPhone
+    to.personEmail = from.personEmail
+    to.hospitalized = from.hospitalized
+    to.subjectDied = from.subjectDied
+    to.personDateOfBirth = from.personDateOfBirth
+    to.onsetOfSymptoms = from.onsetOfSymptoms
+    to.caseDate = from.caseDate
+    this.fakeVariableElements(to)
+  }
+
+  private static sample(codeset: string[]): string {
     const random = Math.floor(Math.random() * codeset.length)
     return codeset[random]
   }
@@ -135,27 +175,27 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
 export class StateCaseTimeSeriesEvent implements TimeSeriesEvent<StateCase> {
   #stateCase: StateCase
 
-  constructor (stateCase: StateCase) {
+  constructor(stateCase: StateCase) {
     this.#stateCase = stateCase
   }
 
-  get eventAt (): Date {
+  get eventAt(): Date {
     return this.#stateCase.caseDate
   }
 
-  get eventId (): number {
+  get eventId(): number {
     return this.#stateCase.caseId
   }
 
-  get eventUpdatedAt (): Date {
+  get eventUpdatedAt(): Date {
     return this.#stateCase.updatedAt
   }
 
-  get model (): StateCase {
+  get model(): StateCase {
     return this.#stateCase
   }
 
-  getValue (name: string): any {
+  getValue(name: string): any {
     return this.#stateCase[name as keyof StateCase]
   }
 }
