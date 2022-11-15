@@ -30,7 +30,10 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
       where.isDeleted = { [Op.not]: true }
     }
 
-    const order: Order = [['caseDate', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']]
+    const order: Order = [
+      ['caseDate', (options?.sortDescending ?? false) ? 'DESC' : 'ASC'],
+      ['caseId', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']
+    ]
     return await StateCase.findAll({ where, order })
   }
 
@@ -98,11 +101,13 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
       return adjustedCaseDate
     }
 
+    let duplicateCount = 0
     const generateNewCase = (newCaseDate: Date, lastCase?: StateCase): StateCase => {
       let stateCase: StateCase
       if (lastCase !== undefined && Math.random() < 0.2) {
         stateCase = new StateCase()
         this.setStateCase(stateCase, lastCase)
+        duplicateCount += 1
       } else {
         stateCase = new StateCase()
         this.fakeStateCase(stateCase, newCaseDate)
@@ -122,6 +127,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
         lastCase = stateCase
       }
     }
+    logger.debug(`Duplicate cases added: ${duplicateCount}`)
     return casesAdded
   }
 
@@ -132,20 +138,31 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
       a.personEmail === b.personEmail
     }
 
-    logger.info('Deduplicating state cases')
-    let duplicateCount = 0
-    const cases = await StateCase.findAll({ order: [['caseId', 'ASC']] })
-    for (let i = 0; i < cases.length; i++) {
-      for (let j = i + 1; j < cases.length; j++) {
-        if (isDuplicate(cases[i], cases[j])) {
-          cases[j].isDeleted = true
-          cases[j].replacedBy = i
-          await cases[j].save()
-          duplicateCount += 1
+    async function findDuplicates(cases: StateCase[], found: (duplicate: StateCase, original: StateCase) => Promise<void>): Promise<number> {
+      // This algorithm only works if duplicates are consecutive as is the case for our code
+      let duplicateCount = 0
+      for (let i = 0; i < cases.length; i++) {
+        for (let j = i + 1; j < cases.length; j++) {
+          if (isDuplicate(cases[i], cases[j])) {
+            await found(cases[j], cases[i])
+            duplicateCount += 1
+          } else {
+            i = j - 1 // increment will make this i = j on next loop
+            break
+          }
         }
       }
+      return duplicateCount
     }
-    logger.info(`Found duplicates: ${duplicateCount}`)
+
+    logger.info('Deduplicating state cases')
+    const cases = await this.findEvents({ sortDescending: false })
+    const duplicateCount = await findDuplicates(cases, async (duplicate, original) => {
+      duplicate.isDeleted = true
+      duplicate.replacedBy = original.id
+      await duplicate.save()
+    })
+    logger.debug(`Found duplicates: ${duplicateCount}`)
   }
 
   private fakeStateCase (stateCase: StateCase, caseDate: Date): void {

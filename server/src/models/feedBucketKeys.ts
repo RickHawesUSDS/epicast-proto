@@ -25,6 +25,17 @@ export const periodFromTimeSeriesKey = (key: string): Period => {
   return Period.parse(periodPart)
 }
 
+export const DELETED_FOLDER = 'deleted'
+export const DELETED_EXT = 'csv'
+export const formDeletedKey = (forPeriod: Period): string => {
+  const fileName = forPeriod.toString()
+  return `${DELETED_FOLDER}/${fileName}.${DELETED_EXT}`
+}
+export const periodFromDeletedKey = (key: string): Period => {
+  const periodPart = pathPosix.parse(key).name
+  return Period.parse(periodPart)
+}
+
 export const SCHEMA_FOLDER = 'schema'
 export const SCHEMA_EXTENSION = 'yaml'
 export const formSchemaKey = (subjectId: string, reporterId: string, feedId: string, validFrom: Date): string => {

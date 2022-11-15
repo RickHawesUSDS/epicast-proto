@@ -13,7 +13,7 @@ router.get('/', asyncHandler(async (req, res, _next) => {
 
   const sortDescending = 'DESC'.localeCompare(sort, 'en', { sensitivity: 'base' }) === 0
   const cases = await req.stateCaseTimeSeries.findEvents({ sortDescending })
-  res.send(cases)
+  res.status(200).send(cases)
 }))
 
 /* POST add a random new cases */
@@ -24,20 +24,20 @@ router.post('/random', asyncHandler(async (req, res, _next) => {
   if (isNaN(numOfDays)) numOfDays = 1
   logger.info(`Add random cases: ${numOfDays}, ${numPerDay}`)
   const stateCases = await req.stateCaseTimeSeries.insertFakeStateCases(numOfDays, numPerDay)
-  res.send(stateCases)
+  res.status(200).send(stateCases)
 }))
 
 /* POST publish all cases */
 router.post('/publish', asyncHandler(async (req, res, _next) => {
   logger.info('publish state cases')
   await publishFeed(req.bucket, req.stateCaseTimeSeries)
-  res.send('success')
+  res.status(200).send('success')
 }))
 
 /* GET schema */
 router.get('/schema', asyncHandler(async (req, res, _next) => {
   logger.info('get the schema')
-  res.send(req.stateCaseTimeSeries.schema)
+  res.status(200).send(req.stateCaseTimeSeries.schema)
 }))
 
 /* PUT feed element */
@@ -50,7 +50,7 @@ router.put('/schema/:elementName', (req, res, _next) => {
   if (created) {
     res.status(201).send(timeSeries.schema.elements.find(e => e.name === elementName))
   } else {
-    res.send(timeSeries.schema.elements.find(e => e.name === elementName))
+    res.status(200).send(timeSeries.schema.elements.find(e => e.name === elementName))
   }
 })
 
@@ -67,7 +67,7 @@ router.delete('/schema/:elementName', (req, res, _next) => {
 router.post('/deduplicate', asyncHandler(async (req, res, _next) => {
   const timeSeries = req.stateCaseTimeSeries
   await timeSeries.deduplicate()
-  res.status(200).send()
+  res.status(200).send('success')
 }))
 
 export default router

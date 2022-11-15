@@ -2,7 +2,7 @@ import { max as maxDate, isAfter, formatISO, isFirstDayOfMonth, addDays, isBefor
 import { stringify } from 'csv-string'
 
 import { BucketObject } from '@/models/FeedBucket'
-import { formTimeSeriesKey, periodFromTimeSeriesKey, TIMESERIES_FOLDER } from '@/models/feedBucketKeys'
+import { formDeletedKey, formTimeSeriesKey, periodFromTimeSeriesKey, TIMESERIES_FOLDER } from '@/models/feedBucketKeys'
 import { getLogger } from '@/utils/loggers'
 import { Period } from '@/utils/Period'
 import { Frequency } from '@/utils/Frequency'
@@ -47,8 +47,14 @@ class TimeSeriesPublisher<T> {
       const isPeriodUpdated = await this.hasUpdates(period, lastPublishDate)
       if (isPeriodUpdated) {
         const periodCases = await this.findEvents({ interval: period.interval })
-        logger.debug(`updating partition: ${publishedObject.key} with ${periodCases.length} cases`)
-        await this.updatePartition(period, periodCases)
+        logger.debug(`updating partition ${publishedObject.key} with ${periodCases.length} cases`)
+        await this.putPartition(period, periodCases)
+
+        const periodDeletedCases = await this.findEvents({ interval: period.interval, isDeleted: true })
+        if (periodDeletedCases.length > 0) {
+          logger.debug(`updating deleted for ${publishedObject.key} with ${periodDeletedCases.length} cases`)
+          await this.putDeletedPartition(period, periodDeletedCases)
+        }
         count += 1
       }
     }
@@ -71,36 +77,40 @@ class TimeSeriesPublisher<T> {
     return updatedCount > 0 || deletedCount > 0
   }
 
-  async updatePartition (period: Period, periodEvents: Array<TimeSeriesEvent<T>>): Promise<void> {
-    const key = formTimeSeriesKey(period)
-    await this.putPartition(key, periodEvents)
-  }
-
   async findLastPublishedPeriod (): Promise<Period | undefined> {
     const publishedObjects = await this.snapshot.listObjects(TIMESERIES_FOLDER)
     return this.calcLastPeriod(publishedObjects)
   }
 
   async publishNewPartitions (): Promise<number> {
-    let events: Array<TimeSeriesEvent<T>>
-    let startDate: Date
-    let endDate: Date
-    // Get the events
-    const lastPublishedPeriod = await this.findLastPublishedPeriod()
-    if (lastPublishedPeriod === undefined) {
-      events = await this.findEvents({})
-      startDate = startOfDay(this.firstEventDate(events) ?? new Date())
-      endDate = endOfDay(this.lastEventDate(events) ?? new Date())
-    } else {
-      startDate = lastPublishedPeriod.nextPeriod().start
-      events = await this.findEvents({ after: startDate })
-      endDate = endOfDay(this.lastEventDate(events) ?? new Date())
+    const fetchNewEvents = async (lastPublishedPeriod: Period | undefined): Promise<[Array<TimeSeriesEvent<T>>, Date, Date]> => {
+      // Get the events
+      if (lastPublishedPeriod === undefined) {
+        const events = await this.findEvents({})
+        return [
+          events,
+          startOfDay(this.firstEventDate(events) ?? new Date()),
+          endOfDay(this.lastEventDate(events) ?? new Date())
+        ]
+      } else {
+        const startDate = lastPublishedPeriod.nextPeriod().start
+        const events = await this.findEvents({ after: startDate })
+        const endDate = endOfDay(this.lastEventDate(events) ?? new Date())
+        return [events, startDate, endDate]
+      }
     }
+
+    const lastPublishedPeriod = await this.findLastPublishedPeriod()
+    const [events, startDate, endDate] = await fetchNewEvents(lastPublishedPeriod)
     if (events.length === 0) return 0 // short circuit
     const partitions = await this.makeRightSizedPartitions(events, startDate, endDate, lastPublishedPeriod)
     for (const partition of partitions) {
-      const key = formTimeSeriesKey(partition.period)
-      await this.putPartition(key, partition.events)
+      await this.putPartition(partition.period, partition.events)
+
+      const deletedEvents = await this.findEvents({ interval: partition.period.interval, isDeleted: true })
+      if (deletedEvents.length > 0) {
+        await this.putDeletedPartition(partition.period, deletedEvents)
+      }
     }
     return partitions.length
   }
@@ -138,7 +148,8 @@ class TimeSeriesPublisher<T> {
     return partitions
   }
 
-  async putPartition (key: string, events: Array<TimeSeriesEvent<T>>): Promise<void> {
+  async putPartition (period: Period, events: Array<TimeSeriesEvent<T>>): Promise<void> {
+    const key = formTimeSeriesKey(period)
     function formatValue (event: TimeSeriesEvent<T>, element: FeedElement): string {
       let result: string
       switch (element.type) {
@@ -167,6 +178,21 @@ class TimeSeriesPublisher<T> {
     const deidentifiedElements = filterElements(this.timeseries.schema.elements, 'pii')
     const report = createCSV(events, deidentifiedElements)
     await this.snapshot.putObject(key, report)
+  }
+
+  async putDeletedPartition (period: Period, events: Array<TimeSeriesEvent<T>>): Promise<void> {
+    const key = formDeletedKey(period)
+    const createCSV = (events: Array<TimeSeriesEvent<T>>): string => {
+      const idName = this.timeseries.schema.elements.find(e => e.tags.includes('id'))?.name ?? 'eventId'
+      const csv: string[] = [stringify([idName, 'replacedBy'])]
+      for (const event of events) {
+        csv.push(stringify([event.eventId.toString(), event.replacedBy?.toString()]))
+      }
+      return csv.join('')
+    }
+
+    const deleted = createCSV(events)
+    await this.snapshot.putObject(key, deleted)
   }
 
   firstEventDate (events: Array<TimeSeriesEvent<T>>): Date | undefined {
