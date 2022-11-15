@@ -3,9 +3,9 @@ import { parse } from 'csv-string'
 import { strict as assert } from 'node:assert'
 
 import { BucketObject } from '@/models/FeedBucket'
-import { TIMESERIES_FOLDER } from '@/models/feedBucketKeys'
+import { formDeletedKeyFromTimeSeriesKey, TIMESERIES_FOLDER } from '@/models/feedBucketKeys'
 import { getLogger } from '@/utils/loggers'
-import { MutableTimeSeries } from '../models/TimeSeries'
+import { MutableTimeSeries, TimeSeriesDeletedEvent } from '../models/TimeSeries'
 import { FeedElement } from '../models/FeedElement'
 import { FeedSchema } from '@/models/FeedSchema'
 import { Snapshot } from '@/models/Snapshot'
@@ -36,8 +36,13 @@ class TimeSeriesReader<T> {
       publishedObjects = publishedObjects.filter((object) => isAfter(object.lastModified, metadata.lastUpdatedAt))
     }
     logger.debug(`${this.snapshot.name} has ${publishedObjects.length} objects to read`)
+
     const events = await this.fetchEvents(publishedObjects)
     await this.timeSeries.upsertEvents(events)
+
+    const deletedEvents = await this.fetchDeletedEvents(publishedObjects)
+    await this.timeSeries.deleteEvents(deletedEvents)
+
     return lastPublished
   }
 
@@ -80,6 +85,24 @@ class TimeSeriesReader<T> {
     })
     const names = elements.map((element) => element.name)
     return this.timeSeries.createEvent(names, values)
+  }
+
+  async fetchDeletedEvents (publishedObjects: BucketObject[]): Promise<TimeSeriesDeletedEvent[]> {
+    const promises = publishedObjects.map(async (publishedObject) => await this.fetchOneDeletedPartition(publishedObject))
+    const events = (await Promise.all(promises)).flatMap((partition) => partition)
+    return events
+  }
+
+  async fetchOneDeletedPartition (publishedObject: BucketObject): Promise<TimeSeriesDeletedEvent[]> {
+    const deletedKey = formDeletedKeyFromTimeSeriesKey(publishedObject.key)
+    if (!this.snapshot.doesObjectExist(deletedKey)) return []
+    const csv = await this.snapshot.getObject(deletedKey)
+    const rows = parse(csv)
+    if (rows.length === 0) throw new Error('invalid object')
+
+    return rows.slice(1).map((row) => {
+      return { eventId: Number.parseFloat(row[0]), replaceBy: row[1].length > 0 ? Number.parseFloat(row[1]) : undefined }
+    })
   }
 
   lastModifiedOf (objects: BucketObject[]): Date {

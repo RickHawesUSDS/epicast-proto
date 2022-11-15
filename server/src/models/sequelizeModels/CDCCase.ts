@@ -1,4 +1,4 @@
-import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, Index } from 'sequelize-typescript'
+import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, Index, DeletedAt } from 'sequelize-typescript'
 
 @Table({ tableName: 'cdcCases' })
 export class CDCCase extends Model<CDCCase> {
@@ -11,7 +11,6 @@ export class CDCCase extends Model<CDCCase> {
     caseDate!: Date
 
   @CreatedAt
-
   @Column
     createdAt!: Date
 

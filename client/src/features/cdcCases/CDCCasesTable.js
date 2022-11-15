@@ -31,14 +31,14 @@ function makeColumns(schema) {
 export default function CDCCasesTable() {
   const getCDCSchemaQuery = useQuery(
     [cdcCasesSchema],
-    fetchCDCCaseSchema,
+    async () => await fetchCDCCaseSchema(),
     {
     }
   )
 
   const getCDCCasesQuery = useQuery(
     [cdcCases],
-    async () => { return await fetchAllCDCCases('desc') },
+    async () => await fetchAllCDCCases('desc'),
     {
       refetchInterval: 5000 //ms
     }

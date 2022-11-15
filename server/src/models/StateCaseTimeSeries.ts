@@ -13,28 +13,28 @@ const logger = getLogger('STATE_CASE_TIME_SERIES')
 
 export class StateCaseTimeSeries implements TimeSeries<StateCase> {
   async findEvents (options: TimeSeriesFindOptions): Promise<StateCase[]> {
-    const where: WhereOptions<StateCase> = {}
+    const whereClause: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
-      where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
+      whereClause.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
     } else if (options.after !== undefined) {
-      where.caseDate = { [Op.gt]: options.after }
+      whereClause.caseDate = { [Op.gt]: options.after }
     } else if (options.before !== undefined) {
-      where.caseDate = { [Op.lt]: options.before }
+      whereClause.caseDate = { [Op.lt]: options.before }
     }
     if (options.updatedAfter !== undefined) {
-      where.updatedAt = { [Op.gt]: options.updatedAfter }
+      whereClause.updatedAt = { [Op.gt]: options.updatedAfter }
     }
     if (options.isDeleted !== undefined) {
-      where.isDeleted = options.isDeleted
+      whereClause.isDeleted = options.isDeleted
     } else {
-      where.isDeleted = { [Op.not]: true }
+      whereClause.isDeleted = { [Op.not]: true }
     }
 
-    const order: Order = [
+    const orderClause: Order = [
       ['caseDate', (options?.sortDescending ?? false) ? 'DESC' : 'ASC'],
       ['caseId', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']
     ]
-    return await StateCase.findAll({ where, order })
+    return await StateCase.findAll({ where: whereClause, order: orderClause })
   }
 
   async countEvents (options: TimeSeriesCountOptions): Promise<number> {
@@ -138,7 +138,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
       a.personEmail === b.personEmail
     }
 
-    async function findDuplicates(cases: StateCase[], found: (duplicate: StateCase, original: StateCase) => Promise<void>): Promise<number> {
+    async function findDuplicates (cases: StateCase[], found: (duplicate: StateCase, original: StateCase) => Promise<void>): Promise<number> {
       // This algorithm only works if duplicates are consecutive as is the case for our code
       let duplicateCount = 0
       for (let i = 0; i < cases.length; i++) {

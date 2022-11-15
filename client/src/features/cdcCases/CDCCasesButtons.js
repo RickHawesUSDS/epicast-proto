@@ -1,13 +1,16 @@
 import { Button, makeStyles, Grid, Box } from '@material-ui/core'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchCDCCaseSubscriber, readCDCCaseFeed } from '../api/api'
-import { cdcCasesSubscriber, cdcCases } from './cdcCasesKeys'
+import { cdcCasesSubscriber, cdcCases, cdcCasesSchema } from './cdcCasesKeys'
 
 export default function CDCCasesButtons(props) {
   const queryClient = useQueryClient()
   const readCDCCaseFeedMutation = useMutation({
     mutationFn: async () => { return await readCDCCaseFeed() },
-    onSuccess: () => { queryClient.invalidateQueries = {queryKey: [cdcCases]}}
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({queryKey: [cdcCases]})
+      await queryClient.invalidateQueries({queryKey: [cdcCasesSchema]})
+    }
   })
   const getCDCCaseSubcriberQuery = useQuery([cdcCasesSubscriber], fetchCDCCaseSubscriber, { refetchInterval: 5000 })
 

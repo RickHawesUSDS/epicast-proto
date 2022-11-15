@@ -3,9 +3,10 @@ import { db } from '@/utils/db'
 
 import { CDCCase } from '@/models/sequelizeModels/CDCCase'
 import { FeedSchema } from './FeedSchema'
-import { TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata, MutableTimeSeries } from './TimeSeries'
+import { TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata, MutableTimeSeries, TimeSeriesDeletedEvent } from './TimeSeries'
 import { assert } from 'console'
 import { getLogger } from 'log4js'
+import { StateCase } from './sequelizeModels/StateCase'
 
 const logger = getLogger('CDC_CASE_TIME_SERIES')
 
@@ -27,18 +28,18 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
   }
 
   async countEvents (options: TimeSeriesCountOptions): Promise<number> {
-    const where: WhereOptions<CDCCase> = {}
+    const whereClause: WhereOptions<CDCCase> = {}
     if (options.interval !== undefined) {
-      where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
+      whereClause.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
     } else if (options.after !== undefined) {
-      where.caseDate = { [Op.gt]: options.after }
+      whereClause.caseDate = { [Op.gt]: options.after }
     } else if (options.before !== undefined) {
-      where.caseDate = { [Op.lt]: options.before }
+      whereClause.caseDate = { [Op.lt]: options.before }
     }
     if (options.updatedAfter !== undefined) {
-      where.updatedAt = { [Op.gt]: options.updatedAfter }
+      whereClause.updatedAt = { [Op.gt]: options.updatedAfter }
     }
-    return await CDCCase.count({ where })
+    return await CDCCase.count({ where: whereClause })
   }
 
   async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
@@ -68,17 +69,26 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
 
   async upsertEvents (events: CDCCase[]): Promise<void> {
     for (const event of events) {
-      // TODO: for some reason cannot get upsert to insert the optional fields of the object
-      await db.transaction(async transaction => {
-        const current = await CDCCase.findByPk(event.caseId, { transaction })
-        if (current === null) {
-          logger.debug('about to insert')
-          await event.save({ transaction })
-        } else {
-          logger.debug('about to update')
-          current.set(event)
-          await current.save({ transaction })
-        }
+      const current = await CDCCase.findByPk(event.caseId, { })
+      if (current === null) {
+        logger.debug('about to insert')
+        await event.save({ })
+      } else {
+        logger.debug('about to update')
+        current.set(event)
+        await current.save({ })
+      }
+    }
+  }
+
+  async deleteEvents (events: TimeSeriesDeletedEvent[]): Promise<void> {
+    if (events.length === 0) return
+    for (const event of events) {
+      await CDCCase.destroy({
+        where: {
+          caseId: event.eventId
+        },
+        force: true
       })
     }
   }

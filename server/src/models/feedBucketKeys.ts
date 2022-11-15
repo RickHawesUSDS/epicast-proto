@@ -31,6 +31,10 @@ export const formDeletedKey = (forPeriod: Period): string => {
   const fileName = forPeriod.toString()
   return `${DELETED_FOLDER}/${fileName}.${DELETED_EXT}`
 }
+export const formDeletedKeyFromTimeSeriesKey = (key: string): string => {
+  const period = periodFromTimeSeriesKey(key)
+  return formDeletedKey(period)
+}
 export const periodFromDeletedKey = (key: string): Period => {
   const periodPart = pathPosix.parse(key).name
   return Period.parse(periodPart)

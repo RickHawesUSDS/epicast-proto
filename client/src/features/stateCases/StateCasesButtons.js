@@ -16,13 +16,13 @@ export default function StateCasesButtons(props) {
     mutationFn: async (params) => {
       return await addRandomStateCases(params.numOfDays, params.numPerDay)
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [stateCases] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [stateCases] })
     }
   })
 
   const publishStateCasesMutation = useMutation({
-    mutationFn: async () => { return await publishStateCases() }
+    mutationFn: () => publishStateCases()
   })
 
   const updateStateSchemaMutation = useMutation({
@@ -35,8 +35,8 @@ export default function StateCasesButtons(props) {
         }
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [stateCases, stateCasesSchema] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [stateCases, stateCasesSchema] })
     }
   })
 
@@ -44,8 +44,8 @@ export default function StateCasesButtons(props) {
     mutationFn: async () => {
       await deduplicateStateCases()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [stateCases]})
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [stateCases]})
     }
   })
 

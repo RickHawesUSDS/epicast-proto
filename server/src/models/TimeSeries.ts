@@ -42,9 +42,15 @@ export interface TimeSeriesMetadata {
   lastEventAt: Date
 }
 
+export interface TimeSeriesDeletedEvent {
+  eventId: number
+  replaceBy: number | undefined
+}
+
 export interface TimeSeriesMutator<T> {
   updateSchema: (newSchema: FeedSchema) => void
   upsertEvents: (events: T[]) => void
+  deleteEvents: (events: TimeSeriesDeletedEvent[]) => void
   createEvent: (names: string[], values: any[]) => T
 }
 

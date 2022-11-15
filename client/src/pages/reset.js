@@ -13,8 +13,8 @@ function ResetPage(props) {
   const queryClient = useQueryClient()
   const resetSystemMutation = useMutation({
     mutationFn: async () => { await resetSystem() },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [cdcCases, cdcCasesSchema, cdcCasesSubscriber, stateCasesSchema, stateCases] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [cdcCases, cdcCasesSchema, cdcCasesSubscriber, stateCasesSchema, stateCases] })
       history.push('/')
     }
   })
