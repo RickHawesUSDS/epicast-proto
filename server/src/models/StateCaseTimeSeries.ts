@@ -12,7 +12,7 @@ import { getLogger } from '@/utils/loggers'
 const logger = getLogger('STATE_CASE_TIME_SERIES')
 
 export class StateCaseTimeSeries implements TimeSeries<StateCase> {
-  async findEvents(options: TimeSeriesFindOptions): Promise<StateCase[]> {
+  async findEvents (options: TimeSeriesFindOptions): Promise<StateCase[]> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -24,11 +24,17 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     if (options.updatedAfter !== undefined) {
       where.updatedAt = { [Op.gt]: options.updatedAfter }
     }
+    if (options.isDeleted !== undefined) {
+      where.isDeleted = options.isDeleted
+    } else {
+      where.isDeleted = { [Op.not]: true }
+    }
+
     const order: Order = [['caseDate', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']]
     return await StateCase.findAll({ where, order })
   }
 
-  async countEvents(options: TimeSeriesCountOptions): Promise<number> {
+  async countEvents (options: TimeSeriesCountOptions): Promise<number> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -40,10 +46,15 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     if (options.updatedAfter !== undefined) {
       where.updatedAt = { [Op.gt]: options.updatedAfter }
     }
+    if (options.isDeleted !== undefined) {
+      where.isDeleted = options.isDeleted
+    } else {
+      where.isDeleted = { [Op.not]: true }
+    }
     return await StateCase.count({ where })
   }
 
-  async fetchMetadata(): Promise<TimeSeriesMetadata | null> {
+  async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
     const lastUpdated = await StateCase.findOne({ order: [['updatedAt', 'DESC']] })
     if (lastUpdated === null) return null
     const lastCase = await StateCase.findOne({ order: [['caseAt', 'DESC']] })
@@ -51,25 +62,25 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return { lastUpdatedAt: lastUpdated.updatedAt, lastEventAt: lastCase.caseDate }
   }
 
-  makeTimeSeriesEvent(event: StateCase): TimeSeriesEvent<StateCase> {
+  makeTimeSeriesEvent (event: StateCase): TimeSeriesEvent<StateCase> {
     return new StateCaseTimeSeriesEvent(event)
   }
 
   schema = new MutableFeedSchema(stateCaseTimeSeriesSchemaV1)
 
-  addFeedElement(element: FeedElement): boolean {
+  addFeedElement (element: FeedElement): boolean {
     return this.schema.addElement(element)
   }
 
-  deleteFeedElement(name: string): boolean {
+  deleteFeedElement (name: string): boolean {
     return this.schema.deleteElement(name)
   }
 
-  resetSchema(): void {
+  resetSchema (): void {
     this.schema = new MutableFeedSchema(stateCaseTimeSeriesSchemaV1)
   }
 
-  async insertFakeStateCases(numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
+  async insertFakeStateCases (numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
     const decideOnDate = async (): Promise<Date> => {
       const now = new Date()
       if (numberOfDays * numberPerDay > 10000) {
@@ -90,7 +101,6 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     const generateNewCase = (newCaseDate: Date, lastCase?: StateCase): StateCase => {
       let stateCase: StateCase
       if (lastCase !== undefined && Math.random() < 0.2) {
-        logger.debug('duplicate')
         stateCase = new StateCase()
         this.setStateCase(stateCase, lastCase)
       } else {
@@ -115,7 +125,30 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return casesAdded
   }
 
-  private fakeStateCase(stateCase: StateCase, caseDate: Date): void {
+  async deduplicate (): Promise<void> {
+    function isDuplicate (a: StateCase, b: StateCase): boolean {
+      return a.personFirstName === b.personFirstName &&
+      a.personLastName === b.personLastName &&
+      a.personEmail === b.personEmail
+    }
+
+    logger.info('Deduplicating state cases')
+    let duplicateCount = 0
+    const cases = await StateCase.findAll({ order: [['caseId', 'ASC']] })
+    for (let i = 0; i < cases.length; i++) {
+      for (let j = i + 1; j < cases.length; j++) {
+        if (isDuplicate(cases[i], cases[j])) {
+          cases[j].isDeleted = true
+          cases[j].replacedBy = i
+          await cases[j].save()
+          duplicateCount += 1
+        }
+      }
+    }
+    logger.info(`Found duplicates: ${duplicateCount}`)
+  }
+
+  private fakeStateCase (stateCase: StateCase, caseDate: Date): void {
     stateCase.personFirstName = faker.name.firstName()
     stateCase.personLastName = faker.name.lastName()
     stateCase.personAddress = faker.address.streetAddress()
@@ -137,7 +170,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     this.fakeVariableElements(stateCase)
   }
 
-  private fakeVariableElements(stateCase: StateCase) {
+  private fakeVariableElements (stateCase: StateCase): void {
     for (const variableElementName of variableSchemaElementNames) {
       const index = this.schema.elements.findIndex(e => e.name === variableElementName)
       if (index !== -1) {
@@ -146,7 +179,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     }
   }
 
-  private setStateCase(to: StateCase, from: StateCase) {
+  private setStateCase (to: StateCase, from: StateCase): void {
     to.personFirstName = from.personFirstName
     to.personLastName = from.personLastName
     to.personAddress = from.personAddress
@@ -166,7 +199,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     this.fakeVariableElements(to)
   }
 
-  private static sample(codeset: string[]): string {
+  private static sample (codeset: string[]): string {
     const random = Math.floor(Math.random() * codeset.length)
     return codeset[random]
   }
@@ -175,27 +208,35 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
 export class StateCaseTimeSeriesEvent implements TimeSeriesEvent<StateCase> {
   #stateCase: StateCase
 
-  constructor(stateCase: StateCase) {
+  constructor (stateCase: StateCase) {
     this.#stateCase = stateCase
   }
 
-  get eventAt(): Date {
+  get eventAt (): Date {
     return this.#stateCase.caseDate
   }
 
-  get eventId(): number {
+  get eventId (): number {
     return this.#stateCase.caseId
   }
 
-  get eventUpdatedAt(): Date {
+  get eventUpdatedAt (): Date {
     return this.#stateCase.updatedAt
   }
 
-  get model(): StateCase {
+  get isDeleted (): boolean | undefined {
+    return this.#stateCase.isDeleted
+  }
+
+  get replacedBy (): number | undefined {
+    return this.#stateCase.replacedBy
+  }
+
+  get model (): StateCase {
     return this.#stateCase
   }
 
-  getValue(name: string): any {
+  getValue (name: string): any {
     return this.#stateCase[name as keyof StateCase]
   }
 }

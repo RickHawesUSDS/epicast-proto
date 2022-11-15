@@ -112,6 +112,14 @@ export class CDCCaseTimeSeriesEvent implements TimeSeriesEvent<CDCCase> {
     return this.#cdcCase.updatedAt
   }
 
+  get isDeleted (): boolean | undefined {
+    return undefined
+  }
+
+  get replacedBy (): number | undefined {
+    return undefined
+  }
+
   get model (): CDCCase {
     return this.#cdcCase
   }

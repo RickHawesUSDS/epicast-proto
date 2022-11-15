@@ -4,6 +4,9 @@ import { parse, stringify } from 'csv-string'
 import { BucketObject, FeedBucket } from './FeedBucket'
 import { formSnapshotKey, SNAPSHOT_FOLDER, versionFromSnapshotKey } from './feedBucketKeys'
 import assert from 'assert'
+import { getLogger } from '@/utils/loggers'
+
+const logger = getLogger('SNAPSHOT')
 
 export interface Snapshot {
   readonly name: string
@@ -85,6 +88,7 @@ export class SnapshotReader implements Snapshot {
 // Dev Note: Caller must ensure only one writer at a time.
 export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
   initializedCalled = false
+  isModified = false
 
   async initialize (): Promise<void> {
     await super.read()
@@ -94,10 +98,12 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
       this.feedVersion = 1
     }
     this.initializedCalled = true
+    this.isModified = false
   }
 
   async putObject (key: string, value: string): Promise<void> {
     if (!this.initializedCalled) throw Error('Initialized must be called')
+    logger.info(`Put of object: ${key}`)
     const writtenObject = await this.bucket.putObject(key, value)
     const index = this.bucketObjects.findIndex((object) => object.key === key)
     if (index === -1) {
@@ -105,18 +111,22 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
     } else {
       this.bucketObjects[index] = writtenObject
     }
+    this.isModified = true
   }
 
   async deleteObject (key: string): Promise<void> {
     if (!this.initializedCalled) throw Error('Initialized must be called')
+    logger.info(`Delete of object: ${key}`)
     const index = this.bucketObjects.findIndex((object) => object.key === key)
     if (index !== -1) {
       await this.bucket.deleteObject(key)
       this.bucketObjects.splice(index)
+      this.isModified = true
     }
   }
 
   async publish (): Promise<void> {
+    if (!this.isModified) return
     const csv = this.bucketObjects.map(object => {
       assert(object.versionId !== undefined)
       const values = [object.key, object.versionId, formatISO(object.lastModified)]

@@ -16,10 +16,10 @@ const DESIRED_MAX_MONTHLY_COUNT = 10000 / 30
 
 const logger = getLogger('PUBLISH_TIME_SERIES_SERVICE')
 
-export async function publishTimeseries<T> (toSnapshot: MutableSnapshot, timeseries: TimeSeries<T>): Promise<void> {
+export async function publishTimeseries<T> (toSnapshot: MutableSnapshot, timeseries: TimeSeries<T>): Promise<number> {
   logger.info(`publishing timeseries: ${timeseries.schema.subjectId}-${timeseries.schema.reporterId}`)
   const publisher = new TimeSeriesPublisher(toSnapshot, timeseries)
-  await publisher.publish()
+  return await publisher.publish()
 }
 class TimeSeriesPublisher<T> {
   snapshot: MutableSnapshot
@@ -30,16 +30,18 @@ class TimeSeriesPublisher<T> {
     this.timeseries = timeseries
   }
 
-  async publish (): Promise<void> {
-    await this.updatePublishedPartions()
-    await this.publishNewPartitions()
+  async publish (): Promise<number> {
+    let count = await this.updatePublishedPartions()
+    count += await this.publishNewPartitions()
+    return count
   }
 
-  async updatePublishedPartions (): Promise<void> {
+  async updatePublishedPartions (): Promise<number> {
     const publishedObjects = await this.snapshot.listObjects(TIMESERIES_FOLDER)
-    if (publishedObjects.length === 0) return // early shortcut
+    if (publishedObjects.length === 0) return 0 // early shortcut
     const lastPublishDate = this.calcMaxLastModified(publishedObjects)
 
+    let count = 0
     for (const publishedObject of publishedObjects) {
       const period = periodFromTimeSeriesKey(publishedObject.key)
       const isPeriodUpdated = await this.hasUpdates(period, lastPublishDate)
@@ -47,18 +49,26 @@ class TimeSeriesPublisher<T> {
         const periodCases = await this.findEvents({ interval: period.interval })
         logger.debug(`updating partition: ${publishedObject.key} with ${periodCases.length} cases`)
         await this.updatePartition(period, periodCases)
+        count += 1
       }
     }
+    return count
   }
 
   async hasUpdates (period: Period, after?: Date): Promise<boolean> {
-    let updatedEvents: number
+    let updatedCount: number
     if (after !== undefined) {
-      updatedEvents = await this.timeseries.countEvents({ interval: period.interval, updatedAfter: after })
+      updatedCount = await this.timeseries.countEvents({ interval: period.interval, updatedAfter: after })
     } else {
-      updatedEvents = await this.timeseries.countEvents({ interval: period.interval })
+      updatedCount = await this.timeseries.countEvents({ interval: period.interval })
     }
-    return updatedEvents > 0
+    let deletedCount: number
+    if (after !== undefined) {
+      deletedCount = await this.timeseries.countEvents({ interval: period.interval, updatedAfter: after, isDeleted: true })
+    } else {
+      deletedCount = await this.timeseries.countEvents({ interval: period.interval, isDeleted: true })
+    }
+    return updatedCount > 0 || deletedCount > 0
   }
 
   async updatePartition (period: Period, periodEvents: Array<TimeSeriesEvent<T>>): Promise<void> {
@@ -71,7 +81,7 @@ class TimeSeriesPublisher<T> {
     return this.calcLastPeriod(publishedObjects)
   }
 
-  async publishNewPartitions (): Promise<void> {
+  async publishNewPartitions (): Promise<number> {
     let events: Array<TimeSeriesEvent<T>>
     let startDate: Date
     let endDate: Date
@@ -86,12 +96,13 @@ class TimeSeriesPublisher<T> {
       events = await this.findEvents({ after: startDate })
       endDate = endOfDay(this.lastEventDate(events) ?? new Date())
     }
-    if (events.length === 0) return // short circuit
+    if (events.length === 0) return 0 // short circuit
     const partitions = await this.makeRightSizedPartitions(events, startDate, endDate, lastPublishedPeriod)
     for (const partition of partitions) {
       const key = formTimeSeriesKey(partition.period)
       await this.putPartition(key, partition.events)
     }
+    return partitions.length
   }
 
   async makeRightSizedPartitions (events: Array<TimeSeriesEvent<T>>, startDate: Date, endDate: Date, lastPublishedPeriod?: Period): Promise<Array<TimeSeriesPartition<T>>> {

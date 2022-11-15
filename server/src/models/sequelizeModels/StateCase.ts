@@ -21,6 +21,12 @@ export class StateCase extends Model<StateCase> {
     updatedAt!: Date
 
   @Column
+    isDeleted?: boolean
+
+  @Column
+    replacedBy?: number
+
+  @Column
     personFirstName!: string
 
   @Column

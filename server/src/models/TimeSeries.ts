@@ -15,6 +15,7 @@ export interface TimeSeriesFindOptions {
   after?: Date
   before?: Date
   updatedAfter?: Date
+  isDeleted?: boolean
   sortDescending?: boolean
 }
 
@@ -22,6 +23,7 @@ export interface TimeSeriesCountOptions {
   interval?: Interval
   after?: Date
   before?: Date
+  isDeleted?: boolean
   updatedAfter?: Date
 }
 
@@ -29,6 +31,8 @@ export interface TimeSeriesEvent<T> {
   get eventAt(): Date
   get eventId(): number
   get eventUpdatedAt(): Date
+  get isDeleted(): boolean | undefined
+  get replacedBy(): number | undefined
   getValue: (name: string) => any
   get model(): T
 }

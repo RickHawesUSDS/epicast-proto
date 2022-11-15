@@ -9,8 +9,10 @@ export async function publishFeed<T> (toBucket: FeedBucket, timeSeries: TimeSeri
   const toSnapshot = new SnapshotWriter(toBucket)
   await toSnapshot.initialize()
   await publishSchema(toSnapshot, timeSeries.schema)
-  await publishTimeseries(toSnapshot, timeSeries)
-  await publishAggregates(toSnapshot, timeSeries)
+  const objectsPublished = await publishTimeseries(toSnapshot, timeSeries)
+  if (objectsPublished > 0) {
+    await publishAggregates(toSnapshot, timeSeries)
+  }
   // other stuff defined later goes here
   await toSnapshot.publish()
 }
