@@ -1,6 +1,6 @@
-import { Button, makeStyles, Grid, Box } from '@material-ui/core'
+import { Button, makeStyles, Grid, Box, Switch, FormControlLabel } from '@material-ui/core'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { fetchCDCCaseSubscriber, readCDCCaseFeed } from '../api/api'
+import { fetchCDCCaseSubscriber, readCDCCaseFeed, setCDCCaseSubscriber } from '../api/api'
 import { cdcCasesSubscriber, cdcCases, cdcCasesSchema } from './cdcCasesKeys'
 
 export default function CDCCasesButtons(props) {
@@ -8,11 +8,21 @@ export default function CDCCasesButtons(props) {
   const readCDCCaseFeedMutation = useMutation({
     mutationFn: async () => { return await readCDCCaseFeed() },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({queryKey: [cdcCases]})
-      await queryClient.invalidateQueries({queryKey: [cdcCasesSchema]})
+      await queryClient.invalidateQueries({queryKey: [cdcCases, cdcCasesSchema]})
     }
   })
-  const getCDCCaseSubcriberQuery = useQuery([cdcCasesSubscriber], fetchCDCCaseSubscriber, { refetchInterval: 5000 })
+  const getCDCCaseSubcriberQuery = useQuery(
+    [cdcCasesSubscriber],
+    fetchCDCCaseSubscriber,
+    { refetchInterval: 5000 }
+  )
+  const setSubscriberAutomaticMutation = useMutation({
+    mutationFn: async (params) => { return await setCDCCaseSubscriber(params.automatic) },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({queryKey: [cdcCases, cdcCasesSchema]})
+    }
+  })
+
 
   const useButtonStyles = makeStyles((theme) => ({
     root: {
@@ -26,12 +36,13 @@ export default function CDCCasesButtons(props) {
   const subscriber = getCDCCaseSubcriberQuery.data
 
   let subscriberStatus = ''
+  let automatic = false
   if (getCDCCaseSubcriberQuery.isFetched && subscriber.reading) {
     subscriberStatus = 'reading...'
   } else if (getCDCCaseSubcriberQuery.isFetched && !subscriber.reading) {
-    const automatic = subscriber.automatic ? 'automatic subscription' : ''
+    automatic = subscriber.automatic
     const lastPublished = subscriber.lastPublished !== undefined ? subscriber.lastPublished : 'na'
-    subscriberStatus = `Last Published: ${lastPublished}; ${automatic}`
+    subscriberStatus = `Last Published: ${lastPublished}`
   } else if (getCDCCaseSubcriberQuery.isError) {
     subscriberStatus = `Query Error: ${getCDCCaseSubcriberQuery.error}`
   }
@@ -46,7 +57,17 @@ export default function CDCCasesButtons(props) {
       </Grid>
       <Grid item xs={6}>
         <div className={buttonClasses.root} align='right'>
-          <Button disabled={isLoading} onClick={() => readCDCCaseFeedMutation.mutate()} color='primary' variant='outlined'>Read Feed</Button>
+          <FormControlLabel
+            control={
+              <Switch
+              checked={automatic}
+              color="primary"
+              name='automatic'
+              onChange={(e) => setSubscriberAutomaticMutation.mutate({ automatic: e.target.checked })} />
+            }
+            label='Automatic Reading'
+          />
+          <Button disabled={isLoading || automatic} onClick={() => readCDCCaseFeedMutation.mutate()} color='primary' variant='outlined'>Read Feed</Button>
         </div>
       </Grid>
     </Grid>

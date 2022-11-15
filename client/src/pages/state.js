@@ -18,7 +18,7 @@ export default function StatePage(props) {
         subtitle=''
       >
         <Container align='center'>
-          This is simple state surveillance system. The table represents all the case of a particular disease.
+          This is a simple state surveillance system. The table represents all the case of a particular disease.
         </Container>
         <StateCasesTable />
         <StateCasesButtons />

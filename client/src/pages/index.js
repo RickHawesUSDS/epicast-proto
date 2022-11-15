@@ -11,8 +11,8 @@ function IndexPage (props) {
         size='medium'
         bgImage=''
         bgImageOpacity={1}
-        title='EpiCast Demonstration'
-        subtitle='EpiCast is new way from states to transmit case data to the CDC'
+        title='Demonstration Overview'
+        subtitle='EpiCast is new way from states to transmit case data to the CDC. This demostration site shows EpiCast in action with a simple case surviellance system and one feed.'
         buttonText='Reset Demo'
         buttonColor='primary'
         buttonPath='/reset'

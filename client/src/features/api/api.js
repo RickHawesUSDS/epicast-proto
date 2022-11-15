@@ -59,3 +59,8 @@ export async function readCDCCaseFeed() {
   return response.data
 }
 
+export async function setCDCCaseSubscriber(automaticValue) {
+  const response = await axios.post('/api/cdcCases/subscriber', { automatic: automaticValue})
+  return response.data
+}
+

@@ -11,8 +11,8 @@ export default function CentralPage(props) {
         size='medium'
         bgImage=''
         bgImageOpacity={1}
-        title='Central'
-        subtitle='Shows off the EpiCentral site'
+        title='EpiCast Central'
+        subtitle='Under construction'
       />
     </>
   )

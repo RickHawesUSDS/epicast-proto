@@ -116,7 +116,7 @@ export default function StateCasesButtons(props) {
     <div className={buttonClasses.root} align='right'>
       <ButtonGroup color='primary'>
         <Button disabled={isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 1, numPerDay: 1 })}>Add 1 Case</Button>
-        <Button disabled={isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 1, numPerDay: 15 })}>Add 15 Case</Button>
+        <Button disabled={isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 2, numPerDay: 10 })}>Add 20 Case</Button>
         <Button disabled={isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 30, numPerDay: 500 })}>Add 15000 Cases</Button>
       </ButtonGroup>
       <Button disabled={isLoading} onClick={() => deduplicateMutation.mutate()} color='primary' variant='outlined'>Deduplicate</Button>
