@@ -5,16 +5,11 @@ import { cdcCasesSubscriber, cdcCases } from './cdcCasesKeys'
 
 export default function CDCCasesButtons(props) {
   const queryClient = useQueryClient()
-  const readCDCCaseFeedMutation = useMutation(async () => { return await readCDCCaseFeed() })
+  const readCDCCaseFeedMutation = useMutation({
+    mutationFn: async () => { return await readCDCCaseFeed() },
+    onSuccess: () => { queryClient.invalidateQueries = {queryKey: [cdcCases]}}
+  })
   const getCDCCaseSubcriberQuery = useQuery([cdcCasesSubscriber], fetchCDCCaseSubscriber, { refetchInterval: 5000 })
-
-  function onRefreshClick() {
-    queryClient.invalidateQueries([cdcCases])
-  }
-
-  function onReadFeedClick() {
-    readCDCCaseFeedMutation.mutate()
-  }
 
   const useButtonStyles = makeStyles((theme) => ({
     root: {
@@ -38,6 +33,7 @@ export default function CDCCasesButtons(props) {
     subscriberStatus = `Query Error: ${getCDCCaseSubcriberQuery.error}`
   }
 
+  const isLoading = readCDCCaseFeedMutation.isLoading
   return (
     <Grid container spacing={2}>
       <Grid item xs={6}>
@@ -47,8 +43,7 @@ export default function CDCCasesButtons(props) {
       </Grid>
       <Grid item xs={6}>
         <div className={buttonClasses.root} align='right'>
-          <Button onClick={() => onRefreshClick()} color='primary' variant='outlined'>Refresh Table</Button>
-          <Button onClick={() => onReadFeedClick()} color='primary' variant='outlined'>Read Feed</Button>
+          <Button disabled={isLoading} onClick={() => readCDCCaseFeedMutation.mutate()} color='primary' variant='outlined'>Read Feed</Button>
         </div>
       </Grid>
     </Grid>

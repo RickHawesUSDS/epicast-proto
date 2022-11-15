@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, ButtonGroup, Checkbox, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormControl, FormGroup, FormLabel, FormControlLabel, makeStyles } from '@material-ui/core'
 
 import { stateCases, stateCasesSchema } from './stateCasesKeys'
-import { addRandomStateCases, addStateCaseElement, deleteStateCaseElement, fetchCDCCaseSchema, fetchStateCaseSchema, publishStateCases } from '../api/api'
+import { addRandomStateCases, addStateCaseElement, deleteStateCaseElement, fetchStateCaseSchema, publishStateCases, deduplicateStateCases } from '../api/api'
 import { variableStateCaseElements, localQuestion1, localQuestion2, localQuestion3, neighborQuestion1, neighborQuestion2, cdcQuestion1, cdcQuestion2 } from './variableStateCaseElements'
 
 
@@ -13,8 +13,12 @@ export default function StateCasesButtons(props) {
   const [checked, setChecked] = React.useState(new Set())
 
   const addCasesMutation = useMutation({
-    mutationFn: async (params) => { return await addRandomStateCases(params.numOfDays, params.numPerDay) },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: [stateCases] }) }
+    mutationFn: async (params) => {
+      return await addRandomStateCases(params.numOfDays, params.numPerDay)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [stateCases] })
+    }
   })
 
   const publishStateCasesMutation = useMutation({
@@ -33,6 +37,15 @@ export default function StateCasesButtons(props) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [stateCases, stateCasesSchema] })
+    }
+  })
+
+  const deduplicateMutation = useMutation({
+    mutationFn: async () => {
+      await deduplicateStateCases()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [stateCases]})
     }
   })
 
@@ -97,15 +110,18 @@ export default function StateCasesButtons(props) {
     ))
   )
 
+  const isLoading = addCasesMutation.isLoading || publishStateCasesMutation.isLoading
+
   return (
     <div className={buttonClasses.root} align='right'>
       <ButtonGroup color='primary'>
-        <Button disabled={addCasesMutation.isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 1, numPerDay: 1 })}>Add 1 Case</Button>
-        <Button disabled={addCasesMutation.isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 1, numPerDay: 15 })}>Add 15 Case</Button>
-        <Button disabled={addCasesMutation.isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 30, numPerDay: 500 })}>Add 15000 Cases</Button>
+        <Button disabled={isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 1, numPerDay: 1 })}>Add 1 Case</Button>
+        <Button disabled={isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 1, numPerDay: 15 })}>Add 15 Case</Button>
+        <Button disabled={isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 30, numPerDay: 500 })}>Add 15000 Cases</Button>
       </ButtonGroup>
-      <Button onClick={() => onChangeSchemaClick()} color='primary' variant='outlined'>Change Data Dictionary</Button>
-      <Button disabled={publishStateCasesMutation.isLoading} onClick={() => publishStateCasesMutation.mutate()} color='primary' variant='outlined'>Publish</Button>
+      <Button disabled={isLoading} onClick={() => deduplicateMutation.mutate()} color='primary' variant='outlined'>Deduplicate</Button>
+      <Button disabled={isLoading} onClick={() => onChangeSchemaClick()} color='primary' variant='outlined'>Update Data Elements</Button>
+      <Button disabled={isLoading} onClick={() => publishStateCasesMutation.mutate()} color='primary' variant='outlined'>Publish</Button>
       <Dialog open={open} onClose={handleClose} maxWidth="" fullWidth="" aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Change Data Dictionary</DialogTitle>
         <DialogContent>

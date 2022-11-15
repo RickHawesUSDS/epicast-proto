@@ -29,6 +29,11 @@ export async function addRandomStateCases(numOfDays, numPerDay) {
   return response.data
 }
 
+export async function deduplicateStateCases() {
+  const response = await axios.post('/api/stateCases/deduplicate')
+  return response.data
+}
+
 export async function publishStateCases() {
   const response = await axios.post('/api/stateCases/publish')
   return response.data
