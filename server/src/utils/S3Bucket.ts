@@ -5,6 +5,8 @@ import { FeedBucket, BucketObject } from '@/models/FeedBucket'
 import { ReadStream } from 'fs'
 import { Readable } from 'stream'
 import { parseISO } from 'date-fns'
+import path from 'path'
+import { FileData, FileArray } from 'chonky'
 
 const logger = getLogger('BUCKET')
 export const REGION = 'us-west-1'
@@ -105,5 +107,45 @@ export class S3Bucket implements FeedBucket {
     if (deleteResponse.$metadata.httpStatusCode !== 204) {
       return await this.handleError(`delete error: ${name}, ${deleteResponse.$metadata.httpStatusCode ?? 0}`)
     }
+  }
+
+  async getFileData(prefix: string): Promise<FileArray> {
+    const chonkyFiles: FileArray = []
+    const listResponse = await this.s3Client.send(new ListObjectsCommand({
+      Bucket: BUCKET_NAME,
+      Prefix: prefix === '/' ? '' : prefix,
+      Delimiter: '/'
+    }))
+
+    if (listResponse.$metadata.httpStatusCode !== 200) return chonkyFiles
+
+    const s3Objects = listResponse.Contents;
+    const s3Prefixes = listResponse.CommonPrefixes;
+
+    if (s3Objects) {
+        chonkyFiles.push(
+            ...s3Objects.map(
+                (object): FileData => ({
+                    id: object.Key!,
+                    name: path.basename(object.Key!),
+                    modDate: object.LastModified,
+                    size: object.Size,
+                })
+            )
+        );
+    }
+
+    if (s3Prefixes) {
+        chonkyFiles.push(
+            ...s3Prefixes.map(
+                (prefix): FileData => ({
+                    id: prefix.Prefix!,
+                    name: path.basename(prefix.Prefix!),
+                    isDir: true,
+                })
+            )
+        );
+    }
+    return chonkyFiles
   }
 }

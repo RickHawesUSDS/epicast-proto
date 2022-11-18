@@ -64,3 +64,8 @@ export async function setCDCCaseSubscriber(automaticValue) {
   return response.data
 }
 
+export async function getFeed(prefix) {
+  const response = await axios.get(`/api/feed?prefix=${prefix}`)
+  return response.data
+}
+

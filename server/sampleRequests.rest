@@ -59,6 +59,11 @@ content-type: application/json
 
 { "automatic": false }
 
-
 ### Deduplicate the state feed
 POST http://localhost:3001/api/stateCases/deduplicate
+
+### Get feed
+GET http://localhost:3001/api/feed?prefix=/
+
+### Get feed
+GET http://localhost:3001/api/feed?prefix=/time_series/

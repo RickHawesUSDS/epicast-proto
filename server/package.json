@@ -12,6 +12,7 @@
     "@aws-sdk/credential-providers": "^3.186.0",
     "@faker-js/faker": "^7.5.0",
     "@types/validator": "*",
+    "chonky": "^2.3.2",
     "cookie-parser": "~1.4.4",
     "csv-string": "^4.1.1",
     "debug": "~2.6.9",

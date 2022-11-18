@@ -8,6 +8,7 @@ import indexRouter from './routes/index'
 import systemRouter from './routes/system'
 import stateCaseRouter from './routes/stateCases'
 import cdcCaseRouter from './routes/cdcCases'
+import feedRouter from './routes/feed'
 import { db } from './utils/db'
 import { S3Bucket } from './utils/S3Bucket'
 import { resetStorage } from './controllers/resetSystem'
@@ -56,6 +57,7 @@ class App {
     this.app.use('/api/system', systemRouter)
     this.app.use('/api/stateCases', stateCaseRouter)
     this.app.use('/api/cdcCases', cdcCaseRouter)
+    this.app.use('/api/feed', feedRouter)
   }
 
   private async databaseSetup (): Promise<void> {
@@ -67,7 +69,7 @@ class App {
   }
 
   private setupBackground (): void {
-    updateFeedSubscriber(this.feedSubscriber, { automatic: false })
+    updateFeedSubscriber(this.feedSubscriber, { automatic: true })
   }
 }
 
