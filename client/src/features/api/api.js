@@ -60,12 +60,16 @@ export async function readCDCCaseFeed() {
 }
 
 export async function setCDCCaseSubscriber(automaticValue) {
-  const response = await axios.post('/api/cdcCases/subscriber', { automatic: automaticValue})
+  const response = await axios.post('/api/cdcCases/subscriber', { automatic: automaticValue })
   return response.data
 }
 
-export async function getFeed(prefix) {
-  const response = await axios.get(`/api/feed?prefix=${prefix}`)
+export async function listFeedMetadata(prefix) {
+  const response = await axios.get(`/api/feed/metadata?prefix=${prefix}`)
   return response.data
 }
 
+export async function getFeedContent(key) {
+  const response = await axios.get(`/api/feed/content?file=${key}`)
+  return response.data
+}

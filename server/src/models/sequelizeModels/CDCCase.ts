@@ -1,4 +1,4 @@
-import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, Index, DeletedAt } from 'sequelize-typescript'
+import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, Index } from 'sequelize-typescript'
 
 @Table({ tableName: 'cdcCases' })
 export class CDCCase extends Model<CDCCase> {

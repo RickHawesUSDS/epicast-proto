@@ -1,12 +1,10 @@
 import { Op, Order, WhereOptions } from 'sequelize'
-import { db } from '@/utils/db'
 
 import { CDCCase } from '@/models/sequelizeModels/CDCCase'
 import { FeedSchema } from './FeedSchema'
 import { TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata, MutableTimeSeries, TimeSeriesDeletedEvent } from './TimeSeries'
 import { assert } from 'console'
 import { getLogger } from 'log4js'
-import { StateCase } from './sequelizeModels/StateCase'
 
 const logger = getLogger('CDC_CASE_TIME_SERIES')
 

@@ -13,7 +13,7 @@ function FeedPage (props) {
         bgImage=''
         bgImageOpacity={1}
         title='Feed'
-        subtitle='A view into the S3 bucket that hosts the feed.'
+        subtitle='A file explorer view into the S3 bucket that hosts the feed.'
       >
         <FeedBrowser/>
       </HeroSection2>

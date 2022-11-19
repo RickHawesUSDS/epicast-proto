@@ -109,7 +109,7 @@ export class S3Bucket implements FeedBucket {
     }
   }
 
-  async getFileData(prefix: string): Promise<FileArray> {
+  async getFileData (prefix: string): Promise<FileArray> {
     const chonkyFiles: FileArray = []
     const listResponse = await this.s3Client.send(new ListObjectsCommand({
       Bucket: BUCKET_NAME,
@@ -119,32 +119,32 @@ export class S3Bucket implements FeedBucket {
 
     if (listResponse.$metadata.httpStatusCode !== 200) return chonkyFiles
 
-    const s3Objects = listResponse.Contents;
-    const s3Prefixes = listResponse.CommonPrefixes;
+    const s3Objects = listResponse.Contents
+    const s3Prefixes = listResponse.CommonPrefixes
 
-    if (s3Objects) {
-        chonkyFiles.push(
-            ...s3Objects.map(
-                (object): FileData => ({
-                    id: object.Key!,
-                    name: path.basename(object.Key!),
-                    modDate: object.LastModified,
-                    size: object.Size,
-                })
-            )
-        );
+    if (s3Objects != null) {
+      chonkyFiles.push(
+        ...s3Objects.map(
+          (object): FileData => ({
+            id: object.Key ?? '',
+            name: path.basename(object.Key ?? ''),
+            modDate: object.LastModified,
+            size: object.Size
+          })
+        )
+      )
     }
 
-    if (s3Prefixes) {
-        chonkyFiles.push(
-            ...s3Prefixes.map(
-                (prefix): FileData => ({
-                    id: prefix.Prefix!,
-                    name: path.basename(prefix.Prefix!),
-                    isDir: true,
-                })
-            )
-        );
+    if (s3Prefixes != null) {
+      chonkyFiles.push(
+        ...s3Prefixes.map(
+          (prefix): FileData => ({
+            id: prefix.Prefix ?? '',
+            name: path.basename(prefix.Prefix ?? ''),
+            isDir: true
+          })
+        )
+      )
     }
     return chonkyFiles
   }

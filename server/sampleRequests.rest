@@ -62,8 +62,12 @@ content-type: application/json
 ### Deduplicate the state feed
 POST http://localhost:3001/api/stateCases/deduplicate
 
-### Get feed
-GET http://localhost:3001/api/feed?prefix=/
+### List feed
+GET http://localhost:3001/api/metadata?prefix=/
 
-### Get feed
-GET http://localhost:3001/api/feed?prefix=/time_series/
+### List feed
+GET http://localhost:3001/api/metadata?prefix=/time_series/
+
+### Get feed content
+GET http://localhost:3001/api/content?file=/snapshots/v1.csv
+

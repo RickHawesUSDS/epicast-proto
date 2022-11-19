@@ -19,6 +19,7 @@
     "chonky-icon-fontawesome": "^2.3.2",
     "history": "4.10.1",
     "http-proxy-middleware": "^2.0.6",
+    "js-file-download": "^0.4.12",
     "query-string": "6.13.8",
     "react": "17.0.2",
     "react-dom": "17.0.2",
