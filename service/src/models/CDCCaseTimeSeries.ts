@@ -2,7 +2,7 @@ import { Op, Order, WhereOptions } from 'sequelize'
 
 import { CDCCase } from '@/models/sequelizeModels/CDCCase'
 import { FeedSchema } from './FeedSchema'
-import { TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata, MutableTimeSeries, TimeSeriesDeletedEvent } from './TimeSeries'
+import { TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata, MutableTimeSeries, TimeSeriesDeletedEvent } from '@/epicast/TimeSeries'
 import { assert } from 'console'
 import { getLogger } from 'log4js'
 

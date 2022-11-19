@@ -6,7 +6,7 @@ import { formDeletedKey, formTimeSeriesKey, periodFromTimeSeriesKey, TIMESERIES_
 import { getLogger } from '@/utils/loggers'
 import { Period } from '@/utils/Period'
 import { Frequency } from '@/utils/Frequency'
-import { TimeSeries, TimeSeriesEvent, TimeSeriesFindOptions } from '../models/TimeSeries'
+import { TimeSeries, TimeSeriesEvent, TimeSeriesFindOptions } from '@/epicast/TimeSeries'
 import { FeedElement, filterElements } from '../models/FeedElement'
 import { assert } from 'console'
 import { MutableSnapshot } from '@/models/Snapshot'

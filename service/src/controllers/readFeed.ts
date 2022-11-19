@@ -1,6 +1,6 @@
 import { FeedBucket } from '@/models/FeedBucket'
 import { SnapshotReader } from '@/models/Snapshot'
-import { MutableTimeSeries } from '@/models/TimeSeries'
+import { MutableTimeSeries } from '@/epicast/TimeSeries'
 import { readSchema } from './readSchema'
 import { readTimeSeries } from './readTimeSeries'
 

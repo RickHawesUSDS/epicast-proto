@@ -1,6 +1,6 @@
 import { formAggregatesKey } from '@/models/feedBucketKeys'
 import { MutableSnapshot } from '@/models/Snapshot'
-import { TimeSeries } from '@/models/TimeSeries'
+import { TimeSeries } from '@/epicast/TimeSeries'
 import { makeCasePartions, TimeSeriesPartition } from '@/models/TimeSeriesPartition'
 import { Frequency } from '@/utils/Frequency'
 import { groupBy } from '@/utils/groupBy'

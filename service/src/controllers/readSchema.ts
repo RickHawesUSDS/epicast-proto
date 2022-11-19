@@ -2,7 +2,7 @@ import YAML from 'yaml'
 import { isAfter } from 'date-fns'
 import { getLogger } from 'log4js'
 
-import { MutableTimeSeries } from '@/models/TimeSeries'
+import { MutableTimeSeries } from '@/epicast/TimeSeries'
 import { FeedSchema } from '@/models/FeedSchema'
 import { SCHEMA_FOLDER } from '@/models/feedBucketKeys'
 import { Snapshot } from '@/models/Snapshot'

@@ -1,5 +1,5 @@
 import { Interval } from 'date-fns'
-import { FeedSchema } from './FeedSchema'
+import { FeedSchema } from '../models/FeedSchema'
 
 export interface TimeSeries<T> {
   fetchMetadata: () => Promise<TimeSeriesMetadata | null>

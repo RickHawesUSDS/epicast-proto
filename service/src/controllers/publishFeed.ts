@@ -1,4 +1,4 @@
-import { TimeSeries } from '@/models/TimeSeries'
+import { TimeSeries } from '@/epicast/TimeSeries'
 import { FeedBucket } from '@/models/FeedBucket'
 import { publishSchema } from './publishSchema'
 import { publishTimeseries } from './publishTimeSeries'

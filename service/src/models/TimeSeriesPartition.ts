@@ -1,7 +1,7 @@
 import { Frequency } from '@/utils/Frequency'
 import { Period } from '@/utils/Period'
 import { isAfter, isWithinInterval } from 'date-fns'
-import { TimeSeriesEvent } from './TimeSeries'
+import { TimeSeriesEvent } from '@/epicast/TimeSeries'
 
 export class TimeSeriesPartition<T> {
   period: Period

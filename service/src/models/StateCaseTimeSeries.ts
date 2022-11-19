@@ -3,7 +3,7 @@ import { addDays, addMonths, endOfDay, startOfDay, startOfMonth } from 'date-fns
 import { Op, Order, WhereOptions } from 'sequelize'
 
 import { StateCase } from '@/models/sequelizeModels/StateCase'
-import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesEvent, TimeSeriesMetadata } from './TimeSeries'
+import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesEvent, TimeSeriesMetadata } from '@/epicast/TimeSeries'
 import { stateCaseTimeSeriesSchemaV1, variableSchemaElementNames } from './stateCaseElements'
 import { MutableFeedSchema } from './FeedSchema'
 import { FeedElement } from './FeedElement'

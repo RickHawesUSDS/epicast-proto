@@ -1,4 +1,4 @@
-import { MutableTimeSeries } from '@/models/TimeSeries'
+import { MutableTimeSeries } from '@/epicast/TimeSeries'
 import { FeedBucket } from './FeedBucket'
 
 export class FeedSubscriber<T> {
