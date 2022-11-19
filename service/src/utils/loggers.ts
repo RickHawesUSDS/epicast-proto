@@ -9,7 +9,7 @@ export function bootstrapLogger (): void {
   configure({
     appenders: {
       out: { type: 'stdout' },
-      app: { type: 'file', filename: path.join(__dirname, '..', 'logs', `${strDate}.log`) }
+      app: { type: 'file', filename: path.join(__dirname, '../..', 'logs', `${strDate}.log`) }
     },
     categories: {
       default: { appenders: ['out', 'app'], level: 'debug' }
