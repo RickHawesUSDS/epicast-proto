@@ -81,11 +81,15 @@ The prototype should be support a demonstration of these concepts.
 * [x] Versioned buckets, publish snapshots, use snapshots consistent reads
 * [x] Change schemas dialog in state. Options for new CDC data element, a new other state element and local element
 * [x] Aggregates published
-* [ ] Auto read button
+* [x] Auto read button
 * [ ] Random change methods and button
 * [x] Random duplicates. Deduplicate button and method. replaceBy column. Deleted log.
-* [ ] Reorganize code around domains (senders, receivers, feed, server, utils) and CUPID
+* [x] Feed file explorer
+* [ ] Reorganize code around domains (website and service). Service sub-domains (senders, receivers, watchers, feeds, core, server, utils) and CUPID
+* [ ] Fix new bugs
 * [ ] Validator service. watcher domain to validate and provide webhooks.
+* [ ] Make two states to cdc and merge states together
+* [ ] Multi-value columns
 * [ ] Show only published elements in State table
 * [ ] Show only what is CDC elements in CDC table
 * [ ] Allow two people to run the demo at the same time. Locking publishers needed.
