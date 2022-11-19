@@ -1,4 +1,4 @@
-import { Period } from '@/utils/Period'
+import { Period } from '@/epicast/Period'
 import { formatISO } from 'date-fns'
 import pathPosix from 'node:path/posix'
 

@@ -1,14 +1,14 @@
-import { StateCase } from '@/models/sequelizeModels/StateCase'
-import { StateCaseTimeSeries } from '../models/StateCaseTimeSeries'
+import { StateCase } from '@/senders/StateCase'
+import { StateCaseTimeSeries } from '../senders/StateCaseTimeSeries'
 import { getLogger } from '@/utils/loggers'
-import { FeedBucket } from '@/models/FeedBucket'
-import { CDCCase } from '@/models/sequelizeModels/CDCCase'
+import { FeedBucket } from '@/epicast/FeedBucket'
+import { CDCCase } from '@/receivers/CDCCase'
 
 const logger = getLogger('RESET_SYSTEM')
 const daysOfFakeCasesOnReset = 1
 const fakesPerDayOnReset = 5
 
-export async function resetSystem (timeseries: StateCaseTimeSeries, feed: FeedBucket): Promise<void> {
+export async function resetSystem(timeseries: StateCaseTimeSeries, feed: FeedBucket): Promise<void> {
   logger.debug('Resetting the database')
   await StateCase.destroy({
     truncate: true
@@ -23,7 +23,7 @@ export async function resetSystem (timeseries: StateCaseTimeSeries, feed: FeedBu
   await timeseries.insertFakeStateCases(daysOfFakeCasesOnReset, fakesPerDayOnReset)
 }
 
-export async function resetStorage (feed: FeedBucket): Promise<void> {
+export async function resetStorage(feed: FeedBucket): Promise<void> {
   logger.info('Resetting storage')
   const bucketObjects = await feed.listObjects('')
   for (const bucketObject of bucketObjects) {

@@ -1,4 +1,4 @@
-import { FeedSchema } from './FeedSchema'
+import { FeedSchema } from '@/epicast/FeedSchema'
 
 export const stateCaseTimeSeriesSchemaV1: FeedSchema = {
   epicastVersion: 1.0,

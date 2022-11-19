@@ -1,7 +1,7 @@
 import express from 'express'
 import asyncHandler from 'express-async-handler'
 import { getLogger } from '@/utils/loggers'
-import { publishFeed } from '@/controllers/publishFeed'
+import { publishFeed } from '@/epicast/publishFeed'
 
 const router = express.Router()
 const logger = getLogger('STATE_CASES_ROUTE')

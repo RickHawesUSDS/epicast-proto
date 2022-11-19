@@ -1,6 +1,6 @@
 import { getLogger } from 'log4js'
-import { FeedSubscriber, FeedSubscriberModel } from '@/models/FeedSubscriber'
-import { readFeed } from './readFeed'
+import { FeedSubscriber, FeedSubscriberModel } from './FeedSubscriber'
+import { readFeed } from '@/epicast/readFeed'
 
 export const FIRST_TIMEOUT = 5000
 export const REPEAT_TIMEOUT = 10000

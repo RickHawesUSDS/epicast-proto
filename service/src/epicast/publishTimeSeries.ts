@@ -1,22 +1,22 @@
 import { max as maxDate, isAfter, formatISO, isFirstDayOfMonth, addDays, isBefore, startOfDay, differenceInDays, endOfDay } from 'date-fns'
 import { stringify } from 'csv-string'
 
-import { BucketObject } from '@/models/FeedBucket'
-import { formDeletedKey, formTimeSeriesKey, periodFromTimeSeriesKey, TIMESERIES_FOLDER } from '@/models/feedBucketKeys'
+import { BucketObject } from './FeedBucket'
+import { formDeletedKey, formTimeSeriesKey, periodFromTimeSeriesKey, TIMESERIES_FOLDER } from './feedBucketKeys'
 import { getLogger } from '@/utils/loggers'
-import { Period } from '@/utils/Period'
-import { Frequency } from '@/utils/Frequency'
-import { TimeSeries, TimeSeriesEvent, TimeSeriesFindOptions } from '@/epicast/TimeSeries'
-import { FeedElement, filterElements } from '../models/FeedElement'
+import { Period } from './Period'
+import { Frequency } from './Frequency'
+import { TimeSeries, TimeSeriesEvent, TimeSeriesFindOptions } from './TimeSeries'
+import { FeedElement, filterElements } from './FeedElement'
 import { assert } from 'console'
-import { MutableSnapshot } from '@/models/Snapshot'
-import { TimeSeriesPartition, makeCasePartions } from '../models/TimeSeriesPartition'
+import { MutableSnapshot } from './Snapshot'
+import { TimeSeriesPartition, makeCasePartions } from './TimeSeriesPartition'
 
 const DESIRED_MAX_MONTHLY_COUNT = 10000 / 30
 
 const logger = getLogger('PUBLISH_TIME_SERIES_SERVICE')
 
-export async function publishTimeseries<T> (toSnapshot: MutableSnapshot, timeseries: TimeSeries<T>): Promise<number> {
+export async function publishTimeseries<T>(toSnapshot: MutableSnapshot, timeseries: TimeSeries<T>): Promise<number> {
   logger.info(`publishing timeseries: ${timeseries.schema.subjectId}-${timeseries.schema.reporterId}`)
   const publisher = new TimeSeriesPublisher(toSnapshot, timeseries)
   return await publisher.publish()
@@ -25,18 +25,18 @@ class TimeSeriesPublisher<T> {
   snapshot: MutableSnapshot
   timeseries: TimeSeries<T>
 
-  constructor (toSnapshot: MutableSnapshot, timeseries: TimeSeries<T>) {
+  constructor(toSnapshot: MutableSnapshot, timeseries: TimeSeries<T>) {
     this.snapshot = toSnapshot
     this.timeseries = timeseries
   }
 
-  async publish (): Promise<number> {
+  async publish(): Promise<number> {
     let count = await this.updatePublishedPartions()
     count += await this.publishNewPartitions()
     return count
   }
 
-  async updatePublishedPartions (): Promise<number> {
+  async updatePublishedPartions(): Promise<number> {
     const publishedObjects = await this.snapshot.listObjects(TIMESERIES_FOLDER)
     if (publishedObjects.length === 0) return 0 // early shortcut
     const lastPublishDate = this.calcMaxLastModified(publishedObjects)
@@ -61,7 +61,7 @@ class TimeSeriesPublisher<T> {
     return count
   }
 
-  async hasUpdates (period: Period, after?: Date): Promise<boolean> {
+  async hasUpdates(period: Period, after?: Date): Promise<boolean> {
     let updatedCount: number
     if (after !== undefined) {
       updatedCount = await this.timeseries.countEvents({ interval: period.interval, updatedAfter: after })
@@ -77,12 +77,12 @@ class TimeSeriesPublisher<T> {
     return updatedCount > 0 || deletedCount > 0
   }
 
-  async findLastPublishedPeriod (): Promise<Period | undefined> {
+  async findLastPublishedPeriod(): Promise<Period | undefined> {
     const publishedObjects = await this.snapshot.listObjects(TIMESERIES_FOLDER)
     return this.calcLastPeriod(publishedObjects)
   }
 
-  async publishNewPartitions (): Promise<number> {
+  async publishNewPartitions(): Promise<number> {
     const fetchNewEvents = async (lastPublishedPeriod: Period | undefined): Promise<[Array<TimeSeriesEvent<T>>, Date, Date]> => {
       // Get the events
       if (lastPublishedPeriod === undefined) {
@@ -115,7 +115,7 @@ class TimeSeriesPublisher<T> {
     return partitions.length
   }
 
-  async makeRightSizedPartitions (events: Array<TimeSeriesEvent<T>>, startDate: Date, endDate: Date, lastPublishedPeriod?: Period): Promise<Array<TimeSeriesPartition<T>>> {
+  async makeRightSizedPartitions(events: Array<TimeSeriesEvent<T>>, startDate: Date, endDate: Date, lastPublishedPeriod?: Period): Promise<Array<TimeSeriesPartition<T>>> {
     assert(isBefore(startDate, endDate), 'end before start date')
     assert(
       lastPublishedPeriod === undefined ||
@@ -148,9 +148,9 @@ class TimeSeriesPublisher<T> {
     return partitions
   }
 
-  async putPartition (period: Period, events: Array<TimeSeriesEvent<T>>): Promise<void> {
+  async putPartition(period: Period, events: Array<TimeSeriesEvent<T>>): Promise<void> {
     const key = formTimeSeriesKey(period)
-    function formatValue (event: TimeSeriesEvent<T>, element: FeedElement): string {
+    function formatValue(event: TimeSeriesEvent<T>, element: FeedElement): string {
       let result: string
       switch (element.type) {
         case 'date': {
@@ -166,7 +166,7 @@ class TimeSeriesPublisher<T> {
       return result
     }
 
-    function createCSV (events: Array<TimeSeriesEvent<T>>, elements: FeedElement[]): string {
+    function createCSV(events: Array<TimeSeriesEvent<T>>, elements: FeedElement[]): string {
       const csv = events.map(event => {
         const values = elements.map(element => formatValue(event, element))
         return stringify(values)
@@ -180,7 +180,7 @@ class TimeSeriesPublisher<T> {
     await this.snapshot.putObject(key, report)
   }
 
-  async putDeletedPartition (period: Period, events: Array<TimeSeriesEvent<T>>): Promise<void> {
+  async putDeletedPartition(period: Period, events: Array<TimeSeriesEvent<T>>): Promise<void> {
     const key = formDeletedKey(period)
     const createCSV = (events: Array<TimeSeriesEvent<T>>): string => {
       const idName = this.timeseries.schema.elements.find(e => e.tags.includes('id'))?.name ?? 'eventId'
@@ -195,21 +195,21 @@ class TimeSeriesPublisher<T> {
     await this.snapshot.putObject(key, deleted)
   }
 
-  firstEventDate (events: Array<TimeSeriesEvent<T>>): Date | undefined {
+  firstEventDate(events: Array<TimeSeriesEvent<T>>): Date | undefined {
     return events.at(0)?.eventAt
   }
 
-  lastEventDate (events: Array<TimeSeriesEvent<T>>): Date | undefined {
+  lastEventDate(events: Array<TimeSeriesEvent<T>>): Date | undefined {
     return events.at(-1)?.eventAt
   }
 
-  calcMaxLastModified (objects: BucketObject[]): Date | undefined {
+  calcMaxLastModified(objects: BucketObject[]): Date | undefined {
     if (objects.length === 0) return undefined
     const modifiedDates = objects.map((object) => { return object.lastModified })
     return maxDate(modifiedDates)
   }
 
-  calcLastPeriod (publishedObjects: BucketObject[]): Period | undefined {
+  calcLastPeriod(publishedObjects: BucketObject[]): Period | undefined {
     if (publishedObjects.length === 0) return undefined
     let lastPeriod = periodFromTimeSeriesKey(publishedObjects[0].key)
     for (const publishedObject of publishedObjects) {
@@ -221,7 +221,7 @@ class TimeSeriesPublisher<T> {
     return lastPeriod
   }
 
-  async findEvents (options: TimeSeriesFindOptions): Promise<Array<TimeSeriesEvent<T>>> {
+  async findEvents(options: TimeSeriesFindOptions): Promise<Array<TimeSeriesEvent<T>>> {
     const rawEvents = await this.timeseries.findEvents(options)
     return rawEvents.map((e) => this.timeseries.makeTimeSeriesEvent(e))
   }

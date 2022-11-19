@@ -5,7 +5,7 @@
 import 'module-alias/register'
 import { config } from 'dotenv'
 
-import app from '@/app'
+import app from '@/server/app'
 import Debug from 'debug'
 import http from 'http'
 import { bootstrapLogger } from '@/utils/loggers'
@@ -39,7 +39,7 @@ server.on('listening', onListening)
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort (val: string): number | string | boolean {
+function normalizePort(val: string): number | string | boolean {
   const port = parseInt(val, 10)
 
   if (isNaN(port)) {
@@ -59,7 +59,7 @@ function normalizePort (val: string): number | string | boolean {
  * Event listener for HTTP server "error" event.
  */
 
-function onError (error: { syscall: string, code: string }): void {
+function onError(error: { syscall: string, code: string }): void {
   if (error.syscall !== 'listen') {
     throw new Error(error.code)
   }
@@ -85,7 +85,7 @@ function onError (error: { syscall: string, code: string }): void {
  * Event listener for HTTP server "listening" event.
  */
 
-function onListening (): void {
+function onListening(): void {
   const addr = server.address()
   const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + port.toString()
   debug('Listening on ' + bind)

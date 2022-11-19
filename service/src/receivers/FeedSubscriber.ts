@@ -1,5 +1,5 @@
-import { MutableTimeSeries } from '@/epicast/TimeSeries'
-import { FeedBucket } from './FeedBucket'
+import { MutableTimeSeries } from '../epicast/TimeSeries'
+import { FeedBucket } from '../epicast/FeedBucket'
 
 export class FeedSubscriber<T> {
   model: FeedSubscriberModel = { automatic: false, lastChecked: undefined, reading: false, lastPublished: undefined }

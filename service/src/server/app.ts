@@ -3,20 +3,20 @@ import express from 'express'
 import path from 'path'
 import cookieParser from 'cookie-parser'
 
-import { getLogger } from './utils/loggers'
-import indexRouter from './routes/index'
-import systemRouter from './routes/system'
-import stateCaseRouter from './routes/stateCases'
-import cdcCaseRouter from './routes/cdcCases'
-import feedRouter from './routes/feed'
-import { db } from './utils/db'
-import { S3Bucket } from './utils/S3Bucket'
-import { resetStorage } from './controllers/resetSystem'
-import { updateFeedSubscriber } from './controllers/updateFeedSubscriber'
-import { StateCaseTimeSeries } from './models/StateCaseTimeSeries'
-import { FeedBucket } from '@/models/FeedBucket'
-import { CDCCaseTimeSeries } from './models/CDCCaseTimeSeries'
-import { FeedSubscriber } from './models/FeedSubscriber'
+import { getLogger } from '../utils/loggers'
+import indexRouter from './indexRoutes'
+import systemRouter from './systemRoutes'
+import stateCaseRouter from '../senders/stateCasesRoutes'
+import cdcCaseRouter from '../receivers/cdcCasesRoutes'
+import feedRouter from '../feeds/feedRoutes'
+import { db } from '../utils/db'
+import { S3Bucket } from '../feeds/S3Bucket'
+import { resetStorage } from './resetSystem'
+import { updateFeedSubscriber } from '../receivers/updateFeedSubscriber'
+import { StateCaseTimeSeries } from '../senders/StateCaseTimeSeries'
+import { FeedBucket } from '@/epicast/FeedBucket'
+import { CDCCaseTimeSeries } from '../receivers/CDCCaseTimeSeries'
+import { FeedSubscriber } from '@/receivers/FeedSubscriber'
 
 const logger = getLogger('APP')
 
@@ -28,7 +28,7 @@ class App {
   public bucket: FeedBucket = new S3Bucket()
   public feedSubscriber = new FeedSubscriber(this.bucket, this.cdcCaseTimeSeries)
 
-  constructor () {
+  constructor() {
     this.app = express()
     this.config()
     this.databaseSetup().catch((error) => { logger.error(error) })
@@ -37,14 +37,14 @@ class App {
     this.setupBackground()
   }
 
-  private config (): void {
+  private config(): void {
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: false }))
     this.app.use(cookieParser())
     this.app.use(express.static(path.join(__dirname, 'public')))
   }
 
-  private routerSetup (): void {
+  private routerSetup(): void {
     this.app.use((req, _res, next) => {
       req.db = this.db
       req.stateCaseTimeSeries = this.stateCaseTimeSeries
@@ -60,15 +60,15 @@ class App {
     this.app.use('/api/feed', feedRouter)
   }
 
-  private async databaseSetup (): Promise<void> {
+  private async databaseSetup(): Promise<void> {
     await this.db.sync()
   }
 
-  private async storageSetup (): Promise<void> {
+  private async storageSetup(): Promise<void> {
     await resetStorage(this.bucket)
   }
 
-  private setupBackground (): void {
+  private setupBackground(): void {
     updateFeedSubscriber(this.feedSubscriber, { automatic: true })
   }
 }

@@ -7,7 +7,7 @@
         "src/*"
       ]
     },
-    "typeRoots": ["./src/types"],
+    "typeRoots": ["src/server/types"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
