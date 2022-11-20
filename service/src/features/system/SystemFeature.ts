@@ -11,9 +11,9 @@ export class SystemFeature implements Feature {
     return []
   }
 
-  init(after: InitEvent): void {
+  async init(after: InitEvent): Promise<void> {
   }
 
-  reset(): void {
+  async reset(): Promise<void> {
   }
 }

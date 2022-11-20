@@ -10,8 +10,8 @@ export interface Feature {
   getModelPaths(): string[]
 
   // Called an init event. First AFTER_DB, then AFTER_ROUTES
-  init(after: InitEvent): void
+  init(after: InitEvent): Promise<void>
 
   // Called during a system reset
-  reset(): void
+  reset(): Promise<void>
 }

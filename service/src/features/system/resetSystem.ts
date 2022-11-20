@@ -3,8 +3,9 @@ import { StateCaseTimeSeries } from '../senders/StateCaseTimeSeries'
 import { getLogger } from '@/utils/loggers'
 import { FeedBucket } from '@/epicast/FeedBucket'
 import { CDCCase } from '@/features/receivers/CDCCase'
+import { resetStorage } from '../feeds/resetStorage'
 
-const logger = getLogger('RESET_SYSTEM')
+export const logger = getLogger('RESET_SYSTEM')
 const daysOfFakeCasesOnReset = 1
 const fakesPerDayOnReset = 5
 
@@ -23,10 +24,4 @@ export async function resetSystem(timeseries: StateCaseTimeSeries, feed: FeedBuc
   await timeseries.insertFakeStateCases(daysOfFakeCasesOnReset, fakesPerDayOnReset)
 }
 
-export async function resetStorage(feed: FeedBucket): Promise<void> {
-  logger.info('Resetting storage')
-  const bucketObjects = await feed.listObjects('')
-  for (const bucketObject of bucketObjects) {
-    await feed.deleteObject(bucketObject.key)
-  }
-}
+
