@@ -1,8 +1,8 @@
-import { StateCase } from '@/senders/StateCase'
-import { StateCaseTimeSeries } from '../senders/StateCaseTimeSeries'
+import { StateCase } from '@/features/senders/StateCase'
+import { StateCaseTimeSeries } from '../features/senders/StateCaseTimeSeries'
 import { getLogger } from '@/utils/loggers'
 import { FeedBucket } from '@/epicast/FeedBucket'
-import { CDCCase } from '@/receivers/CDCCase'
+import { CDCCase } from '@/features/receivers/CDCCase'
 
 const logger = getLogger('RESET_SYSTEM')
 const daysOfFakeCasesOnReset = 1

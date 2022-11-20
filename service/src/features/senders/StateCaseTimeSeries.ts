@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker'
 import { addDays, addMonths, endOfDay, startOfDay, startOfMonth } from 'date-fns'
 import { Op, Order, WhereOptions } from 'sequelize'
 
-import { StateCase } from '@/senders/StateCase'
+import { StateCase } from '@/features/senders/StateCase'
 import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesEvent, TimeSeriesMetadata } from '@/epicast/TimeSeries'
 import { stateCaseTimeSeriesSchemaV1, variableSchemaElementNames } from './stateCaseElements'
 import { MutableFeedSchema } from '@/epicast/FeedSchema'
