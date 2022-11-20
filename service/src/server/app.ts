@@ -5,13 +5,14 @@ import cookieParser from 'cookie-parser'
 
 import { getLogger } from '../utils/loggers'
 import indexRouter from './indexRoutes'
-import systemRouter from './systemRoutes'
+import { SystemFeature } from '../features/system/SystemFeature'
+
 import stateCaseRouter from '../features/senders/stateCasesRoutes'
 import cdcCaseRouter from '../features/receivers/cdcCasesRoutes'
 import feedRouter from '../features/feeds/feedRoutes'
 import { db } from '../utils/db'
 import { S3Bucket } from '../features/feeds/S3Bucket'
-import { resetStorage } from './resetSystem'
+import { resetStorage } from '../features/system/resetSystem'
 import { updateFeedSubscriber } from '../features/receivers/updateFeedSubscriber'
 import { StateCaseTimeSeries } from '../features/senders/StateCaseTimeSeries'
 import { FeedBucket } from '@/epicast/FeedBucket'
@@ -21,12 +22,15 @@ import { FeedSubscriber } from '@/features/receivers/FeedSubscriber'
 const logger = getLogger('APP')
 
 class App {
-  public app: express.Application
-  public db = db
-  public stateCaseTimeSeries = new StateCaseTimeSeries()
-  public cdcCaseTimeSeries = new CDCCaseTimeSeries()
-  public bucket: FeedBucket = new S3Bucket()
-  public feedSubscriber = new FeedSubscriber(this.bucket, this.cdcCaseTimeSeries)
+  app: express.Application
+  db = db
+  systemFeature = new SystemFeature()
+  features = [this.systemFeature]
+
+  stateCaseTimeSeries = new StateCaseTimeSeries()
+  cdcCaseTimeSeries = new CDCCaseTimeSeries()
+  bucket: FeedBucket = new S3Bucket()
+  feedSubscriber = new FeedSubscriber(this.bucket, this.cdcCaseTimeSeries)
 
   constructor() {
     this.app = express()
@@ -54,10 +58,13 @@ class App {
       next()
     })
     this.app.use('/', indexRouter)
-    this.app.use('/api/system', systemRouter)
     this.app.use('/api/stateCases', stateCaseRouter)
     this.app.use('/api/cdcCases', cdcCaseRouter)
     this.app.use('/api/feed', feedRouter)
+    for (const feature of this.features) {
+      const [path, reouter] = feature.getRoutes()
+      this.app.use('/api/' + path, reouter)
+    }
   }
 
   private async databaseSetup(): Promise<void> {
