@@ -12,7 +12,7 @@ import { getLogger } from '@/utils/loggers'
 const logger = getLogger('STATE_CASE_TIME_SERIES')
 
 export class StateCaseTimeSeries implements TimeSeries<StateCase> {
-  async findEvents(options: TimeSeriesFindOptions): Promise<StateCase[]> {
+  async findEvents (options: TimeSeriesFindOptions): Promise<StateCase[]> {
     const whereClause: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       whereClause.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -37,7 +37,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return await StateCase.findAll({ where: whereClause, order: orderClause })
   }
 
-  async countEvents(options: TimeSeriesCountOptions): Promise<number> {
+  async countEvents (options: TimeSeriesCountOptions): Promise<number> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -57,7 +57,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return await StateCase.count({ where })
   }
 
-  async fetchMetadata(): Promise<TimeSeriesMetadata | null> {
+  async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
     const lastUpdated = await StateCase.findOne({ order: [['updatedAt', 'DESC']] })
     if (lastUpdated === null) return null
     const lastCase = await StateCase.findOne({ order: [['caseAt', 'DESC']] })
@@ -65,25 +65,25 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return { lastUpdatedAt: lastUpdated.updatedAt, lastEventAt: lastCase.caseDate }
   }
 
-  makeTimeSeriesEvent(event: StateCase): TimeSeriesEvent<StateCase> {
+  makeTimeSeriesEvent (event: StateCase): TimeSeriesEvent<StateCase> {
     return new StateCaseTimeSeriesEvent(event)
   }
 
   schema = new MutableFeedSchema(stateCaseTimeSeriesSchemaV1)
 
-  addFeedElement(element: FeedElement): boolean {
+  addFeedElement (element: FeedElement): boolean {
     return this.schema.addElement(element)
   }
 
-  deleteFeedElement(name: string): boolean {
+  deleteFeedElement (name: string): boolean {
     return this.schema.deleteElement(name)
   }
 
-  resetSchema(): void {
+  resetSchema (): void {
     this.schema = new MutableFeedSchema(stateCaseTimeSeriesSchemaV1)
   }
 
-  async insertFakeStateCases(numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
+  async insertFakeStateCases (numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
     const decideOnDate = async (): Promise<Date> => {
       const now = new Date()
       if (numberOfDays * numberPerDay > 10000) {
@@ -131,14 +131,14 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return casesAdded
   }
 
-  async deduplicate(): Promise<void> {
-    function isDuplicate(a: StateCase, b: StateCase): boolean {
+  async deduplicate (): Promise<void> {
+    function isDuplicate (a: StateCase, b: StateCase): boolean {
       return a.personFirstName === b.personFirstName &&
         a.personLastName === b.personLastName &&
         a.personEmail === b.personEmail
     }
 
-    async function findDuplicates(cases: StateCase[], found: (duplicate: StateCase, original: StateCase) => Promise<void>): Promise<number> {
+    async function findDuplicates (cases: StateCase[], found: (duplicate: StateCase, original: StateCase) => Promise<void>): Promise<number> {
       // This algorithm only works if duplicates are consecutive as is the case for our code
       let duplicateCount = 0
       for (let i = 0; i < cases.length; i++) {
@@ -165,7 +165,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     logger.debug(`Found duplicates: ${duplicateCount}`)
   }
 
-  private fakeStateCase(stateCase: StateCase, caseDate: Date): void {
+  private fakeStateCase (stateCase: StateCase, caseDate: Date): void {
     stateCase.personFirstName = faker.name.firstName()
     stateCase.personLastName = faker.name.lastName()
     stateCase.personAddress = faker.address.streetAddress()
@@ -187,7 +187,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     this.fakeVariableElements(stateCase)
   }
 
-  private fakeVariableElements(stateCase: StateCase): void {
+  private fakeVariableElements (stateCase: StateCase): void {
     for (const variableElementName of variableSchemaElementNames) {
       const index = this.schema.elements.findIndex(e => e.name === variableElementName)
       if (index !== -1) {
@@ -196,7 +196,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     }
   }
 
-  private setStateCase(to: StateCase, from: StateCase): void {
+  private setStateCase (to: StateCase, from: StateCase): void {
     to.personFirstName = from.personFirstName
     to.personLastName = from.personLastName
     to.personAddress = from.personAddress
@@ -216,7 +216,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     this.fakeVariableElements(to)
   }
 
-  private static sample(codeset: string[]): string {
+  private static sample (codeset: string[]): string {
     const random = Math.floor(Math.random() * codeset.length)
     return codeset[random]
   }
@@ -225,35 +225,35 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
 export class StateCaseTimeSeriesEvent implements TimeSeriesEvent<StateCase> {
   #stateCase: StateCase
 
-  constructor(stateCase: StateCase) {
+  constructor (stateCase: StateCase) {
     this.#stateCase = stateCase
   }
 
-  get eventAt(): Date {
+  get eventAt (): Date {
     return this.#stateCase.caseDate
   }
 
-  get eventId(): number {
+  get eventId (): number {
     return this.#stateCase.caseId
   }
 
-  get eventUpdatedAt(): Date {
+  get eventUpdatedAt (): Date {
     return this.#stateCase.updatedAt
   }
 
-  get isDeleted(): boolean | undefined {
+  get isDeleted (): boolean | undefined {
     return this.#stateCase.isDeleted
   }
 
-  get replacedBy(): number | undefined {
+  get replacedBy (): number | undefined {
     return this.#stateCase.replacedBy
   }
 
-  get model(): StateCase {
+  get model (): StateCase {
     return this.#stateCase
   }
 
-  getValue(name: string): any {
+  getValue (name: string): any {
     return this.#stateCase[name as keyof StateCase]
   }
 }

@@ -7,13 +7,13 @@ export class TimeSeriesPartition<T> {
   period: Period
   events: Array<TimeSeriesEvent<T>>
 
-  constructor(period: Period, events: Array<TimeSeriesEvent<T>>) {
+  constructor (period: Period, events: Array<TimeSeriesEvent<T>>) {
     this.period = period
     this.events = events
   }
 }
 
-export function makeCasePartions<T>(events: Array<TimeSeriesEvent<T>>, frequency: Frequency, optionalStartDate?: Date, optionalEndDate?: Date): Array<TimeSeriesPartition<T>> {
+export function makeCasePartions<T> (events: Array<TimeSeriesEvent<T>>, frequency: Frequency, optionalStartDate?: Date, optionalEndDate?: Date): Array<TimeSeriesPartition<T>> {
   if (events.length === 0) return []
   const partions: Array<TimeSeriesPartition<T>> = []
   const startDate = optionalStartDate !== undefined ? optionalStartDate : events[0].eventAt
@@ -27,6 +27,6 @@ export function makeCasePartions<T>(events: Array<TimeSeriesEvent<T>>, frequency
   return partions
 }
 
-function findCasesForPeriod<T>(events: Array<TimeSeriesEvent<T>>, period: Period): Array<TimeSeriesEvent<T>> {
+function findCasesForPeriod<T> (events: Array<TimeSeriesEvent<T>>, period: Period): Array<TimeSeriesEvent<T>> {
   return events.filter((event) => { return isWithinInterval(event.eventAt, period.interval) })
 }

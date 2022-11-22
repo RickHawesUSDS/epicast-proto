@@ -4,71 +4,88 @@ import path from 'path'
 import cookieParser from 'cookie-parser'
 
 import { getLogger } from '../utils/loggers'
+import { db, Sequelize } from '../utils/db'
+import { FeedBucket } from '@/epicast/FeedBucket'
 import indexRouter from './indexRoutes'
 import { SystemFeature } from '../features/system/SystemFeature'
 import { FeedsFeature } from '../features/feeds/FeedsFeature'
-
-import stateCaseRouter from '../features/publishers/stateCasesRoutes'
+import { StateCasesFeature } from '@/features/publishers/StateCasesFeature'
 import cdcCaseRouter from '../features/subscribers/cdcCasesRoutes'
-import { db } from '../utils/db'
-import { S3Bucket } from '../features/feeds/S3Bucket'
-import { resetStorage } from "../features/feeds/resetStorage"
 import { updateFeedSubscriber } from '../features/subscribers/updateFeedSubscriber'
-import { StateCaseTimeSeries } from '../features/publishers/StateCaseTimeSeries'
-import { FeedBucket } from '@/epicast/FeedBucket'
 import { CDCCaseTimeSeries } from '../features/subscribers/CDCCaseTimeSeries'
 import { FeedSubscriber } from '@/features/subscribers/FeedSubscriber'
-import { InitEvent } from '@/features/Feature'
+import { Feature, InitEvent } from '@/features/Feature'
+import { StateCaseTimeSeries } from '@/features/publishers/StateCaseTimeSeries'
 
 const logger = getLogger('APP')
 
+// The application state is put into every request to share with the request
+export interface AppState {
+  db: Sequelize
+  systemFeature: SystemFeature
+  feedsFeature: FeedsFeature
+  stateCasesFeature: StateCasesFeature
+}
+
+export function getStateCaseTimeSeries (req: express.Request): StateCaseTimeSeries {
+  return req.state.stateCasesFeature.stateCaseTimeSeries
+}
+
+export function getFeedBucket (req: express.Request): FeedBucket {
+  return req.state.feedsFeature.bucket
+}
+
 class App {
   app: express.Application
-  db = db
-  systemFeature = new SystemFeature()
-  feedsFeature = new FeedsFeature()
-  features = [
-    this.systemFeature,
-    this.feedsFeature
+  state: AppState = {
+    db,
+    systemFeature: new SystemFeature(),
+    feedsFeature: new FeedsFeature(),
+    stateCasesFeature: new StateCasesFeature()
+  }
+
+  features: Feature[] = [
+    this.state.systemFeature,
+    this.state.feedsFeature,
+    this.state.stateCasesFeature
   ]
 
-  stateCaseTimeSeries = new StateCaseTimeSeries()
   cdcCaseTimeSeries = new CDCCaseTimeSeries()
-  feedSubscriber = new FeedSubscriber(this.feedsFeature.bucket, this.cdcCaseTimeSeries)
+  feedSubscriber = new FeedSubscriber(this.state.feedsFeature.bucket, this.cdcCaseTimeSeries)
 
-  constructor() {
+  constructor () {
     this.app = express()
     this.config()
     this.init().catch(error => logger.error(error))
   }
 
-  async init(): Promise<void> {
-    this.databaseSetup().catch((error) => { logger.error(error) })
+  async init (): Promise<void> {
+    await this.databaseSetup()
     for (const feature of this.features) {
       await feature.init(InitEvent.AFTER_DB)
     }
     this.routerSetup()
+    for (const feature of this.features) {
+      await feature.init(InitEvent.AFTER_ROUTES)
+    }
     this.setupBackground()
   }
 
-  private config(): void {
+  private config (): void {
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: false }))
     this.app.use(cookieParser())
     this.app.use(express.static(path.join(__dirname, 'public')))
   }
 
-  private routerSetup(): void {
+  private routerSetup (): void {
     this.app.use((req, _res, next) => {
-      req.db = this.db
-      req.stateCaseTimeSeries = this.stateCaseTimeSeries
+      req.state = this.state
       req.cdcCaseTimeSeries = this.cdcCaseTimeSeries
       req.feedSubscriber = this.feedSubscriber
-      req.bucket = this.feedsFeature.bucket
       next()
     })
     this.app.use('/', indexRouter)
-    this.app.use('/api/stateCases', stateCaseRouter)
     this.app.use('/api/cdcCases', cdcCaseRouter)
     for (const feature of this.features) {
       const [path, router] = feature.getRoutes()
@@ -76,11 +93,13 @@ class App {
     }
   }
 
-  private async databaseSetup(): Promise<void> {
-    await this.db.sync()
+  private async databaseSetup (): Promise<void> {
+    const modelPaths = this.features.flatMap(f => f.getModelPaths())
+    this.state.db.addModels(modelPaths)
+    await this.state.db.sync()
   }
 
-  private setupBackground(): void {
+  private setupBackground (): void {
     updateFeedSubscriber(this.feedSubscriber, { automatic: true })
   }
 }

@@ -9,7 +9,7 @@ import { Snapshot } from './Snapshot'
 
 const logger = getLogger('READ_SCHEMA_SERVICE')
 
-export async function readSchema<T>(fromSnapshot: Snapshot, mutatingTimeSeries: MutableTimeSeries<T>): Promise<void> {
+export async function readSchema<T> (fromSnapshot: Snapshot, mutatingTimeSeries: MutableTimeSeries<T>): Promise<void> {
   const publishedBlobKey = await findLastSchemaKey(fromSnapshot, mutatingTimeSeries.schema.validFrom)
   if (publishedBlobKey === null) return
   logger.info('Reading schema: $0', publishedBlobKey)
@@ -20,7 +20,7 @@ export async function readSchema<T>(fromSnapshot: Snapshot, mutatingTimeSeries: 
   mutatingTimeSeries.updateSchema(newSchema)
 }
 
-async function findLastSchemaKey(fromSnapshot: Snapshot, afterDate: Date | null): Promise<string | null> {
+async function findLastSchemaKey (fromSnapshot: Snapshot, afterDate: Date | null): Promise<string | null> {
   let objects = await fromSnapshot.listObjects(SCHEMA_FOLDER)
   if (objects.length === 0) return null
   if (objects.length === 1) {

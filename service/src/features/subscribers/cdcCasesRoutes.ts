@@ -3,6 +3,7 @@ import asyncHandler from 'express-async-handler'
 import { getLogger } from '@/utils/loggers'
 import { readFeed } from '@/epicast/readFeed'
 import { updateFeedSubscriber } from '@/features/subscribers/updateFeedSubscriber'
+import { getFeedBucket } from '@/server/app'
 
 const router = express.Router()
 const logger = getLogger('CDC_CASES_ROUTE')
@@ -37,8 +38,8 @@ router.post('/subscriber', (req, res, _next) => {
 
 router.post('/subscriber/once', asyncHandler(async (req, res, _next) => {
   logger.info('Read feed')
-
-  const lastPublished = await readFeed(req.bucket, req.cdcCaseTimeSeries)
+  const bucket = getFeedBucket(req)
+  const lastPublished = await readFeed(bucket, req.cdcCaseTimeSeries)
   req.feedSubscriber.setLastChecked(lastPublished)
   res.send(req.feedSubscriber.model)
 }))

@@ -1,6 +1,4 @@
-import { StateCaseTimeSeries } from '@/features/publishers/StateCaseTimeSeries'
-import { FeedBucket } from '@/epicast/FeedBucket'
-import { Sequelize } from 'sequelize-typescript'
+import { AppState } from '@/server/app'
 import { CDCCaseTimeSeries } from '@/features/subscribers/CDCCaseTimeSeries'
 import { FeedSubscriber } from '@/features/subscribers/FeedSubscriber'
 
@@ -8,11 +6,9 @@ import { FeedSubscriber } from '@/features/subscribers/FeedSubscriber'
 declare global {
   declare namespace Express {
     interface Request {
-      db: Sequelize
-      stateCaseTimeSeries: StateCaseTimeSeries
+      state: AppState
       cdcCaseTimeSeries: CDCCaseTimeSeries
       feedSubscriber: FeedSubscriber
-      bucket: FeedBucket
     }
   }
 }

@@ -31,12 +31,12 @@ export class SnapshotReader implements Snapshot {
   feedVersion?: number
   readCalled: boolean
 
-  constructor(fromBucket: FeedBucket) {
+  constructor (fromBucket: FeedBucket) {
     this.bucket = fromBucket
     this.readCalled = false
   }
 
-  async read(): Promise<void> {
+  async read (): Promise<void> {
     // TODO: mutex is called for here
     if (this.readCalled) throw Error('Read must not be called twice')
     this.readCalled = true
@@ -54,28 +54,28 @@ export class SnapshotReader implements Snapshot {
     })
   }
 
-  get name(): string {
+  get name (): string {
     return this.bucket.name
   }
 
-  get version(): number | undefined {
+  get version (): number | undefined {
     if (!this.readCalled) throw Error('Read must be called before this method')
     return this.feedVersion
   }
 
-  listObjects(prefix: string): BucketObject[] {
+  listObjects (prefix: string): BucketObject[] {
     if (!this.readCalled) throw Error('Read must be called before this method')
     // production code would work to make this search more efficient
     return this.bucketObjects
       .filter((object) => object.key.startsWith(prefix))
   }
 
-  doesObjectExist(key: string): boolean {
+  doesObjectExist (key: string): boolean {
     if (!this.readCalled) throw Error('Read must be called before this method')
     return this.bucketObjects.findIndex((object) => object.key === key) !== -1
   }
 
-  async getObject(key: string): Promise<string> {
+  async getObject (key: string): Promise<string> {
     if (!this.readCalled) throw Error('Read must be called before this method')
     const index = this.bucketObjects.findIndex((object) => object.key === key)
     if (index === -1) throw Error('Object does not exist')
@@ -90,7 +90,7 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
   initializedCalled = false
   isModified = false
 
-  async initialize(): Promise<void> {
+  async initialize (): Promise<void> {
     await super.read()
     if (this.feedVersion !== undefined) {
       this.feedVersion = this.feedVersion + 1
@@ -101,7 +101,7 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
     this.isModified = false
   }
 
-  async putObject(key: string, value: string): Promise<void> {
+  async putObject (key: string, value: string): Promise<void> {
     if (!this.initializedCalled) throw Error('Initialized must be called')
     logger.info(`Put of object: ${key}`)
     const writtenObject = await this.bucket.putObject(key, value)
@@ -114,7 +114,7 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
     this.isModified = true
   }
 
-  async deleteObject(key: string): Promise<void> {
+  async deleteObject (key: string): Promise<void> {
     if (!this.initializedCalled) throw Error('Initialized must be called')
     logger.info(`Delete of object: ${key}`)
     const index = this.bucketObjects.findIndex((object) => object.key === key)
@@ -125,7 +125,7 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
     }
   }
 
-  async publish(): Promise<void> {
+  async publish (): Promise<void> {
     if (!this.isModified) return
     const csv = this.bucketObjects.map(object => {
       assert(object.versionId !== undefined)
