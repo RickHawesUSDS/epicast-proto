@@ -82,13 +82,15 @@ The prototype should be support a demonstration of these concepts.
 * [x] Change schemas dialog in state. Options for new CDC data element, a new other state element and local element
 * [x] Aggregates published
 * [x] Auto read button
-* [ ] Random change methods and button
 * [x] Random duplicates. Deduplicate button and method. replaceBy column. Deleted log.
 * [x] Feed file explorer
-* [ ] Reorganize code around domains (website and service). Service sub-domains (senders, receivers, watchers, feeds, core, server, utils) and CUPID
-* [ ] Fix new bugs
+* [x] Reorganize code around domains (website and service). Service sub-domains (senders, receivers, watchers, feeds, core, server, utils) and CUPID
+* [x] State and CDC tables are TimeSeriesEvents
+* [ ] Random change methods and button
+* [ ] Schema improvements; column naming;  JS validation with row as context
+* [ ] Make two states feeds and cdc table that merge states together
+* [ ] Validation language
 * [ ] Validator service. watcher domain to validate and provide webhooks.
-* [ ] Make two states to cdc and merge states together
 * [ ] Multi-value columns
 * [ ] Show only published elements in State table
 * [ ] Show only what is CDC elements in CDC table

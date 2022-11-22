@@ -31,8 +31,8 @@ export interface TimeSeriesEvent<T> {
   get eventAt(): Date
   get eventId(): number
   get eventUpdatedAt(): Date
-  get isDeleted(): boolean | undefined
-  get replacedBy(): number | undefined
+  get eventIsDeleted(): boolean | undefined
+  get eventReplacedBy(): number | undefined
   getValue: (name: string) => any
   get model(): T
 }

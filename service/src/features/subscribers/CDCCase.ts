@@ -1,7 +1,8 @@
+import { TimeSeriesEvent } from '@/epicast/TimeSeries'
 import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, Index } from 'sequelize-typescript'
 
 @Table({ tableName: 'cdcCases' })
-export class CDCCase extends Model<CDCCase> {
+export class CDCCase extends Model<CDCCase> implements TimeSeriesEvent<CDCCase> {
   @PrimaryKey
   @Column
     caseId!: number
@@ -72,4 +73,32 @@ export class CDCCase extends Model<CDCCase> {
 
   @Column
     neighborQuestion3?: string
+
+  get eventAt (): Date {
+    return this.caseDate
+  }
+
+  get eventId (): number {
+    return this.caseId
+  }
+
+  get eventUpdatedAt (): Date {
+    return this.updatedAt
+  }
+
+  get eventIsDeleted (): boolean | undefined {
+    return
+  }
+
+  get eventReplacedBy (): number | undefined {
+    return
+  }
+
+  get model (): CDCCase {
+    return this
+  }
+
+  getValue (name: string): any {
+    return this[name as keyof CDCCase]
+  }
 }

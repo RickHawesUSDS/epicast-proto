@@ -48,8 +48,8 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     return { lastUpdatedAt: lastUpdated.updatedAt, lastEventAt: lastCase.caseDate }
   }
 
-  makeTimeSeriesEvent (event: CDCCase): TimeSeriesEvent<CDCCase> {
-    return new CDCCaseTimeSeriesEvent(event)
+  makeTimeSeriesEvent (cdcCase: CDCCase): TimeSeriesEvent<CDCCase> {
+    return cdcCase
   }
 
   schema: FeedSchema = {
@@ -98,41 +98,5 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
       record[names[i]] = values[i]
     }
     return CDCCase.build(record)
-  }
-}
-
-export class CDCCaseTimeSeriesEvent implements TimeSeriesEvent<CDCCase> {
-  #cdcCase: CDCCase
-
-  constructor (cdcCase: CDCCase) {
-    this.#cdcCase = cdcCase
-  }
-
-  get eventAt (): Date {
-    return this.#cdcCase.caseDate
-  }
-
-  get eventId (): number {
-    return this.#cdcCase.caseId
-  }
-
-  get eventUpdatedAt (): Date {
-    return this.#cdcCase.updatedAt
-  }
-
-  get isDeleted (): boolean | undefined {
-    return undefined
-  }
-
-  get replacedBy (): number | undefined {
-    return undefined
-  }
-
-  get model (): CDCCase {
-    return this.#cdcCase
-  }
-
-  getValue (name: string): any {
-    return this.#cdcCase[name as keyof CDCCase]
   }
 }

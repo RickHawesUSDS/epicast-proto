@@ -66,7 +66,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
   }
 
   makeTimeSeriesEvent (event: StateCase): TimeSeriesEvent<StateCase> {
-    return new StateCaseTimeSeriesEvent(event)
+    return event
   }
 
   schema = new MutableFeedSchema(stateCaseTimeSeriesSchemaV1)
@@ -219,41 +219,5 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
   private static sample (codeset: string[]): string {
     const random = Math.floor(Math.random() * codeset.length)
     return codeset[random]
-  }
-}
-
-export class StateCaseTimeSeriesEvent implements TimeSeriesEvent<StateCase> {
-  #stateCase: StateCase
-
-  constructor (stateCase: StateCase) {
-    this.#stateCase = stateCase
-  }
-
-  get eventAt (): Date {
-    return this.#stateCase.caseDate
-  }
-
-  get eventId (): number {
-    return this.#stateCase.caseId
-  }
-
-  get eventUpdatedAt (): Date {
-    return this.#stateCase.updatedAt
-  }
-
-  get isDeleted (): boolean | undefined {
-    return this.#stateCase.isDeleted
-  }
-
-  get replacedBy (): number | undefined {
-    return this.#stateCase.replacedBy
-  }
-
-  get model (): StateCase {
-    return this.#stateCase
-  }
-
-  getValue (name: string): any {
-    return this.#stateCase[name as keyof StateCase]
   }
 }

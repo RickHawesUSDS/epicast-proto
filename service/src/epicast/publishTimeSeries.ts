@@ -186,7 +186,7 @@ class TimeSeriesPublisher<T> {
       const idName = this.timeseries.schema.elements.find(e => e.tags.includes('id'))?.name ?? 'eventId'
       const csv: string[] = [stringify([idName, 'replacedBy'])]
       for (const event of events) {
-        csv.push(stringify([event.eventId.toString(), event.replacedBy?.toString()]))
+        csv.push(stringify([event.eventId.toString(), event.eventReplacedBy?.toString()]))
       }
       return csv.join('')
     }
