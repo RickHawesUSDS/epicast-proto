@@ -1,5 +1,7 @@
 import { FeedBucket } from '@/epicast/FeedBucket'
-import { logger } from '../system/resetSystem'
+import { getLogger } from '@/utils/loggers'
+
+const logger = getLogger('RESET_STORAGE')
 
 export async function resetStorage (feed: FeedBucket): Promise<void> {
   logger.info('Resetting storage')

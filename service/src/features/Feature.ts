@@ -1,8 +1,10 @@
 import { Router } from 'express'
 
-export enum InitEvent { AFTER_DB, AFTER_ROUTES }
+export enum InitEvent { BEFORE_DB, AFTER_DB, AFTER_ROUTES }
 
 export interface Feature {
+  name: string
+
   // Get the router for this feature
   getRoutes: () => [string, Router]
 

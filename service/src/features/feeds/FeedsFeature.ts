@@ -7,6 +7,8 @@ import { S3Bucket } from './S3Bucket'
 export class FeedsFeature implements Feature {
   bucket = new S3Bucket()
 
+  name = 'feed'
+
   getRoutes (): [string, Router] {
     return ['feed', feedRouter]
   }
@@ -22,5 +24,6 @@ export class FeedsFeature implements Feature {
   }
 
   async reset (): Promise<void> {
+    await resetStorage(this.bucket)
   }
 }

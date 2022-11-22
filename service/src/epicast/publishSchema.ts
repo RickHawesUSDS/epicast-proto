@@ -9,7 +9,7 @@ import { filterElements } from './FeedElement'
 import { MutableSnapshot } from './Snapshot'
 
 const logger = getLogger('PUBLISH_SCHEMA_SERVICE')
-const SCHEMA_TEMPLATE_PATH = './src/public/epicast-demoserver-feed1-schema.handlebars'
+const SCHEMA_TEMPLATE_PATH = './public/epicast-demoserver-feed1-schema.handlebars'
 
 export async function publishSchema (toSnapshot: MutableSnapshot, schema: FeedSchema): Promise<void> {
   const schemaKey = formSchemaKey(schema.subjectId, schema.reporterId, schema.topicId, schema.validFrom)
