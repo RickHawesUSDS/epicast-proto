@@ -1,8 +1,8 @@
-import { StateCase } from '@/features/senders/StateCase'
-import { StateCaseTimeSeries } from '../senders/StateCaseTimeSeries'
+import { StateCase } from '@/features/publishers/StateCase'
+import { StateCaseTimeSeries } from '../publishers/StateCaseTimeSeries'
 import { getLogger } from '@/utils/loggers'
 import { FeedBucket } from '@/epicast/FeedBucket'
-import { CDCCase } from '@/features/receivers/CDCCase'
+import { CDCCase } from '@/features/subscribers/CDCCase'
 import { resetStorage } from '../feeds/resetStorage'
 
 export const logger = getLogger('RESET_SYSTEM')

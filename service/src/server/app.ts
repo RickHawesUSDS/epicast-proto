@@ -8,16 +8,16 @@ import indexRouter from './indexRoutes'
 import { SystemFeature } from '../features/system/SystemFeature'
 import { FeedsFeature } from '../features/feeds/FeedsFeature'
 
-import stateCaseRouter from '../features/senders/stateCasesRoutes'
-import cdcCaseRouter from '../features/receivers/cdcCasesRoutes'
+import stateCaseRouter from '../features/publishers/stateCasesRoutes'
+import cdcCaseRouter from '../features/subscribers/cdcCasesRoutes'
 import { db } from '../utils/db'
 import { S3Bucket } from '../features/feeds/S3Bucket'
 import { resetStorage } from "../features/feeds/resetStorage"
-import { updateFeedSubscriber } from '../features/receivers/updateFeedSubscriber'
-import { StateCaseTimeSeries } from '../features/senders/StateCaseTimeSeries'
+import { updateFeedSubscriber } from '../features/subscribers/updateFeedSubscriber'
+import { StateCaseTimeSeries } from '../features/publishers/StateCaseTimeSeries'
 import { FeedBucket } from '@/epicast/FeedBucket'
-import { CDCCaseTimeSeries } from '../features/receivers/CDCCaseTimeSeries'
-import { FeedSubscriber } from '@/features/receivers/FeedSubscriber'
+import { CDCCaseTimeSeries } from '../features/subscribers/CDCCaseTimeSeries'
+import { FeedSubscriber } from '@/features/subscribers/FeedSubscriber'
 import { InitEvent } from '@/features/Feature'
 
 const logger = getLogger('APP')

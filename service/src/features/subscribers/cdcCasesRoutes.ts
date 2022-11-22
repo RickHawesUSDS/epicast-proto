@@ -2,7 +2,7 @@ import express from 'express'
 import asyncHandler from 'express-async-handler'
 import { getLogger } from '@/utils/loggers'
 import { readFeed } from '@/epicast/readFeed'
-import { updateFeedSubscriber } from '@/features/receivers/updateFeedSubscriber'
+import { updateFeedSubscriber } from '@/features/subscribers/updateFeedSubscriber'
 
 const router = express.Router()
 const logger = getLogger('CDC_CASES_ROUTE')

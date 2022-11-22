@@ -1,6 +1,6 @@
 import { Op, Order, WhereOptions } from 'sequelize'
 
-import { CDCCase } from '@/features/receivers/CDCCase'
+import { CDCCase } from '@/features/subscribers/CDCCase'
 import { FeedSchema } from '@/epicast/FeedSchema'
 import { TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata, MutableTimeSeries, TimeSeriesDeletedEvent } from '@/epicast/TimeSeries'
 import { assert } from 'console'

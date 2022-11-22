@@ -14,8 +14,8 @@ const db = new Sequelize({
   storage: ':memory:',
   logging: msg => logger.debug(msg),
   modelPaths: [
-    join(__dirname, '../features/receivers/CDCCase.ts'),
-    join(__dirname, '../features/senders/StateCase.ts')
+    join(__dirname, '../features/subscribers/CDCCase.ts'),
+    join(__dirname, '../features/publishers/StateCase.ts')
   ]
 })
 
