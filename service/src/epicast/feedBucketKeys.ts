@@ -3,7 +3,7 @@ import { formatISO } from 'date-fns'
 import pathPosix from 'node:path/posix'
 
 //
-// Define where to put objects and how to name them in the bucket
+// Define where to put objects and how to name them in a bucket
 //
 
 export const LOG_FOLDER = 'logs'
