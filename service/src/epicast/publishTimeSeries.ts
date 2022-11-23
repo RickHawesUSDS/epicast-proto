@@ -149,19 +149,20 @@ class TimeSeriesPublisher<T> {
   }
 
   async putPartition (period: Period, events: Array<TimeSeriesEvent<T>>): Promise<void> {
-    const key = formTimeSeriesKey(period)
+
     function formatValue (event: TimeSeriesEvent<T>, element: FeedElement): string {
       let result: string
-      switch (element.type) {
-        case 'date': {
-          const value = event.getValue(element.name) as Date
-          result = formatISO(value)
-          break
-        }
-        default: {
-          result = event.getValue(element.name) as string ?? ''
-          break
-        }
+      if (element.name === 'eventId') {
+        result = event.eventId
+      } else if (element.name === 'eventAt') {
+        result = formatISO(event.eventAt)
+      } else if (element.name === 'eventUpdatedAt') {
+        result = formatISO(event.eventUpdatedAt)
+      } else if (element.type === 'date') {
+        const value = event.getValue(element.name) as Date
+        result = formatISO(value)
+      } else {
+        result = event.getValue(element.name) as string ?? ''
       }
       return result
     }
@@ -177,18 +178,18 @@ class TimeSeriesPublisher<T> {
 
     const deidentifiedElements = filterElements(this.timeseries.schema.elements, 'pii')
     const report = createCSV(events, deidentifiedElements)
+    const key = formTimeSeriesKey(period)
     await this.snapshot.putObject(key, report)
   }
 
   async putDeletedPartition (period: Period, events: Array<TimeSeriesEvent<T>>): Promise<void> {
     const key = formDeletedKey(period)
     const createCSV = (events: Array<TimeSeriesEvent<T>>): string => {
-      const idName = this.timeseries.schema.elements.find(e => e.tags.includes('id'))?.name ?? 'eventId'
-      const csv: string[] = [stringify([idName, 'replacedBy'])]
+      const csvRow: string[] = [stringify(['eventId', 'replacedBy'])]
       for (const event of events) {
-        csv.push(stringify([event.eventId.toString(), event.eventReplacedBy?.toString()]))
+        csvRow.push(stringify([event.eventId.toString(), event.eventReplacedBy?.toString()]))
       }
-      return csv.join('')
+      return csvRow.join('')
     }
 
     const deleted = createCSV(events)

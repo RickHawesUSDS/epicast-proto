@@ -28,61 +28,61 @@ export class StateCase extends Model<StateCase> implements TimeSeriesEvent<State
     replacedBy?: number
 
   @Column
-    personFirstName!: string
+    uscdiPatientFirstName!: string
 
   @Column
-    personLastName!: string
+    uscdiPatientLastName!: string
 
   @Column
-    personDateOfBirth?: Date
+    uscdiPatientDateOfBirth?: Date
 
   @Column
-    personRace?: string
+    uscdiPatientRace?: string
 
   @Column
-    personEthnicity?: string
+    uscdiPatientEthnicity?: string
 
   @Column
-    personSexAtBirth?: string
+    uscdiPatientSexAtBirth?: string
 
   @Column
-    personSexualOrientation?: string
+    uscdiPatientSexualOrientation?: string
 
   @Column
-    personAddress?: string
+    uscdiPatientAddress?: string
 
   @Column
-    personCity?: string
+    uscdiPatientCity?: string
 
   @Column
-    personState?: string
+    uscdiPatientState?: string
 
   @Column
-    personPostalCode?: string
+    uscdiPatientPostalCode?: string
 
   @Column
-    personPhone?: string
+    uscdiPatientPhone?: string
 
   @Column
-    personEmail?: string
+    uscdiPatientEmail?: string
 
   @Column
-    onsetOfSymptoms!: Date
+    cdcOnsetOfSymptoms!: Date
 
   @Column
-    hospitalized?: string
+    cdcHospitalized?: string
 
   @Column
-    subjectDied?: string
+    cdcSubjectDied?: string
 
   @Column
-    localQuestion1?: string
+    us_caQuestion1?: string
 
   @Column
-    localQuestion2?: string
+    us_caQuestion2?: string
 
   @Column
-    localQuestion3?: string
+    us_caQuestion3?: string
 
   @Column
     cdcQuestion1?: string
@@ -94,20 +94,20 @@ export class StateCase extends Model<StateCase> implements TimeSeriesEvent<State
     cdcQuestion3?: string
 
   @Column
-    neighborQuestion1?: string
+    us_azQuestion1?: string
 
   @Column
-    neighborQuestion2?: string
+    us_azQuestion2?: string
 
   @Column
-    neighborQuestion3?: string
+    us_azQuestion3?: string
 
   get eventAt (): Date {
     return this.caseDate
   }
 
-  get eventId (): number {
-    return this.caseId
+  get eventId (): string {
+    return this.caseId.toString()
   }
 
   get eventUpdatedAt (): Date {
@@ -118,8 +118,8 @@ export class StateCase extends Model<StateCase> implements TimeSeriesEvent<State
     return this.isDeleted
   }
 
-  get eventReplacedBy (): number | undefined {
-    return this.replacedBy
+  get eventReplacedBy (): string | undefined {
+    return this.replacedBy?.toString()
   }
 
   get model (): StateCase {

@@ -5,14 +5,14 @@ import { Op, Order, WhereOptions } from 'sequelize'
 import { StateCase } from '@/features/publishers/StateCase'
 import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesEvent, TimeSeriesMetadata } from '@/epicast/TimeSeries'
 import { stateCaseTimeSeriesSchemaV1, variableSchemaElementNames } from './stateCaseElements'
-import { MutableFeedSchema } from '@/epicast/FeedSchema'
+import { MutableFeedDictionary } from '@/epicast/FeedDictionary'
 import { FeedElement } from '@/epicast/FeedElement'
 import { getLogger } from '@/utils/loggers'
 
 const logger = getLogger('STATE_CASE_TIME_SERIES')
 
 export class StateCaseTimeSeries implements TimeSeries<StateCase> {
-  async findEvents (options: TimeSeriesFindOptions): Promise<StateCase[]> {
+  async findEvents(options: TimeSeriesFindOptions): Promise<StateCase[]> {
     const whereClause: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       whereClause.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -37,7 +37,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return await StateCase.findAll({ where: whereClause, order: orderClause })
   }
 
-  async countEvents (options: TimeSeriesCountOptions): Promise<number> {
+  async countEvents(options: TimeSeriesCountOptions): Promise<number> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -57,7 +57,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return await StateCase.count({ where })
   }
 
-  async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
+  async fetchMetadata(): Promise<TimeSeriesMetadata | null> {
     const lastUpdated = await StateCase.findOne({ order: [['updatedAt', 'DESC']] })
     if (lastUpdated === null) return null
     const lastCase = await StateCase.findOne({ order: [['caseAt', 'DESC']] })
@@ -65,25 +65,25 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return { lastUpdatedAt: lastUpdated.updatedAt, lastEventAt: lastCase.caseDate }
   }
 
-  makeTimeSeriesEvent (event: StateCase): TimeSeriesEvent<StateCase> {
+  makeTimeSeriesEvent(event: StateCase): TimeSeriesEvent<StateCase> {
     return event
   }
 
-  schema = new MutableFeedSchema(stateCaseTimeSeriesSchemaV1)
+  schema = new MutableFeedDictionary(stateCaseTimeSeriesSchemaV1)
 
-  addFeedElement (element: FeedElement): boolean {
+  addFeedElement(element: FeedElement): boolean {
     return this.schema.addElement(element)
   }
 
-  deleteFeedElement (name: string): boolean {
+  deleteFeedElement(name: string): boolean {
     return this.schema.deleteElement(name)
   }
 
-  resetSchema (): void {
-    this.schema = new MutableFeedSchema(stateCaseTimeSeriesSchemaV1)
+  resetSchema(): void {
+    this.schema = new MutableFeedDictionary(stateCaseTimeSeriesSchemaV1)
   }
 
-  async insertFakeStateCases (numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
+  async insertFakeStateCases(numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
     const decideOnDate = async (): Promise<Date> => {
       const now = new Date()
       if (numberOfDays * numberPerDay > 10000) {
@@ -131,14 +131,14 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return casesAdded
   }
 
-  async deduplicate (): Promise<void> {
-    function isDuplicate (a: StateCase, b: StateCase): boolean {
-      return a.personFirstName === b.personFirstName &&
-        a.personLastName === b.personLastName &&
-        a.personEmail === b.personEmail
+  async deduplicate(): Promise<void> {
+    function isDuplicate(a: StateCase, b: StateCase): boolean {
+      return a.uscdiPatientFirstName === b.uscdiPatientFirstName &&
+        a.uscdiPatientLastName === b.uscdiPatientLastName &&
+        a.uscdiPatientEmail === b.uscdiPatientEmail
     }
 
-    async function findDuplicates (cases: StateCase[], found: (duplicate: StateCase, original: StateCase) => Promise<void>): Promise<number> {
+    async function findDuplicates(cases: StateCase[], found: (duplicate: StateCase, original: StateCase) => Promise<void>): Promise<number> {
       // This algorithm only works if duplicates are consecutive as is the case for our code
       let duplicateCount = 0
       for (let i = 0; i < cases.length; i++) {
@@ -165,29 +165,29 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     logger.debug(`Found duplicates: ${duplicateCount}`)
   }
 
-  private fakeStateCase (stateCase: StateCase, caseDate: Date): void {
-    stateCase.personFirstName = faker.name.firstName()
-    stateCase.personLastName = faker.name.lastName()
-    stateCase.personAddress = faker.address.streetAddress()
-    stateCase.personCity = faker.address.city()
-    stateCase.personState = 'CA'
-    stateCase.personRace = StateCaseTimeSeries.sample(['White', 'Black or African American', 'American Indian or Alaska Native', 'Asian', 'Native Hawaiian'])
-    stateCase.personSexAtBirth = StateCaseTimeSeries.sample(['Male', 'Female'])
-    stateCase.personEthnicity = StateCaseTimeSeries.sample(['Hispanic or Latino', 'Not Hispanic or Latino'])
-    stateCase.personPostalCode = faker.address.zipCodeByState('CA')
-    stateCase.personPhone = faker.phone.number()
-    stateCase.personEmail = faker.internet.email()
-    stateCase.hospitalized = 'N'
-    stateCase.subjectDied = 'N'
+  private fakeStateCase(stateCase: StateCase, caseDate: Date): void {
+    stateCase.uscdiPatientFirstName = faker.name.firstName()
+    stateCase.uscdiPatientLastName = faker.name.lastName()
+    stateCase.uscdiPatientAddress = faker.address.streetAddress()
+    stateCase.uscdiPatientCity = faker.address.city()
+    stateCase.uscdiPatientState = 'CA'
+    stateCase.uscdiPatientRace = StateCaseTimeSeries.sample(['White', 'Black or African American', 'American Indian or Alaska Native', 'Asian', 'Native Hawaiian'])
+    stateCase.uscdiPatientSexAtBirth = StateCaseTimeSeries.sample(['Male', 'Female'])
+    stateCase.uscdiPatientEthnicity = StateCaseTimeSeries.sample(['Hispanic or Latino', 'Not Hispanic or Latino'])
+    stateCase.uscdiPatientPostalCode = faker.address.zipCodeByState('CA')
+    stateCase.uscdiPatientPhone = faker.phone.number()
+    stateCase.uscdiPatientEmail = faker.internet.email()
+    stateCase.cdcHospitalized = 'N'
+    stateCase.cdcSubjectDied = 'N'
 
-    stateCase.personDateOfBirth = faker.date.birthdate({ min: 5, max: 100, mode: 'age' })
-    stateCase.onsetOfSymptoms = caseDate
+    stateCase.uscdiPatientDateOfBirth = faker.date.birthdate({ min: 5, max: 100, mode: 'age' })
+    stateCase.cdcOnsetOfSymptoms = caseDate
 
     stateCase.caseDate = caseDate
     this.fakeVariableElements(stateCase)
   }
 
-  private fakeVariableElements (stateCase: StateCase): void {
+  private fakeVariableElements(stateCase: StateCase): void {
     for (const variableElementName of variableSchemaElementNames) {
       const index = this.schema.elements.findIndex(e => e.name === variableElementName)
       if (index !== -1) {
@@ -196,27 +196,27 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     }
   }
 
-  private setStateCase (to: StateCase, from: StateCase): void {
-    to.personFirstName = from.personFirstName
-    to.personLastName = from.personLastName
-    to.personAddress = from.personAddress
-    to.personCity = from.personCity
-    to.personState = from.personState
-    to.personRace = from.personRace
-    to.personSexAtBirth = from.personSexAtBirth
-    to.personEthnicity = from.personEthnicity
-    to.personPostalCode = from.personPostalCode
-    to.personPhone = from.personPhone
-    to.personEmail = from.personEmail
-    to.hospitalized = from.hospitalized
-    to.subjectDied = from.subjectDied
-    to.personDateOfBirth = from.personDateOfBirth
-    to.onsetOfSymptoms = from.onsetOfSymptoms
+  private setStateCase(to: StateCase, from: StateCase): void {
+    to.uscdiPatientFirstName = from.uscdiPatientFirstName
+    to.uscdiPatientLastName = from.uscdiPatientLastName
+    to.uscdiPatientAddress = from.uscdiPatientAddress
+    to.uscdiPatientCity = from.uscdiPatientCity
+    to.uscdiPatientState = from.uscdiPatientState
+    to.uscdiPatientRace = from.uscdiPatientRace
+    to.uscdiPatientSexAtBirth = from.uscdiPatientSexAtBirth
+    to.uscdiPatientEthnicity = from.uscdiPatientEthnicity
+    to.uscdiPatientPostalCode = from.uscdiPatientPostalCode
+    to.uscdiPatientPhone = from.uscdiPatientPhone
+    to.uscdiPatientEmail = from.uscdiPatientEmail
+    to.cdcHospitalized = from.cdcHospitalized
+    to.cdcSubjectDied = from.cdcSubjectDied
+    to.uscdiPatientDateOfBirth = from.uscdiPatientDateOfBirth
+    to.cdcOnsetOfSymptoms = from.cdcOnsetOfSymptoms
     to.caseDate = from.caseDate
     this.fakeVariableElements(to)
   }
 
-  private static sample (codeset: string[]): string {
+  private static sample(codeset: string[]): string {
     const random = Math.floor(Math.random() * codeset.length)
     return codeset[random]
   }

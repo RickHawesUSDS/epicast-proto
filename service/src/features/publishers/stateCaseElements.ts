@@ -1,151 +1,170 @@
-import { FeedSchema } from '@/epicast/FeedSchema'
+import { FeedDictionary } from '@/epicast/FeedDictionary'
 
-export const stateCaseTimeSeriesSchemaV1: FeedSchema = {
+export const stateCaseTimeSeriesSchemaV1: FeedDictionary = {
   epicastVersion: 1.0,
   subjectId: 'epicast',
   reporterId: 'demoserver',
   topicId: 'feed1',
   validFrom: new Date(2022, 10, 1),
+  namespaces: [
+    {
+      namespace: 'cdc',
+      description: 'Elements from the state'
+    },
+    {
+      namespace: 'uscdi',
+      description: 'Element defined in the uscdi'
+    },
+    {
+      namespace: 'us_ca',
+      description: 'Main state elements'
+    },
+    {
+      namespace: 'us_az',
+      description: 'Neighbor state elements'
+    },
+    {
+      namespace: 'event',
+      description: 'Core EpiCast elements'
+    }
+  ],
   elements: [
     {
-      name: 'caseId',
-      displayName: 'Case Id',
+      name: 'eventId',
+      namespace: 'event',
+      displayName: 'Event Id',
       type: 'string',
-      tags: ['id'],
-      memberOfSchemas: ['cdc', 'state']
+      tags: [],
     },
     {
-      name: 'caseDate',
-      displayName: 'Case Date',
+      name: 'eventAt',
+      namespace: 'event',
+      displayName: 'Event Time',
       type: 'date',
-      tags: ['eventAt'],
-      memberOfSchemas: ['cdc', 'state']
+      tags: [],
     },
     {
-      name: 'createdAt',
-      displayName: 'Created At',
+      name: 'eventUpdatedAt',
+      namespace: 'event',
+      displayName: 'Event Updated Time',
       type: 'date',
-      tags: []
+      tags: [],
     },
     {
-      name: 'updatedAt',
-      displayName: 'Updated At',
-      type: 'date',
-      tags: ['updatedAt'],
-      memberOfSchemas: ['cdc', 'state']
-    },
-    {
-      name: 'onsetOfSymptoms',
+      name: 'cdcOnsetOfSymptoms',
+      namespace: 'cdc',
       displayName: 'Onset of Symptoms',
       type: 'date',
       tags: [],
-      memberOfSchemas: ['cdc', 'state']
     },
     {
-      name: 'hospitalized',
+      name: 'cdcHospitalized',
+      namespace: 'cdc',
       displayName: 'Hospitalized',
       type: 'code',
+      valueSet: 'PHVS_YesNoUnknown_CDC',
       tags: [],
-      memberOfSchemas: ['cdc', 'state']
     },
     {
-      name: 'subjectDied',
+      name: 'cdcSubjectDied',
+      namespace: 'cdc',
       displayName: 'Subject Died',
       type: 'code',
+      valueSet: 'PHVS_YesNoUnknown_CDC',
       tags: [],
-      memberOfSchemas: ['cdc', 'state']
     },
     // person elements
     {
-      name: 'personFirstName',
+      name: 'uscdiPatientFirstName',
+      namespace: 'uscdi',
       displayName: 'First Name',
       type: 'string',
       tags: ['pii'],
-      memberOfSchemas: ['state']
     },
     {
-      name: 'personLastName',
+      name: 'uscdiPatientLastName',
+      namespace: 'uscdi',
       displayName: 'Last Name',
       type: 'string',
       tags: ['pii'],
-      memberOfSchemas: ['state']
     },
     {
-      name: 'personDateOfBirth',
+      name: 'uscdiPatientDateOfBirth',
+      namespace: 'uscdi',
       displayName: 'Date of Birth',
       type: 'date',
       tags: [],
-      memberOfSchemas: ['cdc', 'state']
     },
     {
-      name: 'personRace',
+      name: 'uscdiPatientRaceCatagory',
+      namespace: 'uscdi',
       displayName: 'Race',
       type: 'code',
       tags: [],
-      memberOfSchemas: ['cdc', 'state']
+      valueSet: 'PHVS_RaceCategory_CDC'
     },
     {
-      name: 'personEthnicity',
+      name: 'uscdiPatientEthnicityGroup',
+      namespace: 'uscdi',
       displayName: 'Ethnicity',
       type: 'code',
       tags: [],
-      memberOfSchemas: ['cdc', 'state'],
       valueSet: 'PHVS_EthnicityGroup_CDC'
     },
     {
-      name: 'personSexAtBirth',
+      name: 'uscdiPatientSexAtBirth',
+      namespace: 'uscdi',
       displayName: 'Sex at Birth',
       type: 'code',
       tags: [],
-      memberOfSchemas: ['cdc', 'state']
     },
     {
-      name: 'personAddress',
+      name: 'uscdiPatientAddress',
+      namespace: 'uscdi',
       displayName: 'Address',
       type: 'string',
       tags: ['pii'],
-      memberOfSchemas: ['state']
     },
     {
-      name: 'personCity',
+      name: 'uscdiPatientCity',
+      namespace: 'uscdi',
       displayName: 'City',
       type: 'string',
       tags: ['pii'],
-      memberOfSchemas: ['state']
     },
     {
-      name: 'personState',
+      name: 'uscdiPatientState',
+      namespace: 'uscdi',
       displayName: 'State',
       type: 'string',
       tags: [],
-      memberOfSchemas: ['cdc', 'state']
     },
     {
-      name: 'personPostalCode',
+      name: 'uscdiPatientPostalCode',
+      namespace: 'uscdi',
       displayName: 'Postal Code',
       type: 'string',
       tags: [],
-      memberOfSchemas: ['cdc', 'state']
     },
     {
-      name: 'personPhone',
+      name: 'uscdiPatientPhone',
+      namespace: 'uscdi',
       displayName: 'Telephone',
       type: 'string',
       tags: ['pii'],
-      memberOfSchemas: ['state']
     },
     {
-      name: 'personEmail',
+      name: 'uscdiPatientEmail',
+      namespace: 'uscdi',
       displayName: 'Email',
       type: 'string',
       tags: ['pii'],
-      memberOfSchemas: ['state']
     }
   ]
 }
 
 export const variableSchemaElementNames = [
-  'localQuestion1', 'localQuestion2', 'localQuestion3',
+  'us_caQuestion1', 'us_caQuestion2', 'us_caQuestion3',
+  'us_azQuestion1', 'us_azQuestion2', 'us_azQuestion3',
   'cdcQuestion1', 'cdcQuestion2', 'cdcQuestion3',
-  'neighborQuestion1', 'neighborQuestion2', 'neighborQuestion3'
 ]

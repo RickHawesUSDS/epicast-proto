@@ -1,8 +1,9 @@
 export interface FeedElement {
   name: string
+  namespace: string
   type: FeedElementType
   tags: FeedElementTag[]
-  memberOfSchemas?: FeedElementSchema[]
+  multiValued?: boolean
   displayName?: string
   description?: string
   codeSet?: string
@@ -11,8 +12,7 @@ export interface FeedElement {
 }
 
 export type FeedElementType = 'string' | 'number' | 'date' | 'code'
-export type FeedElementTag = 'id' | 'updatedAt' | 'eventAt' | 'pii'
-export type FeedElementSchema = 'cdc' | 'state'
+export type FeedElementTag = 'pii'
 
 export function filterElements (elements: FeedElement[], excludeTag: FeedElementTag): FeedElement[] {
   return elements.filter((elem) => !elem.tags.includes(excludeTag))

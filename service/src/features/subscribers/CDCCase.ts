@@ -5,56 +5,51 @@ import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, Index } from 's
 export class CDCCase extends Model<CDCCase> implements TimeSeriesEvent<CDCCase> {
   @PrimaryKey
   @Column
-    caseId!: number
+    eventId!: string
 
   @Index
   @Column
-    caseDate!: Date
+    eventAt!: Date
 
-  @CreatedAt
-  @Column
-    createdAt!: Date
-
-  @UpdatedAt
   @Index
   @Column
-    updatedAt!: Date
+    eventUpdatedAt!: Date
 
   @Column
-    personDateOfBirth?: Date
+    uscdiPatientDateOfBirth?: Date
 
   @Column
-    personRace?: string
+    uscdiPatientRace?: string
 
   @Column
-    personEthnicity?: string
+    uscdiPatientEthnicity?: string
 
   @Column
-    personSexAtBirth?: string
+    uscdiPatientSexAtBirth?: string
 
   @Column
-    personState?: string
+    uscdiPatientState?: string
 
   @Column
-    personPostalCode?: string
+    uscdiPatientPostalCode?: string
 
   @Column
-    onsetOfSymptoms!: Date
+    cdcOnsetOfSymptoms!: Date
 
   @Column
-    hospitalized?: string
+    cdcHospitalized?: string
 
   @Column
-    subjectDied?: string
+    cdcSubjectDied?: string
 
   @Column
-    localQuestion1?: string
+    us_caQuestion1?: string
 
   @Column
-    localQuestion2?: string
+    us_caQuestion2?: string
 
   @Column
-    localQuestion3?: string
+    us_caQuestion3?: string
 
   @Column
     cdcQuestion1?: string
@@ -66,31 +61,19 @@ export class CDCCase extends Model<CDCCase> implements TimeSeriesEvent<CDCCase> 
     cdcQuestion3?: string
 
   @Column
-    neighborQuestion1?: string
+    us_azQuestion1?: string
 
   @Column
-    neighborQuestion2?: string
+    us_azQuestion2?: string
 
   @Column
-    neighborQuestion3?: string
-
-  get eventAt (): Date {
-    return this.caseDate
-  }
-
-  get eventId (): number {
-    return this.caseId
-  }
-
-  get eventUpdatedAt (): Date {
-    return this.updatedAt
-  }
+    us_azQuestion3?: string
 
   get eventIsDeleted (): boolean | undefined {
     return
   }
 
-  get eventReplacedBy (): number | undefined {
+  get eventReplacedBy (): string | undefined {
     return
   }
 

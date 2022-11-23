@@ -1,32 +1,43 @@
 import { FeedElement } from './FeedElement'
 
-export interface FeedSchema {
+export interface FeedDictionary {
   readonly epicastVersion: number
   readonly subjectId: string
   readonly reporterId: string
   readonly topicId: string
   readonly validFrom: Date
+  readonly namespaces: FeedNamespace[]
   readonly elements: FeedElement[]
 }
 
-export class MutableFeedSchema implements FeedSchema {
+export interface FeedNamespace {
+  readonly namespace: string
+  readonly displayName?: string
+  readonly description?: string
+  readonly sourceUrl?: string
+  // More to be defined later
+}
+
+export class MutableFeedDictionary implements FeedDictionary {
   epicastVersion: number
   subjectId: string
   reporterId: string
   topicId: string
   validFrom: Date
+  namespaces: FeedNamespace[]
   elements: FeedElement[]
 
-  constructor (initSchema: FeedSchema) {
+  constructor(initSchema: FeedDictionary) {
     this.epicastVersion = initSchema.epicastVersion
     this.subjectId = initSchema.subjectId
     this.reporterId = initSchema.reporterId
     this.topicId = initSchema.topicId
     this.validFrom = initSchema.validFrom
+    this.namespaces = initSchema.namespaces
     this.elements = initSchema.elements
   }
 
-  addElement (element: FeedElement): boolean {
+  addElement(element: FeedElement): boolean {
     this.validFrom = new Date()
     const copy = [...this.elements]
     const index = this.elements.findIndex(e => e.name === element.name)
@@ -39,7 +50,7 @@ export class MutableFeedSchema implements FeedSchema {
     return index === -1
   }
 
-  deleteElement (name: string): boolean {
+  deleteElement(name: string): boolean {
     const index = this.elements.findIndex(e => e.name === name)
     if (index === -1) return false
 

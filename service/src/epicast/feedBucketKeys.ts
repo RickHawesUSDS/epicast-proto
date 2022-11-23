@@ -40,10 +40,10 @@ export const periodFromDeletedKey = (key: string): Period => {
   return Period.parse(periodPart)
 }
 
-export const SCHEMA_FOLDER = 'schema'
-export const SCHEMA_EXTENSION = 'yaml'
+export const DICTIONARY_FOLDER = 'data_dictionary'
+export const DICTIONARY_EXTENSION = 'yaml'
 export const formSchemaKey = (subjectId: string, reporterId: string, feedId: string, validFrom: Date): string => {
-  return `${SCHEMA_FOLDER}/${[subjectId, reporterId, feedId, formatISO(validFrom)].join(FILE_NAME_SEPERATOR)}.${SCHEMA_EXTENSION}`
+  return `${DICTIONARY_FOLDER}/${[subjectId, reporterId, feedId, formatISO(validFrom)].join(FILE_NAME_SEPERATOR)}.${DICTIONARY_EXTENSION}`
 }
 export const splitSchemaKey = (key: string): string[] => {
   const fileName = pathPosix.parse(key).name

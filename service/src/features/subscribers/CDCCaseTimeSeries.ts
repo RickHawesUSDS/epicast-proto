@@ -1,7 +1,7 @@
 import { Op, Order, WhereOptions } from 'sequelize'
 
 import { CDCCase } from '@/features/subscribers/CDCCase'
-import { FeedSchema } from '@/epicast/FeedSchema'
+import { FeedDictionary } from '@/epicast/FeedDictionary'
 import { TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata, MutableTimeSeries, TimeSeriesDeletedEvent } from '@/epicast/TimeSeries'
 import { assert } from 'console'
 import { getLogger } from 'log4js'
@@ -9,30 +9,30 @@ import { getLogger } from 'log4js'
 const logger = getLogger('CDC_CASE_TIME_SERIES')
 
 export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
-  async findEvents (options: TimeSeriesFindOptions): Promise<CDCCase[]> {
+  async findEvents(options: TimeSeriesFindOptions): Promise<CDCCase[]> {
     const where: WhereOptions<CDCCase> = {}
     if (options.interval !== undefined) {
-      where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
+      where.eventAt = { [Op.between]: [options.interval.start, options.interval.end] }
     } else if (options.after !== undefined) {
-      where.caseDate = { [Op.gt]: options.after }
+      where.eventAt = { [Op.gt]: options.after }
     } else if (options.before !== undefined) {
-      where.caseDate = { [Op.lt]: options.before }
+      where.eventAt = { [Op.lt]: options.before }
     }
     if (options.updatedAfter !== undefined) {
-      where.updatedAt = { [Op.gt]: options.updatedAfter }
+      where.eventUpdatedAt = { [Op.gt]: options.updatedAfter }
     }
-    const order: Order = [['caseDate', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']]
+    const order: Order = [['eventAt', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']]
     return await CDCCase.findAll({ where, order })
   }
 
-  async countEvents (options: TimeSeriesCountOptions): Promise<number> {
+  async countEvents(options: TimeSeriesCountOptions): Promise<number> {
     const whereClause: WhereOptions<CDCCase> = {}
     if (options.interval !== undefined) {
-      whereClause.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
+      whereClause.eventAt = { [Op.between]: [options.interval.start, options.interval.end] }
     } else if (options.after !== undefined) {
-      whereClause.caseDate = { [Op.gt]: options.after }
+      whereClause.eventAt = { [Op.gt]: options.after }
     } else if (options.before !== undefined) {
-      whereClause.caseDate = { [Op.lt]: options.before }
+      whereClause.eventAt = { [Op.lt]: options.before }
     }
     if (options.updatedAfter !== undefined) {
       whereClause.updatedAt = { [Op.gt]: options.updatedAfter }
@@ -40,34 +40,35 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     return await CDCCase.count({ where: whereClause })
   }
 
-  async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
-    const lastUpdated = await CDCCase.findOne({ order: [['updatedAt', 'DESC']] })
+  async fetchMetadata(): Promise<TimeSeriesMetadata | null> {
+    const lastUpdated = await CDCCase.findOne({ order: [['eventUpdatedAt', 'DESC']] })
     if (lastUpdated === null) return null
-    const lastCase = await CDCCase.findOne({ order: [['caseDate', 'DESC']] })
+    const lastCase = await CDCCase.findOne({ order: [['eventAt', 'DESC']] })
     if (lastCase === null) return null
-    return { lastUpdatedAt: lastUpdated.updatedAt, lastEventAt: lastCase.caseDate }
+    return { lastUpdatedAt: lastUpdated.eventUpdatedAt, lastEventAt: lastCase.eventAt }
   }
 
-  makeTimeSeriesEvent (cdcCase: CDCCase): TimeSeriesEvent<CDCCase> {
+  makeTimeSeriesEvent(cdcCase: CDCCase): TimeSeriesEvent<CDCCase> {
     return cdcCase
   }
 
-  schema: FeedSchema = {
+  schema: FeedDictionary = {
     epicastVersion: 1.0,
     subjectId: 'epicast',
     reporterId: 'demoserver',
     topicId: 'feed1',
     validFrom: new Date(1900, 1, 1), // Early date
+    namespaces: [],
     elements: []
   }
 
-  updateSchema (newSchema: FeedSchema): void {
+  updateSchema(newSchema: FeedDictionary): void {
     this.schema = newSchema
   }
 
-  async upsertEvents (events: CDCCase[]): Promise<void> {
+  async upsertEvents(events: CDCCase[]): Promise<void> {
     for (const event of events) {
-      const current = await CDCCase.findByPk(event.caseId, {})
+      const current = await CDCCase.findByPk(event.eventId, {})
       if (current === null) {
         logger.debug('about to insert')
         await event.save({})
@@ -79,19 +80,19 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     }
   }
 
-  async deleteEvents (events: TimeSeriesDeletedEvent[]): Promise<void> {
+  async deleteEvents(events: TimeSeriesDeletedEvent[]): Promise<void> {
     if (events.length === 0) return
     for (const event of events) {
       await CDCCase.destroy({
         where: {
-          caseId: event.eventId
+          eventId: event.eventId
         },
         force: true
       })
     }
   }
 
-  createEvent (names: string[], values: any[]): CDCCase {
+  createEvent(names: string[], values: any[]): CDCCase {
     assert(names.length === values.length)
     const record: any = {}
     for (let i = 0; i < names.length; i++) {

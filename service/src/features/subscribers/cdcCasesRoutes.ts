@@ -3,7 +3,7 @@ import asyncHandler from 'express-async-handler'
 import { getLogger } from '@/utils/loggers'
 import { readFeed } from '@/epicast/readFeed'
 import { updateFeedSubscriber } from '@/features/subscribers/updateFeedSubscriber'
-import { getFeedBucket } from '@/server/app'
+import { getFeedBucket, getCDCCaseTimeSeries, getCDCSubscriber } from '@/server/app'
 
 const router = express.Router()
 const logger = getLogger('CDC_CASES_ROUTE')
@@ -14,20 +14,23 @@ router.get('/', asyncHandler(async (req, res, _next) => {
   logger.info(`Get all cases: sort=${sort}`)
 
   const sortDescending = 'DESC'.localeCompare(sort, 'en', { sensitivity: 'base' }) === 0
-  const cases = await req.cdcCaseTimeSeries.findEvents({ sortDescending })
+  const timeSeries = getCDCCaseTimeSeries(req)
+  const cases = await timeSeries.findEvents({ sortDescending: sortDescending })
   res.send(cases)
 }))
 
 /* GET get all schema */
 router.get('/schema', asyncHandler(async (req, res, _next) => {
   logger.info('Get CDC Schema')
-  res.send(req.cdcCaseTimeSeries.schema)
+  const timeSeries = getCDCCaseTimeSeries(req)
+  res.send(timeSeries.schema)
 }))
 
 /* GET subscriber */
 router.get('/subscriber', asyncHandler(async (req, res, _next) => {
   logger.info('Get subscriber')
-  res.send(req.feedSubscriber.model)
+  const feedSubscriber = getCDCSubscriber(req)
+  res.send(feedSubscriber.model)
 }))
 
 router.post('/subscriber', (req, res, _next) => {
@@ -40,8 +43,9 @@ router.post('/subscriber/once', asyncHandler(async (req, res, _next) => {
   logger.info('Read feed')
   const bucket = getFeedBucket(req)
   const lastPublished = await readFeed(bucket, req.cdcCaseTimeSeries)
-  req.feedSubscriber.setLastChecked(lastPublished)
-  res.send(req.feedSubscriber.model)
+  const feedSubscriber = getCDCSubscriber(req)
+  feedSubscriber.setLastChecked(lastPublished)
+  res.send(feedSubscriber.model)
 }))
 
 export default router

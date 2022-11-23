@@ -1,5 +1,5 @@
 import { Interval } from 'date-fns'
-import { FeedSchema } from './FeedSchema'
+import { FeedDictionary } from './FeedDictionary'
 
 export interface TimeSeries<T> {
   fetchMetadata: () => Promise<TimeSeriesMetadata | null>
@@ -7,7 +7,7 @@ export interface TimeSeries<T> {
   countEvents: (options: TimeSeriesCountOptions) => Promise<number>
   makeTimeSeriesEvent: (event: T) => TimeSeriesEvent<T>
 
-  readonly schema: FeedSchema
+  readonly schema: FeedDictionary
 }
 
 export interface TimeSeriesFindOptions {
@@ -29,10 +29,10 @@ export interface TimeSeriesCountOptions {
 
 export interface TimeSeriesEvent<T> {
   get eventAt(): Date
-  get eventId(): number
+  get eventId(): string
   get eventUpdatedAt(): Date
   get eventIsDeleted(): boolean | undefined
-  get eventReplacedBy(): number | undefined
+  get eventReplacedBy(): string | undefined
   getValue: (name: string) => any
   get model(): T
 }
@@ -48,7 +48,7 @@ export interface TimeSeriesDeletedEvent {
 }
 
 export interface TimeSeriesMutator<T> {
-  updateSchema: (newSchema: FeedSchema) => void
+  updateSchema: (newSchema: FeedDictionary) => void
   upsertEvents: (events: T[]) => void
   deleteEvents: (events: TimeSeriesDeletedEvent[]) => void
   createEvent: (names: string[], values: any[]) => T

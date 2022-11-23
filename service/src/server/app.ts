@@ -14,6 +14,8 @@ import { CDCCasesFeature } from '@/features/subscribers/CDCCasesFeature'
 import { Feature, InitEvent } from '@/features/Feature'
 import { StateCaseTimeSeries } from '@/features/publishers/StateCaseTimeSeries'
 import { CDCCaseTimeSeries } from '@/features/subscribers/CDCCaseTimeSeries'
+import { FeedSubscriber } from '@/features/subscribers/FeedSubscriber'
+import { CDCCase } from '@/features/subscribers/CDCCase'
 
 const logger = getLogger('APP')
 
@@ -36,6 +38,10 @@ export function getCDCCaseTimeSeries (req: express.Request): CDCCaseTimeSeries {
 
 export function getFeedBucket (req: express.Request): FeedBucket {
   return req.state.feedsFeature.bucket
+}
+
+export function getCDCSubscriber(req: express.Request): FeedSubscriber<CDCCase> {
+  return req.state.cdcCasesFeature.feedSubscriber
 }
 
 class App {
