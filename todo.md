@@ -29,7 +29,8 @@
 
 * [x] Add subject, reporter, and topic to all events.
 * [x] Make descriptions have a language culture. Add sections to feed elements
-* [ ] Change bucket name. Multiple feeds per bucket. FeedDescription denotes a feed. Provenance and Notes. Reader always looks at the snapshot.
+* [ ] Multiple feeds per bucket. Change bucket name.
+* [ ] FeedDescription denotes a feed. Provenance and Notes. Reader always looks at the snapshot.
 * [ ] Dynamic Sequalize tables. CDCEvent inherits from StateEvent at the sequelize level
 * [ ] Make two states feeds and cdc table that merge states together
 * [ ] Add EpiCast package tests
