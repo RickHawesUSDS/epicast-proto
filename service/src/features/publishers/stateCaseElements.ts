@@ -32,154 +32,235 @@ export const stateCaseTimeSeriesSchemaV1: FeedDictionary = {
     {
       name: 'eventId',
       namespace: 'event',
-      displayName: 'Event Id',
       type: 'string',
-      tags: []
+      tags: [],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'event',
+        displayName: 'Event Id'
+      }]
     },
     {
       name: 'eventAt',
       namespace: 'event',
-      displayName: 'Event Time',
       type: 'date',
-      tags: []
+      tags: [],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'event',
+        displayName: 'Event Time'
+      }]
     },
     {
       name: 'eventSubject',
       namespace: 'event',
-      displayName: 'Subject',
       type: 'string',
-      tags: []
+      tags: [],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'event',
+        displayName: 'Event Subject'
+      }]
     },
     {
       name: 'eventReporter',
       namespace: 'event',
-      displayName: 'Reporter',
       type: 'string',
-      tags: []
+      tags: [],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'event',
+        displayName: 'Event Reporter'
+      }]
     },
     {
       name: 'eventTopic',
       namespace: 'event',
-      displayName: 'Subject',
       type: 'string',
-      tags: []
+      tags: [],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'event',
+        displayName: 'Event Topic'
+      }]
     },
     {
       name: 'eventUpdatedAt',
       namespace: 'event',
-      displayName: 'Event Updated Time',
       type: 'date',
-      tags: []
+      tags: [],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'event',
+        displayName: 'Event Updated Time'
+      }]
     },
     {
       name: 'cdcOnsetOfSymptoms',
       namespace: 'cdc',
-      displayName: 'Onset of Symptoms',
       type: 'date',
-      tags: []
+      tags: [],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        displayName: 'Onset of Symptoms'
+      }]
     },
     {
       name: 'cdcHospitalized',
       namespace: 'cdc',
-      displayName: 'Hospitalized',
       type: 'code',
-      valueSet: 'PHVS_YesNoUnknown_CDC',
-      tags: []
+      codeSet: 'PHVS_YesNoUnknown_CDC',
+      tags: [],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        displayName: 'Hospitalized'
+      }]
     },
     {
       name: 'cdcSubjectDied',
       namespace: 'cdc',
-      displayName: 'Subject Died',
       type: 'code',
-      valueSet: 'PHVS_YesNoUnknown_CDC',
-      tags: []
+      codeSet: 'PHVS_YesNoUnknown_CDC',
+      tags: [],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        displayName: 'Subject Died'
+      }]
     },
     // person elements
     {
       name: 'uscdiPatientFirstName',
       namespace: 'uscdi',
-      displayName: 'First Name',
       type: 'string',
-      tags: ['pii']
+      tags: ['pii'],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'First Name'
+      }]
     },
     {
       name: 'uscdiPatientLastName',
       namespace: 'uscdi',
-      displayName: 'Last Name',
       type: 'string',
-      tags: ['pii']
+      tags: ['pii'],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'Last Name'
+      }]
     },
     {
       name: 'uscdiPatientDateOfBirth',
       namespace: 'uscdi',
-      displayName: 'Date of Birth',
       type: 'date',
-      tags: []
+      tags: [],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'Date of Birth'
+      }]
     },
     {
       name: 'uscdiPatientRaceCatagory',
       namespace: 'uscdi',
-      displayName: 'Race',
       type: 'code',
       tags: [],
-      valueSet: 'PHVS_RaceCategory_CDC'
+      codeSet: 'PHVS_RaceCategory_CDC',
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'Race'
+      }]
     },
     {
       name: 'uscdiPatientEthnicityGroup',
       namespace: 'uscdi',
-      displayName: 'Ethnicity',
       type: 'code',
       tags: [],
-      valueSet: 'PHVS_EthnicityGroup_CDC'
+      codeSet: 'PHVS_EthnicityGroup_CDC',
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'Ethnicity'
+      }]
     },
     {
       name: 'uscdiPatientSexAtBirth',
       namespace: 'uscdi',
-      displayName: 'Sex at Birth',
       type: 'code',
-      tags: []
+      tags: [],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'Sex at Birth'
+      }]
     },
     {
       name: 'uscdiPatientAddress',
       namespace: 'uscdi',
-      displayName: 'Address',
       type: 'string',
-      tags: ['pii']
+      tags: ['pii'],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'Address'
+      }]
     },
     {
       name: 'uscdiPatientCity',
       namespace: 'uscdi',
-      displayName: 'City',
       type: 'string',
-      tags: ['pii']
+      tags: ['pii'],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'City'
+      }]
     },
     {
       name: 'uscdiPatientState',
       namespace: 'uscdi',
-      displayName: 'State',
       type: 'string',
-      tags: []
+      tags: [],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'State'
+      }]
     },
     {
       name: 'uscdiPatientPostalCode',
       namespace: 'uscdi',
-      displayName: 'Postal Code',
       type: 'string',
-      tags: []
+      tags: [],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'Postal Code'
+      }]
     },
     {
       name: 'uscdiPatientPhone',
       namespace: 'uscdi',
-      displayName: 'Telephone',
       type: 'string',
-      tags: ['pii']
+      tags: ['pii'],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'Telephone'
+      }]
     },
     {
       name: 'uscdiPatientEmail',
       namespace: 'uscdi',
-      displayName: 'Email',
       type: 'string',
-      tags: ['pii']
+      tags: ['pii'],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'Email'
+      }]
     }
   ]
 }

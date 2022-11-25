@@ -12,7 +12,6 @@ export interface FeedDictionary {
 
 export interface FeedNamespace {
   readonly namespace: string
-  readonly displayName?: string
   readonly description?: string
   readonly sourceUrl?: string
   // More to be defined later

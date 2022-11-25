@@ -19,16 +19,10 @@ validFrom: {{ validFrom }}
 # The namespaces used in this data dictionary. Since data dictionaries are meant to be composable,
 # unique data elements need a unique name. Epicast central will manage namespace registration.
 namespaces:
-{{#each namespaces}}
-- name: {{this.name}}
-  {{#if this.displayName }}
-  displayName: {{ this.displayName }}
-  {{/if}}
+{{#each namespaces }}
+- namespace: {{this.namespace}}
   {{#if this.description }}
   description: {{this.description}}
-  {{/if}}
-  {{#if this.displayName }}
-  displayName: {{ this.displayName }}
   {{/if}}
   {{#if this.sourceUrl }}
   sourceUrl: {{ this.sourceUrl }}
@@ -58,14 +52,11 @@ elements:
   description: {{this.description}}
   {{/if}}
   type: {{ this.type }}
-  {{#if this.isMultiValued}}
-  isMultiValued: {{this.isMultiValued}}
+  {{#if this.isRepeated}}
+  isRepeated: {{this.isRepeated}}
   {{/if}}
   {{#if this.codeSet}}
   codeSet: {{this.codeSet}}
-  {{/if}}
-  {{#if this.valueSet}}
-  valueSet: {{this.valueSet}}
   {{/if}}
   {{#if this.validation}}
   validation: {{this.validation}}
@@ -73,5 +64,19 @@ elements:
   tags:
   {{#each this.tags }}
   - {{ this }}
+  {{/each}}
+  descriptions:
+  {{#each this.descriptions }}
+  - isoCultureCode: {{ this.isoCultureCode }}
+    displayName: {{ this.displayName }}
+    {{#if this.section }}
+    section: {{ this.section }}
+    {{/if}}
+    {{#if this.details }}
+    details: {{ this.details }}
+    {{/if}}
+    {{#if this.authorComments }}
+    authorComments: {{ this.authorComments }}
+    {{/if}}
   {{/each}}
 {{/each}}

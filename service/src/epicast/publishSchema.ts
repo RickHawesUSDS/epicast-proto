@@ -29,8 +29,9 @@ function formTemplateContext (schema: FeedDictionary): any {
   return {
     subjectId: schema.subjectId,
     reporterId: schema.reporterId,
-    feedId: schema.topicId,
+    topicId: schema.topicId,
     validFrom: formatISO(schema.validFrom),
+    namespaces: schema.namespaces,
     elements: deidentifiedElements
   }
 }

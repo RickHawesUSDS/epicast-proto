@@ -9,10 +9,10 @@
     "concurrently": "^7.4.0"
   },
   "scripts": {
-    "install-all": "cd client && yarn install && cd ../server && yarn install",
-    "start": "concurrently \"yarn run server\" \"yarn run client\"",
-    "server": "cd server && yarn start",
-    "client": "cd client && yarn start"
+    "install-all": "cd website && yarn install && cd ../service && yarn install",
+    "start": "concurrently \"yarn run service\" \"yarn run website\"",
+    "service": "cd service && yarn start",
+    "website": "cd website && yarn start"
   },
   "dependencies": {
     "date-fns": "^2.29.3",

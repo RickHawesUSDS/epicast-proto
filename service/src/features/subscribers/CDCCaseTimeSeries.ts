@@ -35,7 +35,7 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
       whereClause.eventAt = { [Op.lt]: options.before }
     }
     if (options.updatedAfter !== undefined) {
-      whereClause.updatedAt = { [Op.gt]: options.updatedAfter }
+      whereClause.eventUpdatedAt = { [Op.gt]: options.updatedAfter }
     }
     return await CDCCase.count({ where: whereClause })
   }
@@ -51,7 +51,7 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
   schema: FeedDictionary = {
     epicastVersion: 1.0,
     subjectId: 'epicast',
-    reporterId: 'demoserver',
+    reporterId: 'demo',
     topicId: 'feed1',
     validFrom: new Date(1900, 1, 1), // Early date
     namespaces: [],

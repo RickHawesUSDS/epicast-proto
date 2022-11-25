@@ -79,11 +79,11 @@ export class CDCCase extends Model<CDCCase> implements TimeSeriesEvent<CDCCase> 
     us_azQuestion3?: string
 
   get eventIsDeleted (): boolean | undefined {
-    return
+    return undefined
   }
 
   get eventReplacedBy (): string | undefined {
-    return 
+    return undefined
   }
 
   get model (): CDCCase {
@@ -92,7 +92,7 @@ export class CDCCase extends Model<CDCCase> implements TimeSeriesEvent<CDCCase> 
 
   getValue (name: EventElementName): any {
     if (name === 'eventIsDeleted' || name === 'eventReplacedBy') {
-      return
+      return undefined
     } else {
       return this[name as keyof CDCCase]
     }

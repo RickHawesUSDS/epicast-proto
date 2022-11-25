@@ -12,6 +12,8 @@ import { getLogger } from '@/utils/loggers'
 const logger = getLogger('STATE_CASE_TIME_SERIES')
 
 export class StateCaseTimeSeries implements TimeSeries<StateCase> {
+  lastCaseNumber = 1
+
   async fetchEvents (options: TimeSeriesFindOptions): Promise<StateCase[]> {
     const whereClause: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
@@ -32,7 +34,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
 
     const orderClause: Order = [
       ['eventAt', (options?.sortDescending ?? false) ? 'DESC' : 'ASC'],
-      ['caseId', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']
+      ['eventId', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']
     ]
     return await StateCase.findAll({ where: whereClause, order: orderClause })
   }
@@ -47,7 +49,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
       where.eventAt = { [Op.lt]: options.before }
     }
     if (options.updatedAfter !== undefined) {
-      where.updatedAt = { [Op.gt]: options.updatedAfter }
+      where.eventUpdatedAt = { [Op.gt]: options.updatedAfter }
     }
     if (options.isDeleted !== undefined) {
       where.eventIsDeleted = options.isDeleted
@@ -62,7 +64,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     if (lastUpdated === null) return null
     const lastCase = await StateCase.findOne({ order: [['caseAt', 'DESC']] })
     if (lastCase === null) return null
-    return { lastUpdatedAt: lastUpdated.updatedAt, lastEventAt: lastCase.eventAt }
+    return { lastUpdatedAt: lastUpdated.eventUpdatedAt, lastEventAt: lastCase.eventAt }
   }
 
   schema = new MutableFeedDictionary(stateCaseTimeSeriesSchemaV1)
@@ -108,6 +110,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
         stateCase = new StateCase()
         this.fakeStateCase(stateCase, newCaseDate)
       }
+      stateCase.eventId = 'CA' + this.lastCaseNumber++
       return stateCase
     }
 

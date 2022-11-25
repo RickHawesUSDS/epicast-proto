@@ -4,9 +4,8 @@ import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, AutoIncrement, 
 @Table({ tableName: 'stateCases' })
 export class StateCase extends Model<StateCase> implements TimeSeriesEvent<StateCase> {
   @PrimaryKey
-  @AutoIncrement
   @Column
-    caseId!: number
+    eventId!: string
 
   @Index
   @Column
@@ -110,19 +109,11 @@ export class StateCase extends Model<StateCase> implements TimeSeriesEvent<State
   @Column
     us_azQuestion3?: string
 
-  get eventId (): string {
-    return this.caseId.toString()
-  }
-
   get model (): StateCase {
     return this
   }
 
   getValue (name: EventElementName): any {
-    if (name === 'eventId') {
-      return this.caseId.toString()
-    } else {
-      return this[name as keyof StateCase]
-    }
+    return this[name as keyof StateCase]
   }
 }

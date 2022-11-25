@@ -20,7 +20,7 @@ function makeColumns(schema) {
   return schema.elements.map((element) => {
     return {
       id: element.name,
-      label: element.displayName,
+      label: element.descriptions[0].displayName,
       minWidth: customWidths[element.name] ?? 100,
       dateFormat: element.type === 'date',
     }

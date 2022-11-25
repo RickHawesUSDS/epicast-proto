@@ -28,7 +28,7 @@
 * [x] Schema improvements; namespaces;
 
 * [x] Add subject, reporter, and topic to all events.
-* [ ] Add sections to feed elements
+* [x] Make descriptions have a language culture. Add sections to feed elements
 * [ ] Change bucket name. Multiple feeds per bucket. FeedDescription denotes a feed. Provenance and Notes. Reader always looks at the snapshot.
 * [ ] Dynamic Sequalize tables. CDCEvent inherits from StateEvent at the sequelize level
 * [ ] Make two states feeds and cdc table that merge states together
