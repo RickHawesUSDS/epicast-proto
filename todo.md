@@ -34,6 +34,7 @@
 * [ ] Stratifiers in data dictionary; JS functions
 * [ ] Improve aggregates; age, gender, age+gender,
 * [ ] Export only aggregates from CDC
+* [ ] Draw an EpiCurve from aggregates
 
 * [ ] Validation language as JS functions
 * [ ] Random errors methods and fix button
