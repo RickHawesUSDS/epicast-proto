@@ -1,4 +1,4 @@
-import { TimeSeriesEvent } from '@/epicast/TimeSeries'
+import { EventElementName, TimeSeriesEvent } from '@/epicast/TimeSeries'
 import { Table, Column, Model, PrimaryKey, Index } from 'sequelize-typescript'
 
 @Table({ tableName: 'cdcCases' })
@@ -10,6 +10,15 @@ export class CDCCase extends Model<CDCCase> implements TimeSeriesEvent<CDCCase> 
   @Index
   @Column
     eventAt!: Date
+
+  @Column
+    eventSubject!: string
+
+  @Column
+    eventReporter!: string
+
+  @Column
+    eventTopic!: string
 
   @Index
   @Column
@@ -81,7 +90,11 @@ export class CDCCase extends Model<CDCCase> implements TimeSeriesEvent<CDCCase> 
     return this
   }
 
-  getValue (name: string): any {
-    return this[name as keyof CDCCase]
+  getValue (name: EventElementName): any {
+    if (name === 'eventIsDeleted' || name === 'eventReplacedBy') {
+      return
+    } else {
+      return this[name as keyof CDCCase]
+    }
   }
 }

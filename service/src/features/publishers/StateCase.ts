@@ -1,4 +1,4 @@
-import { TimeSeriesEvent } from '@/epicast/TimeSeries'
+import { TimeSeriesEvent, EventElementName } from '@/epicast/TimeSeries'
 import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, AutoIncrement, Index } from 'sequelize-typescript'
 
 @Table({ tableName: 'stateCases' })
@@ -10,22 +10,30 @@ export class StateCase extends Model<StateCase> implements TimeSeriesEvent<State
 
   @Index
   @Column
-    caseDate!: Date
+    eventAt!: Date
+
+  @Column
+    eventSubject!: string
+
+  @Column
+    eventReporter!: string
+
+  @Column
+    eventTopic!: string
+
+  @Column
+    eventIsDeleted?: boolean
+
+  @Column
+    eventReplacedBy?: string
+
+  @Column
+  @UpdatedAt
+    eventUpdatedAt!: Date
 
   @CreatedAt
   @Column
     createdAt!: Date
-
-  @Index
-  @UpdatedAt
-  @Column
-    updatedAt!: Date
-
-  @Column
-    isDeleted?: boolean
-
-  @Column
-    replacedBy?: number
 
   @Column
     uscdiPatientFirstName!: string
@@ -102,31 +110,19 @@ export class StateCase extends Model<StateCase> implements TimeSeriesEvent<State
   @Column
     us_azQuestion3?: string
 
-  get eventAt (): Date {
-    return this.caseDate
-  }
-
   get eventId (): string {
     return this.caseId.toString()
-  }
-
-  get eventUpdatedAt (): Date {
-    return this.updatedAt
-  }
-
-  get eventIsDeleted (): boolean | undefined {
-    return this.isDeleted
-  }
-
-  get eventReplacedBy (): string | undefined {
-    return this.replacedBy?.toString()
   }
 
   get model (): StateCase {
     return this
   }
 
-  getValue (name: string): any {
-    return this[name as keyof StateCase]
+  getValue (name: EventElementName): any {
+    if (name === 'eventId') {
+      return this.caseId.toString()
+    } else {
+      return this[name as keyof StateCase]
+    }
   }
 }

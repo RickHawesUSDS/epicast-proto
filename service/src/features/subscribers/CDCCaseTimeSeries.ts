@@ -2,7 +2,7 @@ import { Op, Order, WhereOptions } from 'sequelize'
 
 import { CDCCase } from '@/features/subscribers/CDCCase'
 import { FeedDictionary } from '@/epicast/FeedDictionary'
-import { TimeSeriesCountOptions, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata, MutableTimeSeries, TimeSeriesDeletedEvent } from '@/epicast/TimeSeries'
+import { TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesMetadata, MutableTimeSeries, TimeSeriesDeletedEvent } from '@/epicast/TimeSeries'
 import { assert } from 'console'
 import { getLogger } from 'log4js'
 
@@ -46,10 +46,6 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     const lastCase = await CDCCase.findOne({ order: [['eventAt', 'DESC']] })
     if (lastCase === null) return null
     return { lastUpdatedAt: lastUpdated.eventUpdatedAt, lastEventAt: lastCase.eventAt }
-  }
-
-  makeTimeSeriesEvent (cdcCase: CDCCase): TimeSeriesEvent<CDCCase> {
-    return cdcCase
   }
 
   schema: FeedDictionary = {

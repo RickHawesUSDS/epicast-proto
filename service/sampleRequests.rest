@@ -66,8 +66,10 @@ POST http://localhost:3001/api/stateCases/deduplicate
 GET http://localhost:3001/api/feed/metadata?prefix=/
 
 ### List feed
-GET http://localhost:3001/api/feed/metadata?prefix=/time_series/
+GET http://localhost:3001/api/feed/metadata?prefix=time_series/
 
 ### Get feed content
-GET http://localhost:3001/api/feed/content?file=/snapshots/v1.csv
+GET http://localhost:3001/api/feed/content?file=snapshots/1.csv
 
+###
+GET http://localhost:3001/api/feed/content?file=time_series/20221101T000000-07:00--P1M.csv

@@ -44,6 +44,27 @@ export const stateCaseTimeSeriesSchemaV1: FeedDictionary = {
       tags: []
     },
     {
+      name: 'eventSubject',
+      namespace: 'event',
+      displayName: 'Subject',
+      type: 'string',
+      tags: []
+    },
+    {
+      name: 'eventReporter',
+      namespace: 'event',
+      displayName: 'Reporter',
+      type: 'string',
+      tags: []
+    },
+    {
+      name: 'eventTopic',
+      namespace: 'event',
+      displayName: 'Subject',
+      type: 'string',
+      tags: []
+    },
+    {
       name: 'eventUpdatedAt',
       namespace: 'event',
       displayName: 'Event Updated Time',

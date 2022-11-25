@@ -151,13 +151,7 @@ class TimeSeriesPublisher<T> {
   async putPartition (period: Period, events: Array<TimeSeriesEvent<T>>): Promise<void> {
     function formatValue (event: TimeSeriesEvent<T>, element: FeedElement): string {
       let result: string
-      if (element.name === 'eventId') {
-        result = event.eventId
-      } else if (element.name === 'eventAt') {
-        result = formatISO(event.eventAt)
-      } else if (element.name === 'eventUpdatedAt') {
-        result = formatISO(event.eventUpdatedAt)
-      } else if (element.type === 'date') {
+      if (element.type === 'date') {
         const value = event.getValue(element.name) as Date
         result = formatISO(value)
       } else {

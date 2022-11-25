@@ -3,7 +3,7 @@ import { addDays, addMonths, endOfDay, startOfDay, startOfMonth } from 'date-fns
 import { Op, Order, WhereOptions } from 'sequelize'
 
 import { StateCase } from '@/features/publishers/StateCase'
-import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesEvent, TimeSeriesMetadata } from '@/epicast/TimeSeries'
+import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesMetadata } from '@/epicast/TimeSeries'
 import { stateCaseTimeSeriesSchemaV1, variableSchemaElementNames } from './stateCaseElements'
 import { MutableFeedDictionary } from '@/epicast/FeedDictionary'
 import { FeedElement } from '@/epicast/FeedElement'
@@ -15,23 +15,23 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
   async fetchEvents (options: TimeSeriesFindOptions): Promise<StateCase[]> {
     const whereClause: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
-      whereClause.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
+      whereClause.eventAt = { [Op.between]: [options.interval.start, options.interval.end] }
     } else if (options.after !== undefined) {
-      whereClause.caseDate = { [Op.gt]: options.after }
+      whereClause.eventAt = { [Op.gt]: options.after }
     } else if (options.before !== undefined) {
-      whereClause.caseDate = { [Op.lt]: options.before }
+      whereClause.eventAt = { [Op.lt]: options.before }
     }
     if (options.updatedAfter !== undefined) {
-      whereClause.updatedAt = { [Op.gt]: options.updatedAfter }
+      whereClause.eventUpdatedAt = { [Op.gt]: options.updatedAfter }
     }
     if (options.isDeleted !== undefined) {
-      whereClause.isDeleted = options.isDeleted
+      whereClause.eventIsDeleted = options.isDeleted
     } else {
-      whereClause.isDeleted = { [Op.not]: true }
+      whereClause.eventIsDeleted = { [Op.not]: true }
     }
 
     const orderClause: Order = [
-      ['caseDate', (options?.sortDescending ?? false) ? 'DESC' : 'ASC'],
+      ['eventAt', (options?.sortDescending ?? false) ? 'DESC' : 'ASC'],
       ['caseId', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']
     ]
     return await StateCase.findAll({ where: whereClause, order: orderClause })
@@ -40,19 +40,19 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
   async countEvents (options: TimeSeriesCountOptions): Promise<number> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
-      where.caseDate = { [Op.between]: [options.interval.start, options.interval.end] }
+      where.eventAt = { [Op.between]: [options.interval.start, options.interval.end] }
     } else if (options.after !== undefined) {
-      where.caseDate = { [Op.gt]: options.after }
+      where.eventAt = { [Op.gt]: options.after }
     } else if (options.before !== undefined) {
-      where.caseDate = { [Op.lt]: options.before }
+      where.eventAt = { [Op.lt]: options.before }
     }
     if (options.updatedAfter !== undefined) {
       where.updatedAt = { [Op.gt]: options.updatedAfter }
     }
     if (options.isDeleted !== undefined) {
-      where.isDeleted = options.isDeleted
+      where.eventIsDeleted = options.isDeleted
     } else {
-      where.isDeleted = { [Op.not]: true }
+      where.eventIsDeleted = { [Op.not]: true }
     }
     return await StateCase.count({ where })
   }
@@ -62,11 +62,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     if (lastUpdated === null) return null
     const lastCase = await StateCase.findOne({ order: [['caseAt', 'DESC']] })
     if (lastCase === null) return null
-    return { lastUpdatedAt: lastUpdated.updatedAt, lastEventAt: lastCase.caseDate }
-  }
-
-  makeTimeSeriesEvent (event: StateCase): TimeSeriesEvent<StateCase> {
-    return event
+    return { lastUpdatedAt: lastUpdated.updatedAt, lastEventAt: lastCase.eventAt }
   }
 
   schema = new MutableFeedDictionary(stateCaseTimeSeriesSchemaV1)
@@ -91,10 +87,10 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
       }
       const stateCase = await StateCase.findOne({
         order: [
-          ['caseDate', 'DESC']
+          ['eventAt', 'DESC']
         ]
       })
-      const lastCaseDate = stateCase?.caseDate != null ? stateCase.caseDate : now
+      const lastCaseDate = stateCase?.eventAt != null ? stateCase.eventAt : now
       const countOfLastCaseDate = await this.countEvents({ interval: { start: startOfDay(lastCaseDate), end: endOfDay(lastCaseDate) } })
       let adjustedCaseDate = lastCaseDate
       if (countOfLastCaseDate > 5) adjustedCaseDate = addDays(adjustedCaseDate, 1)
@@ -158,14 +154,14 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     logger.info('Deduplicating state cases')
     const cases = await this.fetchEvents({ sortDescending: false })
     const duplicateCount = await findDuplicates(cases, async (duplicate, original) => {
-      duplicate.isDeleted = true
-      duplicate.replacedBy = original.id
+      duplicate.eventIsDeleted = true
+      duplicate.eventReplacedBy = original.eventId
       await duplicate.save()
     })
     logger.debug(`Found duplicates: ${duplicateCount}`)
   }
 
-  private fakeStateCase (stateCase: StateCase, caseDate: Date): void {
+  private fakeStateCase (stateCase: StateCase, eventAt: Date): void {
     stateCase.uscdiPatientFirstName = faker.name.firstName()
     stateCase.uscdiPatientLastName = faker.name.lastName()
     stateCase.uscdiPatientAddress = faker.address.streetAddress()
@@ -181,9 +177,12 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     stateCase.cdcSubjectDied = 'N'
 
     stateCase.uscdiPatientDateOfBirth = faker.date.birthdate({ min: 5, max: 100, mode: 'age' })
-    stateCase.cdcOnsetOfSymptoms = caseDate
+    stateCase.cdcOnsetOfSymptoms = eventAt
 
-    stateCase.caseDate = caseDate
+    stateCase.eventAt = eventAt
+    stateCase.eventSubject = 'epicast'
+    stateCase.eventReporter = 'demo'
+    stateCase.eventTopic = 'feed1'
     this.fakeVariableElements(stateCase)
   }
 
@@ -212,7 +211,12 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     to.cdcSubjectDied = from.cdcSubjectDied
     to.uscdiPatientDateOfBirth = from.uscdiPatientDateOfBirth
     to.cdcOnsetOfSymptoms = from.cdcOnsetOfSymptoms
-    to.caseDate = from.caseDate
+    to.eventAt = from.eventAt
+    to.eventReporter = from.eventReporter
+    to.eventSubject = from.eventSubject
+    to.eventTopic = from.eventTopic
+    to.eventIsDeleted = from.eventIsDeleted
+    to.eventReplacedBy = from.eventReplacedBy
     this.fakeVariableElements(to)
   }
 
