@@ -9,7 +9,7 @@ import { getLogger } from 'log4js'
 const logger = getLogger('CDC_CASE_TIME_SERIES')
 
 export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
-  async findEvents(options: TimeSeriesFindOptions): Promise<CDCCase[]> {
+  async fetchEvents (options: TimeSeriesFindOptions): Promise<CDCCase[]> {
     const where: WhereOptions<CDCCase> = {}
     if (options.interval !== undefined) {
       where.eventAt = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -25,7 +25,7 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     return await CDCCase.findAll({ where, order })
   }
 
-  async countEvents(options: TimeSeriesCountOptions): Promise<number> {
+  async countEvents (options: TimeSeriesCountOptions): Promise<number> {
     const whereClause: WhereOptions<CDCCase> = {}
     if (options.interval !== undefined) {
       whereClause.eventAt = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -40,7 +40,7 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     return await CDCCase.count({ where: whereClause })
   }
 
-  async fetchMetadata(): Promise<TimeSeriesMetadata | null> {
+  async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
     const lastUpdated = await CDCCase.findOne({ order: [['eventUpdatedAt', 'DESC']] })
     if (lastUpdated === null) return null
     const lastCase = await CDCCase.findOne({ order: [['eventAt', 'DESC']] })
@@ -48,7 +48,7 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     return { lastUpdatedAt: lastUpdated.eventUpdatedAt, lastEventAt: lastCase.eventAt }
   }
 
-  makeTimeSeriesEvent(cdcCase: CDCCase): TimeSeriesEvent<CDCCase> {
+  makeTimeSeriesEvent (cdcCase: CDCCase): TimeSeriesEvent<CDCCase> {
     return cdcCase
   }
 
@@ -62,11 +62,11 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     elements: []
   }
 
-  updateSchema(newSchema: FeedDictionary): void {
+  updateSchema (newSchema: FeedDictionary): void {
     this.schema = newSchema
   }
 
-  async upsertEvents(events: CDCCase[]): Promise<void> {
+  async upsertEvents (events: CDCCase[]): Promise<void> {
     for (const event of events) {
       const current = await CDCCase.findByPk(event.eventId, {})
       if (current === null) {
@@ -80,7 +80,7 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     }
   }
 
-  async deleteEvents(events: TimeSeriesDeletedEvent[]): Promise<void> {
+  async deleteEvents (events: TimeSeriesDeletedEvent[]): Promise<void> {
     if (events.length === 0) return
     for (const event of events) {
       await CDCCase.destroy({
@@ -92,7 +92,7 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     }
   }
 
-  createEvent(names: string[], values: any[]): CDCCase {
+  createEvent (names: string[], values: any[]): CDCCase {
     assert(names.length === values.length)
     const record: any = {}
     for (let i = 0; i < names.length; i++) {

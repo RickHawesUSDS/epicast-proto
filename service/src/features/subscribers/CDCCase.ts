@@ -1,5 +1,5 @@
 import { TimeSeriesEvent } from '@/epicast/TimeSeries'
-import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, Index } from 'sequelize-typescript'
+import { Table, Column, Model, PrimaryKey, Index } from 'sequelize-typescript'
 
 @Table({ tableName: 'cdcCases' })
 export class CDCCase extends Model<CDCCase> implements TimeSeriesEvent<CDCCase> {
@@ -74,7 +74,7 @@ export class CDCCase extends Model<CDCCase> implements TimeSeriesEvent<CDCCase> 
   }
 
   get eventReplacedBy (): string | undefined {
-    return
+    return 
   }
 
   get model (): CDCCase {

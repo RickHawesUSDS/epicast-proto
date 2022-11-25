@@ -27,7 +27,7 @@ export class MutableFeedDictionary implements FeedDictionary {
   namespaces: FeedNamespace[]
   elements: FeedElement[]
 
-  constructor(initSchema: FeedDictionary) {
+  constructor (initSchema: FeedDictionary) {
     this.epicastVersion = initSchema.epicastVersion
     this.subjectId = initSchema.subjectId
     this.reporterId = initSchema.reporterId
@@ -37,7 +37,7 @@ export class MutableFeedDictionary implements FeedDictionary {
     this.elements = initSchema.elements
   }
 
-  addElement(element: FeedElement): boolean {
+  addElement (element: FeedElement): boolean {
     this.validFrom = new Date()
     const copy = [...this.elements]
     const index = this.elements.findIndex(e => e.name === element.name)
@@ -50,7 +50,7 @@ export class MutableFeedDictionary implements FeedDictionary {
     return index === -1
   }
 
-  deleteElement(name: string): boolean {
+  deleteElement (name: string): boolean {
     const index = this.elements.findIndex(e => e.name === name)
     if (index === -1) return false
 

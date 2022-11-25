@@ -34,28 +34,28 @@ export const stateCaseTimeSeriesSchemaV1: FeedDictionary = {
       namespace: 'event',
       displayName: 'Event Id',
       type: 'string',
-      tags: [],
+      tags: []
     },
     {
       name: 'eventAt',
       namespace: 'event',
       displayName: 'Event Time',
       type: 'date',
-      tags: [],
+      tags: []
     },
     {
       name: 'eventUpdatedAt',
       namespace: 'event',
       displayName: 'Event Updated Time',
       type: 'date',
-      tags: [],
+      tags: []
     },
     {
       name: 'cdcOnsetOfSymptoms',
       namespace: 'cdc',
       displayName: 'Onset of Symptoms',
       type: 'date',
-      tags: [],
+      tags: []
     },
     {
       name: 'cdcHospitalized',
@@ -63,7 +63,7 @@ export const stateCaseTimeSeriesSchemaV1: FeedDictionary = {
       displayName: 'Hospitalized',
       type: 'code',
       valueSet: 'PHVS_YesNoUnknown_CDC',
-      tags: [],
+      tags: []
     },
     {
       name: 'cdcSubjectDied',
@@ -71,7 +71,7 @@ export const stateCaseTimeSeriesSchemaV1: FeedDictionary = {
       displayName: 'Subject Died',
       type: 'code',
       valueSet: 'PHVS_YesNoUnknown_CDC',
-      tags: [],
+      tags: []
     },
     // person elements
     {
@@ -79,21 +79,21 @@ export const stateCaseTimeSeriesSchemaV1: FeedDictionary = {
       namespace: 'uscdi',
       displayName: 'First Name',
       type: 'string',
-      tags: ['pii'],
+      tags: ['pii']
     },
     {
       name: 'uscdiPatientLastName',
       namespace: 'uscdi',
       displayName: 'Last Name',
       type: 'string',
-      tags: ['pii'],
+      tags: ['pii']
     },
     {
       name: 'uscdiPatientDateOfBirth',
       namespace: 'uscdi',
       displayName: 'Date of Birth',
       type: 'date',
-      tags: [],
+      tags: []
     },
     {
       name: 'uscdiPatientRaceCatagory',
@@ -116,49 +116,49 @@ export const stateCaseTimeSeriesSchemaV1: FeedDictionary = {
       namespace: 'uscdi',
       displayName: 'Sex at Birth',
       type: 'code',
-      tags: [],
+      tags: []
     },
     {
       name: 'uscdiPatientAddress',
       namespace: 'uscdi',
       displayName: 'Address',
       type: 'string',
-      tags: ['pii'],
+      tags: ['pii']
     },
     {
       name: 'uscdiPatientCity',
       namespace: 'uscdi',
       displayName: 'City',
       type: 'string',
-      tags: ['pii'],
+      tags: ['pii']
     },
     {
       name: 'uscdiPatientState',
       namespace: 'uscdi',
       displayName: 'State',
       type: 'string',
-      tags: [],
+      tags: []
     },
     {
       name: 'uscdiPatientPostalCode',
       namespace: 'uscdi',
       displayName: 'Postal Code',
       type: 'string',
-      tags: [],
+      tags: []
     },
     {
       name: 'uscdiPatientPhone',
       namespace: 'uscdi',
       displayName: 'Telephone',
       type: 'string',
-      tags: ['pii'],
+      tags: ['pii']
     },
     {
       name: 'uscdiPatientEmail',
       namespace: 'uscdi',
       displayName: 'Email',
       type: 'string',
-      tags: ['pii'],
+      tags: ['pii']
     }
   ]
 }
@@ -166,5 +166,5 @@ export const stateCaseTimeSeriesSchemaV1: FeedDictionary = {
 export const variableSchemaElementNames = [
   'us_caQuestion1', 'us_caQuestion2', 'us_caQuestion3',
   'us_azQuestion1', 'us_azQuestion2', 'us_azQuestion3',
-  'cdcQuestion1', 'cdcQuestion2', 'cdcQuestion3',
+  'cdcQuestion1', 'cdcQuestion2', 'cdcQuestion3'
 ]

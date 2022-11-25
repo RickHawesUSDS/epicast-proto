@@ -11,7 +11,7 @@ import { MutableSnapshot } from './Snapshot'
 const logger = getLogger('PUBLISH_SCHEMA_SERVICE')
 const SCHEMA_TEMPLATE_PATH = './public/epicast-demoserver-feed1-dictionary.handlebars'
 
-export async function publishSchema(toSnapshot: MutableSnapshot, schema: FeedDictionary): Promise<void> {
+export async function publishSchema (toSnapshot: MutableSnapshot, schema: FeedDictionary): Promise<void> {
   const schemaKey = formSchemaKey(schema.subjectId, schema.reporterId, schema.topicId, schema.validFrom)
   if (!toSnapshot.doesObjectExist(schemaKey)) {
     logger.info('publishing data dictionary')
@@ -23,7 +23,7 @@ export async function publishSchema(toSnapshot: MutableSnapshot, schema: FeedDic
   }
 }
 
-function formTemplateContext(schema: FeedDictionary): any {
+function formTemplateContext (schema: FeedDictionary): any {
   const deidentifiedElements = filterElements(schema.elements, 'pii')
   // format stuff in the way that the YAML file wants
   return {

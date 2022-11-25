@@ -26,10 +26,9 @@ class AggregatesPublisher<T> {
 
   async publish (): Promise<void> {
     logger.info('Publishing an aggregate')
-    const events = await this.timeSeries.findEvents({ sortDescending: false })
+    const events = await this.timeSeries.fetchEvents({ sortDescending: false })
     if (events.length === 0) return
-    const timeSeriesEvents = events.map(e => this.timeSeries.makeTimeSeriesEvent(e))
-    const partitions = makeCasePartions(timeSeriesEvents, Frequency.DAILY)
+    const partitions = makeCasePartions(events, Frequency.DAILY)
     const partitionsByYear = groupBy(partitions, item => item.period.start.getFullYear())
     for (const [year, yearPartition] of partitionsByYear) {
       await this.publishDailyCounts(year, yearPartition)

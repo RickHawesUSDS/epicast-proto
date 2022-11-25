@@ -15,7 +15,7 @@ router.get('/', asyncHandler(async (req, res, _next) => {
 
   const sortDescending = 'DESC'.localeCompare(sort, 'en', { sensitivity: 'base' }) === 0
   const timeSeries = getCDCCaseTimeSeries(req)
-  const cases = await timeSeries.findEvents({ sortDescending: sortDescending })
+  const cases = await timeSeries.fetchEvents({ sortDescending })
   res.send(cases)
 }))
 

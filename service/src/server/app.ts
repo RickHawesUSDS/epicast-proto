@@ -40,7 +40,7 @@ export function getFeedBucket (req: express.Request): FeedBucket {
   return req.state.feedsFeature.bucket
 }
 
-export function getCDCSubscriber(req: express.Request): FeedSubscriber<CDCCase> {
+export function getCDCSubscriber (req: express.Request): FeedSubscriber<CDCCase> {
   return req.state.cdcCasesFeature.feedSubscriber
 }
 

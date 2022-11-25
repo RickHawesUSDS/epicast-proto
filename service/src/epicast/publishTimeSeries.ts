@@ -1,16 +1,16 @@
 import { max as maxDate, isAfter, formatISO, isFirstDayOfMonth, addDays, isBefore, startOfDay, differenceInDays, endOfDay } from 'date-fns'
 import { stringify } from 'csv-string'
+import { assert } from 'console'
 
-import { BucketObject } from './FeedBucket'
-import { formDeletedKey, formTimeSeriesKey, periodFromTimeSeriesKey, TIMESERIES_FOLDER } from './feedBucketKeys'
-import { getLogger } from '@/utils/loggers'
 import { Period } from './Period'
 import { Frequency } from './Frequency'
-import { TimeSeries, TimeSeriesEvent, TimeSeriesFindOptions } from './TimeSeries'
+import { BucketObject } from './FeedBucket'
+import { formDeletedKey, formTimeSeriesKey, periodFromTimeSeriesKey, TIMESERIES_FOLDER } from './feedBucketKeys'
+import { TimeSeries, TimeSeriesEvent } from './TimeSeries'
 import { FeedElement, filterElements } from './FeedElement'
-import { assert } from 'console'
 import { MutableSnapshot } from './Snapshot'
 import { TimeSeriesPartition, makeCasePartions } from './TimeSeriesPartition'
+import { getLogger } from '@/utils/loggers'
 
 const DESIRED_MAX_MONTHLY_COUNT = 10000 / 30
 
@@ -23,11 +23,11 @@ export async function publishTimeseries<T> (toSnapshot: MutableSnapshot, timeser
 }
 class TimeSeriesPublisher<T> {
   snapshot: MutableSnapshot
-  timeseries: TimeSeries<T>
+  timeSeries: TimeSeries<T>
 
   constructor (toSnapshot: MutableSnapshot, timeseries: TimeSeries<T>) {
     this.snapshot = toSnapshot
-    this.timeseries = timeseries
+    this.timeSeries = timeseries
   }
 
   async publish (): Promise<number> {
@@ -46,11 +46,11 @@ class TimeSeriesPublisher<T> {
       const period = periodFromTimeSeriesKey(publishedObject.key)
       const isPeriodUpdated = await this.hasUpdates(period, lastPublishDate)
       if (isPeriodUpdated) {
-        const periodCases = await this.findEvents({ interval: period.interval })
+        const periodCases = await this.timeSeries.fetchEvents({ interval: period.interval })
         logger.debug(`updating partition ${publishedObject.key} with ${periodCases.length} cases`)
         await this.putPartition(period, periodCases)
 
-        const periodDeletedCases = await this.findEvents({ interval: period.interval, isDeleted: true })
+        const periodDeletedCases = await this.timeSeries.fetchEvents({ interval: period.interval, isDeleted: true })
         if (periodDeletedCases.length > 0) {
           logger.debug(`updating deleted for ${publishedObject.key} with ${periodDeletedCases.length} cases`)
           await this.putDeletedPartition(period, periodDeletedCases)
@@ -64,15 +64,15 @@ class TimeSeriesPublisher<T> {
   async hasUpdates (period: Period, after?: Date): Promise<boolean> {
     let updatedCount: number
     if (after !== undefined) {
-      updatedCount = await this.timeseries.countEvents({ interval: period.interval, updatedAfter: after })
+      updatedCount = await this.timeSeries.countEvents({ interval: period.interval, updatedAfter: after })
     } else {
-      updatedCount = await this.timeseries.countEvents({ interval: period.interval })
+      updatedCount = await this.timeSeries.countEvents({ interval: period.interval })
     }
     let deletedCount: number
     if (after !== undefined) {
-      deletedCount = await this.timeseries.countEvents({ interval: period.interval, updatedAfter: after, isDeleted: true })
+      deletedCount = await this.timeSeries.countEvents({ interval: period.interval, updatedAfter: after, isDeleted: true })
     } else {
-      deletedCount = await this.timeseries.countEvents({ interval: period.interval, isDeleted: true })
+      deletedCount = await this.timeSeries.countEvents({ interval: period.interval, isDeleted: true })
     }
     return updatedCount > 0 || deletedCount > 0
   }
@@ -86,7 +86,7 @@ class TimeSeriesPublisher<T> {
     const fetchNewEvents = async (lastPublishedPeriod: Period | undefined): Promise<[Array<TimeSeriesEvent<T>>, Date, Date]> => {
       // Get the events
       if (lastPublishedPeriod === undefined) {
-        const events = await this.findEvents({})
+        const events = await this.timeSeries.fetchEvents({})
         return [
           events,
           startOfDay(this.firstEventDate(events) ?? new Date()),
@@ -94,7 +94,7 @@ class TimeSeriesPublisher<T> {
         ]
       } else {
         const startDate = lastPublishedPeriod.nextPeriod().start
-        const events = await this.findEvents({ after: startDate })
+        const events = await this.timeSeries.fetchEvents({ after: startDate })
         const endDate = endOfDay(this.lastEventDate(events) ?? new Date())
         return [events, startDate, endDate]
       }
@@ -107,7 +107,7 @@ class TimeSeriesPublisher<T> {
     for (const partition of partitions) {
       await this.putPartition(partition.period, partition.events)
 
-      const deletedEvents = await this.findEvents({ interval: partition.period.interval, isDeleted: true })
+      const deletedEvents = await this.timeSeries.fetchEvents({ interval: partition.period.interval, isDeleted: true })
       if (deletedEvents.length > 0) {
         await this.putDeletedPartition(partition.period, deletedEvents)
       }
@@ -133,7 +133,7 @@ class TimeSeriesPublisher<T> {
       const monthlyPartition = monthlyPartitions[index]
       let count
       if (index === 0) {
-        count = await this.timeseries.countEvents({ after: startOfDay(addDays(monthlyPartition.period.end, -30)), before: monthlyPartition.period.end })
+        count = await this.timeSeries.countEvents({ after: startOfDay(addDays(monthlyPartition.period.end, -30)), before: monthlyPartition.period.end })
       } else {
         count = monthlyPartition.events.length
       }
@@ -149,7 +149,6 @@ class TimeSeriesPublisher<T> {
   }
 
   async putPartition (period: Period, events: Array<TimeSeriesEvent<T>>): Promise<void> {
-
     function formatValue (event: TimeSeriesEvent<T>, element: FeedElement): string {
       let result: string
       if (element.name === 'eventId') {
@@ -176,7 +175,7 @@ class TimeSeriesPublisher<T> {
       return csv.join('')
     }
 
-    const deidentifiedElements = filterElements(this.timeseries.schema.elements, 'pii')
+    const deidentifiedElements = filterElements(this.timeSeries.schema.elements, 'pii')
     const report = createCSV(events, deidentifiedElements)
     const key = formTimeSeriesKey(period)
     await this.snapshot.putObject(key, report)
@@ -220,10 +219,5 @@ class TimeSeriesPublisher<T> {
       }
     }
     return lastPeriod
-  }
-
-  async findEvents (options: TimeSeriesFindOptions): Promise<Array<TimeSeriesEvent<T>>> {
-    const rawEvents = await this.timeseries.findEvents(options)
-    return rawEvents.map((e) => this.timeseries.makeTimeSeriesEvent(e))
   }
 }

@@ -30,6 +30,7 @@
 * [ ] Add support for sections; Add subject, reporter, and topic to all events.
 * [ ] Multiple feeds per bucket
 * [ ] Make two states feeds and cdc table that merge states together
+* [ ] Add EpiCast package tests
 
 * [ ] Stratifiers in data dictionary; JS functions
 * [ ] Improve aggregates; age, gender, age+gender,

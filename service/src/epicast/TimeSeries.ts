@@ -3,9 +3,8 @@ import { FeedDictionary } from './FeedDictionary'
 
 export interface TimeSeries<T> {
   fetchMetadata: () => Promise<TimeSeriesMetadata | null>
-  findEvents: (options: TimeSeriesFindOptions) => Promise<T[]>
+  fetchEvents: (options: TimeSeriesFindOptions) => Promise<Array<TimeSeriesEvent<T>>>
   countEvents: (options: TimeSeriesCountOptions) => Promise<number>
-  makeTimeSeriesEvent: (event: T) => TimeSeriesEvent<T>
 
   readonly schema: FeedDictionary
 }
