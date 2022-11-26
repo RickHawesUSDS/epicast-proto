@@ -1,5 +1,6 @@
 import { compareDesc, parseISO, formatISO } from 'date-fns'
 import { parse, stringify } from 'csv-string'
+import { Mutex } from 'async-mutex'
 
 import { BucketObject, FeedBucket } from './FeedBucket'
 import { formSnapshotKey, SNAPSHOT_FOLDER, versionFromSnapshotKey } from './feedBucketKeys'
@@ -37,25 +38,27 @@ export class SnapshotReader implements Snapshot {
   }
 
   async read (): Promise<void> {
-    // TODO: mutex is called for here
-    if (this.readCalled) throw Error('Read must not be called twice')
-    this.readCalled = true
-    const snapshotObjects = await this.bucket.listObjects(SNAPSHOT_FOLDER)
-    if (snapshotObjects.length === 0) return
-    const lastSnapshotObject = snapshotObjects.sort((a, b) => compareDesc(a.lastModified, b.lastModified))[0]
+    const mutex = new Mutex()
+    await mutex.runExclusive(async () => {
+      if (this.readCalled) throw Error('Read must not be called twice')
+      this.readCalled = true
+      const snapshotObjects = await this.bucket.listObjects(SNAPSHOT_FOLDER)
+      if (snapshotObjects.length === 0) return
+      const lastSnapshotObject = snapshotObjects.sort((a, b) => compareDesc(a.lastModified, b.lastModified))[0]
 
-    this.feedVersion = versionFromSnapshotKey(lastSnapshotObject.key)
-    this.createdAt = lastSnapshotObject.lastModified
-    const snapshotRaw = await this.bucket.getObject(lastSnapshotObject.key, lastSnapshotObject.versionId)
-    const rows = parse(snapshotRaw)
-    if (rows.length === 0) throw Error('empty snapshot')
-    this.bucketObjects = rows.map((row) => {
-      return { key: row[0], versionId: row[1], lastModified: parseISO(row[2]) }
+      this.feedVersion = versionFromSnapshotKey(lastSnapshotObject.key)
+      this.createdAt = lastSnapshotObject.lastModified
+      const snapshotRaw = await this.bucket.getObject(lastSnapshotObject.key, lastSnapshotObject.versionId)
+      const rows = parse(snapshotRaw)
+      if (rows.length === 0) throw Error('empty snapshot')
+      this.bucketObjects = rows.map((row) => {
+        return { key: row[0], versionId: row[1], lastModified: parseISO(row[2]) }
+      })
     })
   }
 
   get name (): string {
-    return this.bucket.name
+    return this.bucket.bucket
   }
 
   get version (): number | undefined {

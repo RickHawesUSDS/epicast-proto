@@ -5,7 +5,6 @@ import cookieParser from 'cookie-parser'
 
 import { getLogger } from '../utils/loggers'
 import { db, Sequelize } from '../utils/db'
-import { FeedBucket } from '@/epicast/FeedBucket'
 import indexRouter from './indexRoutes'
 import { SystemFeature } from '../features/system/SystemFeature'
 import { FeedsFeature } from '../features/feeds/FeedsFeature'
@@ -16,6 +15,7 @@ import { StateCaseTimeSeries } from '@/features/publishers/StateCaseTimeSeries'
 import { CDCCaseTimeSeries } from '@/features/subscribers/CDCCaseTimeSeries'
 import { FeedSubscriber } from '@/features/subscribers/FeedSubscriber'
 import { CDCCase } from '@/features/subscribers/CDCCase'
+import { S3Bucket } from '@/features/feeds/S3Bucket'
 
 const logger = getLogger('APP')
 
@@ -36,7 +36,7 @@ export function getCDCCaseTimeSeries (req: express.Request): CDCCaseTimeSeries {
   return req.state.cdcCasesFeature.cdcCaseTimeSeries
 }
 
-export function getFeedBucket (req: express.Request): FeedBucket {
+export function getFeedBucket (req: express.Request): S3Bucket {
   return req.state.feedsFeature.bucket
 }
 

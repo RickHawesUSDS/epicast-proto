@@ -1,5 +1,5 @@
 import { TimeSeriesEvent, EventElementName } from '@/epicast/TimeSeries'
-import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, AutoIncrement, Index } from 'sequelize-typescript'
+import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, Index } from 'sequelize-typescript'
 
 @Table({ tableName: 'stateCases' })
 export class StateCase extends Model<StateCase> implements TimeSeriesEvent<StateCase> {

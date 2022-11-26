@@ -1,5 +1,5 @@
 export interface FeedBucket {
-  readonly name: string
+  readonly bucket: string
   checkConnection: () => Promise<void>
   listObjects: (prefix: string) => Promise<BucketObject[]>
   putObject: (name: string, body: string) => Promise<BucketObject>

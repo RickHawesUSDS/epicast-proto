@@ -2,10 +2,10 @@ import { Router } from 'express'
 import { Feature, InitEvent } from '../Feature'
 import feedRouter from './feedRoutes'
 import { resetStorage } from './resetStorage'
-import { S3Bucket } from './S3Bucket'
+import { S3Bucket, FEED_FOLDER } from './S3Bucket'
 
 export class FeedsFeature implements Feature {
-  bucket = new S3Bucket()
+  bucket = new S3Bucket(FEED_FOLDER)
 
   name = 'feed'
 

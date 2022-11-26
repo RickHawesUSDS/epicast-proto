@@ -110,7 +110,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
         stateCase = new StateCase()
         this.fakeStateCase(stateCase, newCaseDate)
       }
-      stateCase.eventId = 'CA' + this.lastCaseNumber++
+      stateCase.eventId = `CA${this.lastCaseNumber++}`
       return stateCase
     }
 
