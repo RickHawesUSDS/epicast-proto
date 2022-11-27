@@ -3,8 +3,12 @@ import { formatISO } from 'date-fns'
 import pathPosix from 'node:path/posix'
 
 //
-// Define where to put objects and how to name them in a bucket
+// Define where to put objects and how to name them in a feed's storage
 //
+
+export const DESCRIPTION_FOLDER = ''
+export const DESCRIPTION_EXTENSION = 'yaml'
+export const DESCRIPTION_KEY = 'description.yaml'
 
 export const LOG_FOLDER = 'logs'
 export const LOG_EXTENSION = 'log'
@@ -42,10 +46,10 @@ export const periodFromDeletedKey = (key: string): Period => {
 
 export const DICTIONARY_FOLDER = 'data_dictionary'
 export const DICTIONARY_EXTENSION = 'yaml'
-export const formSchemaKey = (subjectId: string, reporterId: string, feedId: string, validFrom: Date): string => {
-  return `${DICTIONARY_FOLDER}/${[subjectId, reporterId, feedId, formatISO(validFrom)].join(FILE_NAME_SEPERATOR)}.${DICTIONARY_EXTENSION}`
+export const formDictionaryKey = (topic: string, validFrom: Date): string => {
+  return `${DICTIONARY_FOLDER}/${[topic, formatISO(validFrom)].join(FILE_NAME_SEPERATOR)}.${DICTIONARY_EXTENSION}`
 }
-export const splitSchemaKey = (key: string): string[] => {
+export const splitDictionaryKey = (key: string): string[] => {
   const fileName = pathPosix.parse(key).name
   return fileName.split(FILE_NAME_SEPERATOR, 4)
 }

@@ -2,7 +2,7 @@ import express from 'express'
 import asyncHandler from 'express-async-handler'
 import { getLogger } from '@/utils/loggers'
 import { publishFeed } from '@/epicast/publishFeed'
-import { getStateCaseTimeSeries, getFeedBucket } from '@/server/app'
+import { getStateCaseTimeSeries, getFeedStorage } from '@/server/app'
 
 const router = express.Router()
 const logger = getLogger('STATE_CASES_ROUTE')
@@ -34,37 +34,37 @@ router.post('/random', asyncHandler(async (req, res, _next) => {
 router.post('/publish', asyncHandler(async (req, res, _next) => {
   logger.info('publish state cases')
   const timeSeries = getStateCaseTimeSeries(req)
-  const bucket = getFeedBucket(req)
-  await publishFeed(bucket, timeSeries)
+  const storage = getFeedStorage(req)
+  await publishFeed(storage, timeSeries)
   res.status(200).send('success')
 }))
 
-/* GET schema */
-router.get('/schema', asyncHandler(async (req, res, _next) => {
-  logger.info('get the schema')
+/* GET dictionary */
+router.get('/dictionary', asyncHandler(async (req, res, _next) => {
+  logger.info('get the dictionary')
   const timeSeries = getStateCaseTimeSeries(req)
-  res.status(200).send(timeSeries.schema)
+  res.status(200).send(timeSeries.dictionary)
 }))
 
 /* PUT feed element */
-router.put('/schema/:elementName', (req, res, _next) => {
+router.put('/dictionary/:elementName', (req, res, _next) => {
   const elementName = req.params.elementName
   const timeSeries = getStateCaseTimeSeries(req)
-  logger.info(`put schema element: ${elementName}`)
+  logger.info(`put dictionary element: ${elementName}`)
   logger.debug(`put element ${JSON.stringify(req.body)}`)
   const created = timeSeries.addFeedElement(req.body)
   if (created) {
-    res.status(201).send(timeSeries.schema.elements.find(e => e.name === elementName))
+    res.status(201).send(timeSeries.dictionary.elements.find(e => e.name === elementName))
   } else {
-    res.status(200).send(timeSeries.schema.elements.find(e => e.name === elementName))
+    res.status(200).send(timeSeries.dictionary.elements.find(e => e.name === elementName))
   }
 })
 
 /* DELETE feed element */
-router.delete('/schema/:elementName', (req, res, _next) => {
+router.delete('/dictionary/:elementName', (req, res, _next) => {
   const elementName = req.params.elementName
   const timeSeries = getStateCaseTimeSeries(req)
-  logger.info(`delete the schema element: ${elementName}`)
+  logger.info(`delete the dictionary element: ${elementName}`)
   timeSeries.deleteFeedElement(elementName)
   res.status(204).send()
 })

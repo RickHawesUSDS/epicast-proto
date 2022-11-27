@@ -4,10 +4,11 @@ import { Op, Order, WhereOptions } from 'sequelize'
 
 import { StateCase } from '@/features/publishers/StateCase'
 import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesMetadata } from '@/epicast/TimeSeries'
-import { stateCaseTimeSeriesSchemaV1, variableSchemaElementNames } from './stateCaseElements'
+import { stateCaseDictionary, variableDictionaryElementNames } from './stateCaseDictionary'
 import { MutableFeedDictionary } from '@/epicast/FeedDictionary'
 import { FeedElement } from '@/epicast/FeedElement'
 import { getLogger } from '@/utils/loggers'
+import { FeedSummary } from '@/epicast/FeedSummary'
 
 const logger = getLogger('STATE_CASE_TIME_SERIES')
 
@@ -67,18 +68,28 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return { lastUpdatedAt: lastUpdated.eventUpdatedAt, lastEventAt: lastCase.eventAt }
   }
 
-  schema = new MutableFeedDictionary(stateCaseTimeSeriesSchemaV1)
+  summary: FeedSummary = {
+    epicastVersion: '0.1',
+    subject: 'epicast',
+    reporter: 'demoserver',
+    topic: 'feed1',
+    sourceUrl: 'xyz',
+    sourceFeeds: [],
+    lastUpdated: new Date()
+  }
+
+  dictionary = new MutableFeedDictionary(stateCaseDictionary)
 
   addFeedElement (element: FeedElement): boolean {
-    return this.schema.addElement(element)
+    return this.dictionary.addElement(element)
   }
 
   deleteFeedElement (name: string): boolean {
-    return this.schema.deleteElement(name)
+    return this.dictionary.deleteElement(name)
   }
 
-  resetSchema (): void {
-    this.schema = new MutableFeedDictionary(stateCaseTimeSeriesSchemaV1)
+  resetDictionary (): void {
+    this.dictionary = new MutableFeedDictionary(stateCaseDictionary)
   }
 
   async insertFakeStateCases (numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
@@ -170,9 +181,9 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     stateCase.uscdiPatientAddress = faker.address.streetAddress()
     stateCase.uscdiPatientCity = faker.address.city()
     stateCase.uscdiPatientState = 'CA'
-    stateCase.uscdiPatientRace = StateCaseTimeSeries.sample(['White', 'Black or African American', 'American Indian or Alaska Native', 'Asian', 'Native Hawaiian'])
+    stateCase.uscdiPatientRaceCategory = StateCaseTimeSeries.sample(['White', 'Black or African American', 'American Indian or Alaska Native', 'Asian', 'Native Hawaiian'])
     stateCase.uscdiPatientSexAtBirth = StateCaseTimeSeries.sample(['Male', 'Female'])
-    stateCase.uscdiPatientEthnicity = StateCaseTimeSeries.sample(['Hispanic or Latino', 'Not Hispanic or Latino'])
+    stateCase.uscdiPatientEthnicityGroup = StateCaseTimeSeries.sample(['Hispanic or Latino', 'Not Hispanic or Latino'])
     stateCase.uscdiPatientPostalCode = faker.address.zipCodeByState('CA')
     stateCase.uscdiPatientPhone = faker.phone.number()
     stateCase.uscdiPatientEmail = faker.internet.email()
@@ -190,8 +201,8 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
   }
 
   private fakeVariableElements (stateCase: StateCase): void {
-    for (const variableElementName of variableSchemaElementNames) {
-      const index = this.schema.elements.findIndex(e => e.name === variableElementName)
+    for (const variableElementName of variableDictionaryElementNames) {
+      const index = this.dictionary.elements.findIndex(e => e.name === variableElementName)
       if (index !== -1) {
         stateCase.set(variableElementName as keyof StateCase, 'fake response')
       }
@@ -204,9 +215,9 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     to.uscdiPatientAddress = from.uscdiPatientAddress
     to.uscdiPatientCity = from.uscdiPatientCity
     to.uscdiPatientState = from.uscdiPatientState
-    to.uscdiPatientRace = from.uscdiPatientRace
+    to.uscdiPatientRaceCategory = from.uscdiPatientRaceCategory
     to.uscdiPatientSexAtBirth = from.uscdiPatientSexAtBirth
-    to.uscdiPatientEthnicity = from.uscdiPatientEthnicity
+    to.uscdiPatientEthnicityGroup = from.uscdiPatientEthnicityGroup
     to.uscdiPatientPostalCode = from.uscdiPatientPostalCode
     to.uscdiPatientPhone = from.uscdiPatientPhone
     to.uscdiPatientEmail = from.uscdiPatientEmail

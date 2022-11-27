@@ -3,7 +3,7 @@ import asyncHandler from 'express-async-handler'
 import { getLogger } from '@/utils/loggers'
 import { readFeed } from '@/epicast/readFeed'
 import { updateFeedSubscriber } from '@/features/subscribers/updateFeedSubscriber'
-import { getFeedBucket, getCDCCaseTimeSeries, getCDCSubscriber } from '@/server/app'
+import { getFeedStorage, getCDCCaseTimeSeries, getCDCSubscriber } from '@/server/app'
 
 const router = express.Router()
 const logger = getLogger('CDC_CASES_ROUTE')
@@ -19,11 +19,11 @@ router.get('/', asyncHandler(async (req, res, _next) => {
   res.send(cases)
 }))
 
-/* GET get all schema */
-router.get('/schema', asyncHandler(async (req, res, _next) => {
-  logger.info('Get CDC Schema')
+/* GET get all dictionary */
+router.get('/dictionary', asyncHandler(async (req, res, _next) => {
+  logger.info('Get CDC Dictionary')
   const timeSeries = getCDCCaseTimeSeries(req)
-  res.send(timeSeries.schema)
+  res.send(timeSeries.dictionary)
 }))
 
 /* GET subscriber */
@@ -41,8 +41,8 @@ router.post('/subscriber', (req, res, _next) => {
 
 router.post('/subscriber/once', asyncHandler(async (req, res, _next) => {
   logger.info('Read feed')
-  const bucket = getFeedBucket(req)
-  const lastPublished = await readFeed(bucket, req.cdcCaseTimeSeries)
+  const storage = getFeedStorage(req)
+  const lastPublished = await readFeed(storage, req.cdcCaseTimeSeries)
   const feedSubscriber = getCDCSubscriber(req)
   feedSubscriber.setLastChecked(lastPublished)
   res.send(feedSubscriber.model)

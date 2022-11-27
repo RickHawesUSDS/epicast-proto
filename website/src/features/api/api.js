@@ -9,18 +9,18 @@ export async function fetchAllStateCases(sortParam) {
   return response.data
 }
 
-export async function fetchStateCaseSchema() {
-  const response = await axios.get('/api/stateCases/schema')
+export async function fetchStateCaseDictionary() {
+  const response = await axios.get('/api/stateCases/dictionary')
   return response.data
 }
 
 export async function addStateCaseElement(element) {
-  const response = await axios.put(`/api/stateCases/schema/${element.name}`, element)
+  const response = await axios.put(`/api/stateCases/dictionary/${element.name}`, element)
   return response.data
 }
 
 export async function deleteStateCaseElement(name) {
-  const response = await axios.delete(`/api/stateCases/schema/${name}`)
+  const response = await axios.delete(`/api/stateCases/dictionary/${name}`)
   return response.data
 }
 
@@ -44,8 +44,8 @@ export async function fetchAllCDCCases(sortParam) {
   return response.data
 }
 
-export async function fetchCDCCaseSchema() {
-  const response = await axios.get('/api/cdcCases/schema')
+export async function fetchCDCCaseDictionary() {
+  const response = await axios.get('/api/cdcCases/dictionary')
   return response.data
 }
 

@@ -1,10 +1,8 @@
 import { FeedDictionary } from '@/epicast/FeedDictionary'
 
-export const stateCaseTimeSeriesSchemaV1: FeedDictionary = {
-  epicastVersion: 1.0,
-  subjectId: 'epicast',
-  reporterId: 'demoserver',
-  topicId: 'feed1',
+export const stateCaseDictionary: FeedDictionary = {
+  topic: 'feed1',
+  reporter: 'demoserver',
   validFrom: new Date(2022, 10, 1),
   namespaces: [
     {
@@ -162,7 +160,7 @@ export const stateCaseTimeSeriesSchemaV1: FeedDictionary = {
       }]
     },
     {
-      name: 'uscdiPatientRaceCatagory',
+      name: 'uscdiPatientRaceCategory',
       namespace: 'uscdi',
       type: 'code',
       tags: [],
@@ -265,7 +263,7 @@ export const stateCaseTimeSeriesSchemaV1: FeedDictionary = {
   ]
 }
 
-export const variableSchemaElementNames = [
+export const variableDictionaryElementNames = [
   'us_caQuestion1', 'us_caQuestion2', 'us_caQuestion3',
   'us_azQuestion1', 'us_azQuestion2', 'us_azQuestion3',
   'cdcQuestion1', 'cdcQuestion2', 'cdcQuestion3'

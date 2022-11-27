@@ -2,8 +2,8 @@ import React from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, ButtonGroup, Checkbox, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormControl, FormGroup, FormLabel, FormControlLabel, makeStyles } from '@material-ui/core'
 
-import { stateCases, stateCasesSchema } from './stateCasesKeys'
-import { addRandomStateCases, addStateCaseElement, deleteStateCaseElement, fetchStateCaseSchema, publishStateCases, deduplicateStateCases } from '../api/api'
+import { stateCases, stateCasesDictionary } from './stateCasesKeys'
+import { addRandomStateCases, addStateCaseElement, deleteStateCaseElement, fetchStateCaseDictionary, publishStateCases, deduplicateStateCases } from '../api/api'
 import { variableStateCaseElements, localQuestion1, localQuestion2, localQuestion3, neighborQuestion1, neighborQuestion2, cdcQuestion1, cdcQuestion2 } from './variableStateCaseElements'
 
 
@@ -25,7 +25,7 @@ export default function StateCasesButtons(props) {
     mutationFn: () => publishStateCases()
   })
 
-  const updateStateSchemaMutation = useMutation({
+  const updateStateDictionaryMutation = useMutation({
     mutationFn: async () => {
       for (let element of variableStateCaseElements) {
         if (checked.has(element.name)) {
@@ -36,7 +36,7 @@ export default function StateCasesButtons(props) {
       }
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [stateCases, stateCasesSchema] })
+      await queryClient.invalidateQueries({ queryKey: [stateCases, stateCasesDictionary] })
     }
   })
 
@@ -45,15 +45,15 @@ export default function StateCasesButtons(props) {
       await deduplicateStateCases()
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [stateCases]})
+      await queryClient.invalidateQueries({ queryKey: [stateCases] })
     }
   })
 
   const handleClickOpen = async () => {
-    const schema = await fetchStateCaseSchema()
+    const dictionary = await fetchStateCaseDictionary()
     const newChecked = new Set()
     for (let element of variableStateCaseElements) {
-      if (schema.elements.findIndex( e => e.name === element.name) !== -1) {
+      if (dictionary.elements.findIndex(e => e.name === element.name) !== -1) {
         newChecked.add(element.name)
       }
     }
@@ -66,7 +66,7 @@ export default function StateCasesButtons(props) {
   }
 
   const handleUpdate = async () => {
-    await updateStateSchemaMutation.mutateAsync()
+    await updateStateDictionaryMutation.mutateAsync()
     setOpen(false);
   }
 
@@ -81,7 +81,7 @@ export default function StateCasesButtons(props) {
     setChecked(newChecked)
   }
 
-  function onChangeSchemaClick() {
+  function onChangeDictionaryClick() {
     handleClickOpen()
   }
 
@@ -103,7 +103,7 @@ export default function StateCasesButtons(props) {
     questions.map((question) => (
       <FormControlLabel
         control={
-          <Checkbox name={question.name} checked={checked.has(question.name)} onChange={handleCheckboxChange}/>
+          <Checkbox name={question.name} checked={checked.has(question.name)} onChange={handleCheckboxChange} />
         }
         label={question.displayName}
       />
@@ -120,7 +120,7 @@ export default function StateCasesButtons(props) {
         <Button disabled={isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 30, numPerDay: 500 })}>Add 15000 Cases</Button>
       </ButtonGroup>
       <Button disabled={isLoading} onClick={() => deduplicateMutation.mutate()} color='primary' variant='outlined'>Deduplicate</Button>
-      <Button disabled={isLoading} onClick={() => onChangeSchemaClick()} color='primary' variant='outlined'>Update Data Elements</Button>
+      <Button disabled={isLoading} onClick={() => onChangeDictionaryClick()} color='primary' variant='outlined'>Update Data Elements</Button>
       <Button disabled={isLoading} onClick={() => publishStateCasesMutation.mutate()} color='primary' variant='outlined'>Publish</Button>
       <Dialog open={open} onClose={handleClose} maxWidth="" fullWidth="" aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Change Data Dictionary</DialogTitle>
@@ -151,7 +151,7 @@ export default function StateCasesButtons(props) {
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button disable={updateStateSchemaMutation.isLoading} onClick={handleUpdate} color="primary">
+          <Button disable={updateStateDictionaryMutation.isLoading} onClick={handleUpdate} color="primary">
             Update
           </Button>
         </DialogActions>

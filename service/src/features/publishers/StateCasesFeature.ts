@@ -27,7 +27,7 @@ export class StateCasesFeature implements Feature {
     await StateCase.destroy({
       truncate: true
     })
-    this.stateCaseTimeSeries.resetSchema()
+    this.stateCaseTimeSeries.resetDictionary()
     await this.stateCaseTimeSeries.insertFakeStateCases(DAYS_OF_FAKE, FAKES_PER_DAY)
   }
 }

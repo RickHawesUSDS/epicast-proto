@@ -17,7 +17,7 @@ export default function CdcPage(props) {
         title='CDC'
       >
         <Container align='center'>
-          This is the data that CDC receives when the state publishes a feed. The table is directly synchronized to the feed's bucket stored in the cloud.
+          This is the data that CDC receives when the state publishes a feed. The table is directly synchronized to the feed's storage in the cloud.
         </Container>
         <CDCCasesTable />
         <CDCCasesButtons />

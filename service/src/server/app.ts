@@ -15,7 +15,7 @@ import { StateCaseTimeSeries } from '@/features/publishers/StateCaseTimeSeries'
 import { CDCCaseTimeSeries } from '@/features/subscribers/CDCCaseTimeSeries'
 import { FeedSubscriber } from '@/features/subscribers/FeedSubscriber'
 import { CDCCase } from '@/features/subscribers/CDCCase'
-import { S3Bucket } from '@/features/feeds/S3Bucket'
+import { S3Storage } from '@/features/feeds/S3Storage'
 
 const logger = getLogger('APP')
 
@@ -28,19 +28,19 @@ export interface AppState {
   cdcCasesFeature: CDCCasesFeature
 }
 
-export function getStateCaseTimeSeries (req: express.Request): StateCaseTimeSeries {
+export function getStateCaseTimeSeries(req: express.Request): StateCaseTimeSeries {
   return req.state.stateCasesFeature.stateCaseTimeSeries
 }
 
-export function getCDCCaseTimeSeries (req: express.Request): CDCCaseTimeSeries {
+export function getCDCCaseTimeSeries(req: express.Request): CDCCaseTimeSeries {
   return req.state.cdcCasesFeature.cdcCaseTimeSeries
 }
 
-export function getFeedBucket (req: express.Request): S3Bucket {
-  return req.state.feedsFeature.bucket
+export function getFeedStorage(req: express.Request): S3Storage {
+  return req.state.feedsFeature.storage
 }
 
-export function getCDCSubscriber (req: express.Request): FeedSubscriber<CDCCase> {
+export function getCDCSubscriber(req: express.Request): FeedSubscriber<CDCCase> {
   return req.state.cdcCasesFeature.feedSubscriber
 }
 
@@ -49,10 +49,10 @@ class App {
   state: AppState
   features: Feature[]
 
-  constructor () {
+  constructor() {
     const feedsFeature = new FeedsFeature()
     const stateCasesFeature = new StateCasesFeature()
-    const cdcCasesFeature = new CDCCasesFeature(feedsFeature.bucket)
+    const cdcCasesFeature = new CDCCasesFeature(feedsFeature.storage)
     const systemFeature = new SystemFeature([feedsFeature, stateCasesFeature, cdcCasesFeature])
 
     this.state = { db, feedsFeature, systemFeature, stateCasesFeature, cdcCasesFeature }
@@ -69,7 +69,7 @@ class App {
     this.init().catch(error => logger.error(error))
   }
 
-  async init (): Promise<void> {
+  async init(): Promise<void> {
     for (const feature of this.features) {
       await feature.init(InitEvent.BEFORE_DB)
     }
@@ -83,14 +83,14 @@ class App {
     }
   }
 
-  private config (): void {
+  private config(): void {
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: false }))
     this.app.use(cookieParser())
     this.app.use(express.static(path.join(__dirname, 'public')))
   }
 
-  private routerSetup (): void {
+  private routerSetup(): void {
     this.app.use((req, _res, next) => {
       req.state = this.state
       next()
@@ -102,7 +102,7 @@ class App {
     }
   }
 
-  private async databaseSetup (): Promise<void> {
+  private async databaseSetup(): Promise<void> {
     const modelPaths = this.features.flatMap(f => f.getModelPaths())
     this.state.db.addModels(modelPaths)
     await this.state.db.sync()

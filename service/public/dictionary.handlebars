@@ -1,17 +1,11 @@
 # version of the epicast that is used
 epicastVersion: 0.1
 
-# Subject ID represent of the reporting subject.
-# For cases, the jurisdiction or the population that is the subject of the reporting.
-# In this demo, epicast is used to represent jurisdition
-subjectId: {{ subjectId }}
+# The topic of the feed and dictionary.
+topic: {{ topic }}
 
-# The reporter is the organization, system or facility reporting on the subject.
-# For cases, this will likely be a name of a public health agency
-reporterId: {{ reporterId }}
-
-# The topic of the feed. For cases, this will be something like 'covid_19_cases'
-topicId: {{ topicId }}
+# The reporter of the feed and dictionary. 
+reporter: {{ reporter }}
 
 # The date that this data dictionary was used in this feed
 validFrom: {{ validFrom }}
@@ -30,7 +24,7 @@ namespaces:
 {{/each}}
 
 #
-# Elements of the schema
+# Elements of the dictionary
 #
 # Each element has:
 # - name

@@ -16,30 +16,34 @@ POST http://localhost:3001/api/stateCases/random?numOfDays=5&numPerDay=3000
 ### Publish cases
 POST http://localhost:3001/api/stateCases/publish
 
-### Get the schema
-GET http://localhost:3001/api/stateCases/schema
+### Get the dictionary
+GET http://localhost:3001/api/stateCases/dictionary
 
-### Change the schema
-PUT http://localhost:3001/api/stateCases/schema/localQuestion1
+### Change the dictionary
+PUT http://localhost:3001/api/stateCases/dictionary/us_caQuestion1
 content-type: application/json
 
 {
-  "name": "localQuestion1",
+  "name": "us_caQuestion1",
+  "namespace": "us_ca",
   "type": "string",
   "tags": [],
-  "memberOfSchemas": ["state"],
-  "displayName": "Good Local Question",
-  "description": "pretend good local question"
+  "descriptions": [{
+    "isoCultureCode": "en-us",
+    "displayName": "CA Question 1",
+    "section": "patient",
+    "details": "pretend good local question"
+  }]
 }
 
 ###
-DELETE http://localhost:3001/api/stateCases/schema/localQuestion1
+DELETE http://localhost:3001/api/stateCases/dictionary/us_caQuestion1
 
 ### Get all the cdcCases
 GET http://localhost:3001/api/cdcCases
 
-### Get CDC caseCases schema
-GET http://localhost:3001/api/cdcCases/schema
+### Get CDC caseCases dictionary
+GET http://localhost:3001/api/cdcCases/dictionary
 
 ### Get the subscriber
 GET http://localhost:3001/api/cdcCases/subscriber

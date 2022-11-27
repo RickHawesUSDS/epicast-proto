@@ -1,6 +1,6 @@
 import CaseTable from '../../components/CaseTable'
-import { fetchAllCDCCases, fetchCDCCaseSchema } from '../../features/api/api'
-import { cdcCases, cdcCasesSchema } from './cdcCasesKeys'
+import { fetchAllCDCCases, fetchCDCCaseDictionary } from '../../features/api/api'
+import { cdcCases, cdcCasesDictionary } from './cdcCasesKeys'
 
 import { CircularProgress } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
@@ -17,8 +17,8 @@ const customWidths = {
   personEmail: 200
 }
 
-function makeColumns(schema) {
-  return schema.elements.map((element) => {
+function makeColumns(dictionary) {
+  return dictionary.elements.map((element) => {
     return {
       id: element.name,
       label: element.descriptions[0].displayName,
@@ -29,9 +29,9 @@ function makeColumns(schema) {
 }
 
 export default function CDCCasesTable() {
-  const getCDCSchemaQuery = useQuery(
-    [cdcCasesSchema],
-    async () => await fetchCDCCaseSchema(),
+  const getCDCDictionaryQuery = useQuery(
+    [cdcCasesDictionary],
+    async () => await fetchCDCCaseDictionary(),
     {
     }
   )
@@ -46,7 +46,7 @@ export default function CDCCasesTable() {
 
   let content = ''
 
-  if (getCDCCasesQuery.isError || getCDCSchemaQuery.isError) {
+  if (getCDCCasesQuery.isError || getCDCDictionaryQuery.isError) {
     if (getCDCCasesQuery.isError) {
       content = (
         <Alert severity='error'>
@@ -54,19 +54,19 @@ export default function CDCCasesTable() {
         </Alert>
       )
     }
-    if (getCDCSchemaQuery.isError) {
+    if (getCDCDictionaryQuery.isError) {
       content = (
         <Alert severity='error'>
-          Get state cases schema api error: {getCDCSchemaQuery.error}
+          Get state cases dictionary api error: {getCDCDictionaryQuery.error}
         </Alert>
       )
     }
-  } else if (getCDCCasesQuery.isLoading || getCDCSchemaQuery.isLoading) {
+  } else if (getCDCCasesQuery.isLoading || getCDCDictionaryQuery.isLoading) {
     content = (
       <CircularProgress />
     )
-  } else if (getCDCCasesQuery.isFetched && getCDCSchemaQuery.isFetched) {
-    const columns = makeColumns(getCDCSchemaQuery.data)
+  } else if (getCDCCasesQuery.isFetched && getCDCDictionaryQuery.isFetched) {
+    const columns = makeColumns(getCDCDictionaryQuery.data)
     if (columns.length === 0) {
       content = (
         <Alert severity='info'>

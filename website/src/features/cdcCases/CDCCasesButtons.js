@@ -1,14 +1,14 @@
 import { Button, makeStyles, Grid, Box, Switch, FormControlLabel } from '@material-ui/core'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchCDCCaseSubscriber, readCDCCaseFeed, setCDCCaseSubscriber } from '../api/api'
-import { cdcCasesSubscriber, cdcCases, cdcCasesSchema } from './cdcCasesKeys'
+import { cdcCasesSubscriber, cdcCases, cdcCasesDictionary } from './cdcCasesKeys'
 
 export default function CDCCasesButtons(props) {
   const queryClient = useQueryClient()
   const readCDCCaseFeedMutation = useMutation({
     mutationFn: async () => { return await readCDCCaseFeed() },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({queryKey: [cdcCases, cdcCasesSchema]})
+      await queryClient.invalidateQueries({ queryKey: [cdcCases, cdcCasesDictionary] })
     }
   })
   const getCDCCaseSubcriberQuery = useQuery(
@@ -19,7 +19,7 @@ export default function CDCCasesButtons(props) {
   const setSubscriberAutomaticMutation = useMutation({
     mutationFn: async (params) => { return await setCDCCaseSubscriber(params.automatic) },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({queryKey: [cdcCases, cdcCasesSchema]})
+      await queryClient.invalidateQueries({ queryKey: [cdcCases, cdcCasesDictionary] })
     }
   })
 
@@ -60,10 +60,10 @@ export default function CDCCasesButtons(props) {
           <FormControlLabel
             control={
               <Switch
-              checked={automatic}
-              color="primary"
-              name='automatic'
-              onChange={(e) => setSubscriberAutomaticMutation.mutate({ automatic: e.target.checked })} />
+                checked={automatic}
+                color="primary"
+                name='automatic'
+                onChange={(e) => setSubscriberAutomaticMutation.mutate({ automatic: e.target.checked })} />
             }
             label='Automatic Reading'
           />

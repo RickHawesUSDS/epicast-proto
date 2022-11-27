@@ -44,10 +44,10 @@ export class StateCase extends Model<StateCase> implements TimeSeriesEvent<State
     uscdiPatientDateOfBirth?: Date
 
   @Column
-    uscdiPatientRace?: string
+    uscdiPatientRaceCategory?: string
 
   @Column
-    uscdiPatientEthnicity?: string
+    uscdiPatientEthnicityGroup?: string
 
   @Column
     uscdiPatientSexAtBirth?: string

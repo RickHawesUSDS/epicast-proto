@@ -5,8 +5,8 @@ import { Container, Button } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import { resetSystem } from '../features/api/api'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { cdcCases, cdcCasesSchema, cdcCasesSubscriber } from '../features/cdcCases/cdcCasesKeys'
-import { stateCases, stateCasesSchema } from '../features/stateCases/stateCasesKeys'
+import { cdcCases, cdcCasesDictionary, cdcCasesSubscriber } from '../features/cdcCases/cdcCasesKeys'
+import { stateCases, stateCasesDictionary } from '../features/stateCases/stateCasesKeys'
 
 function ResetPage(props) {
   const history = useHistory()
@@ -14,7 +14,7 @@ function ResetPage(props) {
   const resetSystemMutation = useMutation({
     mutationFn: async () => { await resetSystem() },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [cdcCases, cdcCasesSchema, cdcCasesSubscriber, stateCasesSchema, stateCases] })
+      await queryClient.invalidateQueries({ queryKey: [cdcCases, cdcCasesDictionary, cdcCasesSubscriber, stateCasesDictionary, stateCases] })
       history.push('/')
     }
   })

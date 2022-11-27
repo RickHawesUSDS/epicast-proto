@@ -1,10 +1,8 @@
 import { FeedElement } from './FeedElement'
 
 export interface FeedDictionary {
-  readonly epicastVersion: number
-  readonly subjectId: string
-  readonly reporterId: string
-  readonly topicId: string
+  readonly topic: string
+  readonly reporter: string
   readonly validFrom: Date
   readonly namespaces: FeedNamespace[]
   readonly elements: FeedElement[]
@@ -18,22 +16,18 @@ export interface FeedNamespace {
 }
 
 export class MutableFeedDictionary implements FeedDictionary {
-  epicastVersion: number
-  subjectId: string
-  reporterId: string
-  topicId: string
+  topic: string
+  reporter: string
   validFrom: Date
   namespaces: FeedNamespace[]
   elements: FeedElement[]
 
-  constructor (initSchema: FeedDictionary) {
-    this.epicastVersion = initSchema.epicastVersion
-    this.subjectId = initSchema.subjectId
-    this.reporterId = initSchema.reporterId
-    this.topicId = initSchema.topicId
-    this.validFrom = initSchema.validFrom
-    this.namespaces = initSchema.namespaces
-    this.elements = initSchema.elements
+  constructor (initDictionary: FeedDictionary) {
+    this.topic = initDictionary.topic
+    this.reporter = initDictionary.topic
+    this.validFrom = initDictionary.validFrom
+    this.namespaces = initDictionary.namespaces
+    this.elements = initDictionary.elements
   }
 
   addElement (element: FeedElement): boolean {

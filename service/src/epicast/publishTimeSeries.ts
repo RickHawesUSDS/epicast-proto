@@ -4,8 +4,8 @@ import { assert } from 'console'
 
 import { Period } from './Period'
 import { Frequency } from './Frequency'
-import { BucketObject } from './FeedBucket'
-import { formDeletedKey, formTimeSeriesKey, periodFromTimeSeriesKey, TIMESERIES_FOLDER } from './feedBucketKeys'
+import { StorageObject } from './FeedStorage'
+import { formDeletedKey, formTimeSeriesKey, periodFromTimeSeriesKey, TIMESERIES_FOLDER } from './feedStorageKeys'
 import { TimeSeries, TimeSeriesEvent } from './TimeSeries'
 import { FeedElement, filterElements } from './FeedElement'
 import { MutableSnapshot } from './Snapshot'
@@ -17,7 +17,7 @@ const DESIRED_MAX_MONTHLY_COUNT = 10000 / 30
 const logger = getLogger('PUBLISH_TIME_SERIES_SERVICE')
 
 export async function publishTimeseries<T> (toSnapshot: MutableSnapshot, timeseries: TimeSeries<T>): Promise<number> {
-  logger.info(`publishing timeseries: ${timeseries.schema.subjectId}-${timeseries.schema.reporterId}`)
+  logger.info(`publishing timeseries: ${timeseries.summary.subject}-${timeseries.summary.reporter}`)
   const publisher = new TimeSeriesPublisher(toSnapshot, timeseries)
   return await publisher.publish()
 }
@@ -169,7 +169,7 @@ class TimeSeriesPublisher<T> {
       return csv.join('')
     }
 
-    const deidentifiedElements = filterElements(this.timeSeries.schema.elements, 'pii')
+    const deidentifiedElements = filterElements(this.timeSeries.dictionary.elements, 'pii')
     const report = createCSV(events, deidentifiedElements)
     const key = formTimeSeriesKey(period)
     await this.snapshot.putObject(key, report)
@@ -197,13 +197,13 @@ class TimeSeriesPublisher<T> {
     return events.at(-1)?.eventAt
   }
 
-  calcMaxLastModified (objects: BucketObject[]): Date | undefined {
+  calcMaxLastModified (objects: StorageObject[]): Date | undefined {
     if (objects.length === 0) return undefined
     const modifiedDates = objects.map((object) => { return object.lastModified })
     return maxDate(modifiedDates)
   }
 
-  calcLastPeriod (publishedObjects: BucketObject[]): Period | undefined {
+  calcLastPeriod (publishedObjects: StorageObject[]): Period | undefined {
     if (publishedObjects.length === 0) return undefined
     let lastPeriod = periodFromTimeSeriesKey(publishedObjects[0].key)
     for (const publishedObject of publishedObjects) {

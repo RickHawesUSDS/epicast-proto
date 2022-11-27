@@ -2,18 +2,17 @@ import { compareDesc, parseISO, formatISO } from 'date-fns'
 import { parse, stringify } from 'csv-string'
 import { Mutex } from 'async-mutex'
 
-import { BucketObject, FeedBucket } from './FeedBucket'
-import { formSnapshotKey, SNAPSHOT_FOLDER, versionFromSnapshotKey } from './feedBucketKeys'
+import { StorageObject, FeedStorage } from './FeedStorage'
+import { formSnapshotKey, SNAPSHOT_FOLDER, versionFromSnapshotKey } from './feedStorageKeys'
 import assert from 'assert'
 import { getLogger } from '@/utils/loggers'
 
 const logger = getLogger('SNAPSHOT')
 
 export interface Snapshot {
-  readonly name: string
   readonly version?: number
   readonly createdAt?: Date
-  listObjects: (prefix: string) => BucketObject[]
+  listObjects: (prefix: string) => StorageObject[]
   doesObjectExist: (key: string) => boolean
   getObject: (key: string) => Promise<string>
 }
@@ -26,14 +25,14 @@ export interface SnapshotMutator {
 export type MutableSnapshot = Snapshot & SnapshotMutator
 
 export class SnapshotReader implements Snapshot {
-  bucket: FeedBucket
-  bucketObjects: BucketObject[] = []
+  storage: FeedStorage
+  stoargeObjects: StorageObject[] = []
   createdAt?: Date
   feedVersion?: number
   readCalled: boolean
 
-  constructor (fromBucket: FeedBucket) {
-    this.bucket = fromBucket
+  constructor (fromStorage: FeedStorage) {
+    this.storage = fromStorage
     this.readCalled = false
   }
 
@@ -42,23 +41,19 @@ export class SnapshotReader implements Snapshot {
     await mutex.runExclusive(async () => {
       if (this.readCalled) throw Error('Read must not be called twice')
       this.readCalled = true
-      const snapshotObjects = await this.bucket.listObjects(SNAPSHOT_FOLDER)
+      const snapshotObjects = await this.storage.listObjects(SNAPSHOT_FOLDER)
       if (snapshotObjects.length === 0) return
       const lastSnapshotObject = snapshotObjects.sort((a, b) => compareDesc(a.lastModified, b.lastModified))[0]
 
       this.feedVersion = versionFromSnapshotKey(lastSnapshotObject.key)
       this.createdAt = lastSnapshotObject.lastModified
-      const snapshotRaw = await this.bucket.getObject(lastSnapshotObject.key, lastSnapshotObject.versionId)
+      const snapshotRaw = await this.storage.getObject(lastSnapshotObject.key, lastSnapshotObject.versionId)
       const rows = parse(snapshotRaw)
       if (rows.length === 0) throw Error('empty snapshot')
-      this.bucketObjects = rows.map((row) => {
+      this.stoargeObjects = rows.map((row) => {
         return { key: row[0], versionId: row[1], lastModified: parseISO(row[2]) }
       })
     })
-  }
-
-  get name (): string {
-    return this.bucket.bucket
   }
 
   get version (): number | undefined {
@@ -66,25 +61,25 @@ export class SnapshotReader implements Snapshot {
     return this.feedVersion
   }
 
-  listObjects (prefix: string): BucketObject[] {
+  listObjects (prefix: string): StorageObject[] {
     if (!this.readCalled) throw Error('Read must be called before this method')
     // production code would work to make this search more efficient
-    return this.bucketObjects
+    return this.stoargeObjects
       .filter((object) => object.key.startsWith(prefix))
   }
 
   doesObjectExist (key: string): boolean {
     if (!this.readCalled) throw Error('Read must be called before this method')
-    return this.bucketObjects.findIndex((object) => object.key === key) !== -1
+    return this.stoargeObjects.findIndex((object) => object.key === key) !== -1
   }
 
   async getObject (key: string): Promise<string> {
     if (!this.readCalled) throw Error('Read must be called before this method')
-    const index = this.bucketObjects.findIndex((object) => object.key === key)
+    const index = this.stoargeObjects.findIndex((object) => object.key === key)
     if (index === -1) throw Error('Object does not exist')
-    const versionId = this.bucketObjects[index].versionId
-    if (versionId === undefined) throw Error('versioning is not enabled on bucket or some other error')
-    return await this.bucket.getObject(key, versionId)
+    const versionId = this.stoargeObjects[index].versionId
+    if (versionId === undefined) throw Error('versioning is not enabled on storage or some other error')
+    return await this.storage.getObject(key, versionId)
   }
 }
 
@@ -107,12 +102,12 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
   async putObject (key: string, value: string): Promise<void> {
     if (!this.initializedCalled) throw Error('Initialized must be called')
     logger.info(`Put of object: ${key}`)
-    const writtenObject = await this.bucket.putObject(key, value)
-    const index = this.bucketObjects.findIndex((object) => object.key === key)
+    const writtenObject = await this.storage.putObject(key, value)
+    const index = this.stoargeObjects.findIndex((object) => object.key === key)
     if (index === -1) {
-      this.bucketObjects.push(writtenObject)
+      this.stoargeObjects.push(writtenObject)
     } else {
-      this.bucketObjects[index] = writtenObject
+      this.stoargeObjects[index] = writtenObject
     }
     this.isModified = true
   }
@@ -120,23 +115,23 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
   async deleteObject (key: string): Promise<void> {
     if (!this.initializedCalled) throw Error('Initialized must be called')
     logger.info(`Delete of object: ${key}`)
-    const index = this.bucketObjects.findIndex((object) => object.key === key)
+    const index = this.stoargeObjects.findIndex((object) => object.key === key)
     if (index !== -1) {
-      await this.bucket.deleteObject(key)
-      this.bucketObjects.splice(index)
+      await this.storage.deleteObject(key)
+      this.stoargeObjects.splice(index)
       this.isModified = true
     }
   }
 
   async publish (): Promise<void> {
     if (!this.isModified) return
-    const csv = this.bucketObjects.map(object => {
+    const csv = this.stoargeObjects.map(object => {
       assert(object.versionId !== undefined)
       const values = [object.key, object.versionId, formatISO(object.lastModified)]
       return stringify(values)
     })
     const raw = csv.join('')
     assert(this.feedVersion !== undefined)
-    await this.bucket.putObject(formSnapshotKey(this.feedVersion), raw)
+    await this.storage.putObject(formSnapshotKey(this.feedVersion), raw)
   }
 }

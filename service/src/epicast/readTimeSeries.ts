@@ -2,8 +2,8 @@ import { isAfter, min, parseISO } from 'date-fns'
 import { parse } from 'csv-string'
 import { strict as assert } from 'node:assert'
 
-import { BucketObject } from './FeedBucket'
-import { formDeletedKeyFromTimeSeriesKey, TIMESERIES_FOLDER } from './feedBucketKeys'
+import { StorageObject } from './FeedStorage'
+import { formDeletedKeyFromTimeSeriesKey, TIMESERIES_FOLDER } from './feedStorageKeys'
 import { getLogger } from '@/utils/loggers'
 import { MutableTimeSeries, TimeSeriesDeletedEvent } from './TimeSeries'
 import { FeedElement } from './FeedElement'
@@ -27,7 +27,7 @@ class TimeSeriesReader<T> {
   }
 
   async read (): Promise<Date | undefined> {
-    logger.info(`Reading: ${this.snapshot.name}`)
+    logger.info(`Reading: ${this.snapshot.version}`)
     let publishedObjects = await this.snapshot.listObjects(TIMESERIES_FOLDER)
     if (publishedObjects.length === 0) return
     const lastPublished = this.lastModifiedOf(publishedObjects)
@@ -35,7 +35,7 @@ class TimeSeriesReader<T> {
     if (metadata !== null) {
       publishedObjects = publishedObjects.filter((object) => isAfter(object.lastModified, metadata.lastUpdatedAt))
     }
-    logger.debug(`${this.snapshot.name} has ${publishedObjects.length} objects to read`)
+    logger.debug(`${this.snapshot.version} has ${publishedObjects.length} objects to read`)
 
     const events = await this.fetchEvents(publishedObjects)
     await this.timeSeries.upsertEvents(events)
@@ -46,18 +46,18 @@ class TimeSeriesReader<T> {
     return lastPublished
   }
 
-  async fetchEvents (publishedObjects: BucketObject[]): Promise<T[]> {
+  async fetchEvents (publishedObjects: StorageObject[]): Promise<T[]> {
     const promises = publishedObjects.map(async (publishedObject) => await this.fetchOnePartition(publishedObject))
     const events = (await Promise.all(promises)).flatMap((partition) => partition)
     return events
   }
 
-  async fetchOnePartition (publishedObject: BucketObject): Promise<T[]> {
-    function matchElements (header: string[], schema: FeedDictionary): FeedElement[] {
+  async fetchOnePartition (publishedObject: StorageObject): Promise<T[]> {
+    function matchElements (header: string[], dictionary: FeedDictionary): FeedElement[] {
       const elements: FeedElement[] = []
       for (let col = 0; col < header.length; col++) {
         const name = header[col]
-        const matchedElement = schema.elements.find((element) => element.name === name)
+        const matchedElement = dictionary.elements.find((element) => element.name === name)
         if (matchedElement !== undefined) {
           elements.push(matchedElement)
         }
@@ -70,7 +70,7 @@ class TimeSeriesReader<T> {
     const rows = parse(csv)
     if (rows.length === 0) throw new Error('invalid object')
 
-    const elements = matchElements(rows[0], this.timeSeries.schema)
+    const elements = matchElements(rows[0], this.timeSeries.dictionary)
     return rows.slice(1).map((row) => this.readEvent(row, elements))
   }
 
@@ -87,13 +87,13 @@ class TimeSeriesReader<T> {
     return this.timeSeries.createEvent(names, values)
   }
 
-  async fetchDeletedEvents (publishedObjects: BucketObject[]): Promise<TimeSeriesDeletedEvent[]> {
+  async fetchDeletedEvents (publishedObjects: StorageObject[]): Promise<TimeSeriesDeletedEvent[]> {
     const promises = publishedObjects.map(async (publishedObject) => await this.fetchOneDeletedPartition(publishedObject))
     const events = (await Promise.all(promises)).flatMap((partition) => partition)
     return events
   }
 
-  async fetchOneDeletedPartition (publishedObject: BucketObject): Promise<TimeSeriesDeletedEvent[]> {
+  async fetchOneDeletedPartition (publishedObject: StorageObject): Promise<TimeSeriesDeletedEvent[]> {
     const deletedKey = formDeletedKeyFromTimeSeriesKey(publishedObject.key)
     if (!this.snapshot.doesObjectExist(deletedKey)) return []
     const csv = await this.snapshot.getObject(deletedKey)
@@ -105,7 +105,7 @@ class TimeSeriesReader<T> {
     })
   }
 
-  lastModifiedOf (objects: BucketObject[]): Date {
+  lastModifiedOf (objects: StorageObject[]): Date {
     return min(objects.map((o) => o.lastModified))
   }
 }

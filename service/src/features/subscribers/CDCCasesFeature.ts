@@ -1,4 +1,4 @@
-import { FeedBucket } from '@/epicast/FeedBucket'
+import { FeedStorage } from '@/epicast/FeedStorage'
 import { Router } from 'express'
 import { join } from 'path/posix'
 import { Feature, InitEvent } from '../Feature'
@@ -12,9 +12,9 @@ export class CDCCasesFeature implements Feature {
   cdcCaseTimeSeries: CDCCaseTimeSeries
   feedSubscriber: FeedSubscriber<CDCCase>
 
-  constructor (bucket: FeedBucket) {
+  constructor (storage: FeedStorage) {
     this.cdcCaseTimeSeries = new CDCCaseTimeSeries()
-    this.feedSubscriber = new FeedSubscriber(bucket, this.cdcCaseTimeSeries)
+    this.feedSubscriber = new FeedSubscriber(storage, this.cdcCaseTimeSeries)
   }
 
   name = 'cdcCases'

@@ -1,0 +1,49 @@
+# Feed Summary
+#
+# Describes the feed and its content.
+#
+
+# version of the epicast that the feed conforms to
+epicastVersion: 0.2
+
+# Subject, reporter, topic uniquely define a feed. Each value must be registered
+# with the central EpiCast website
+
+# Subject represent the reporting subject.
+# For cases, the jurisdiction or the population that is the subject of the reporting.
+subject: {{ subject }}
+
+# The reporter is the organization, system or facility reporting on the subject.
+# For cases, this will likely be a name of a public health agency
+reporter: {{ reporter }}
+
+# The topic of the feed. For cases, this will be something like 'covid_19_cases'
+topic: {{ topic }}
+
+# The source URL for this feed. Points to the URL for the snapshot for this version of the feed.
+sourceUrl: {{ sourceUrl }}
+
+# Human viewable descriptions about the feed by language.
+# Must have at least one description. The most complete description should be first.
+#
+descriptions:
+{{#each this.descriptions }}
+  - isoCultureCode: {{ this.isoCultureCode }}
+    subjectFullName: {{ this.subjectFullName }}
+    reporterFullName: {{ this.reporterFullName }}
+    topicFullName: {{ this.topicFullName }}
+    feedDetails: {{ this.details }}
+{{/each}}
+
+# The feeds that contributed to this feed.
+sourceFeeds:
+{{#each feeds }}
+- subject: {{this.subject}}
+  reporter: {{this.reporter}}
+  topic: {{this.topic}}
+  sourceUrl: {{ this.sourceUrl }}
+  # real code will have the source feed's source feeds listed here as well to provide the full tree
+{{/each}}
+
+
+

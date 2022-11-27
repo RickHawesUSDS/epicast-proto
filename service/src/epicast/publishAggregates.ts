@@ -1,4 +1,4 @@
-import { formAggregatesKey } from '@/epicast/feedBucketKeys'
+import { formAggregatesKey } from '@/epicast/feedStorageKeys'
 import { MutableSnapshot } from '@/epicast/Snapshot'
 import { TimeSeries } from '@/epicast/TimeSeries'
 import { makeCasePartions, TimeSeriesPartition } from '@/epicast/TimeSeriesPartition'
@@ -36,9 +36,9 @@ class AggregatesPublisher<T> {
   }
 
   async publishDailyCounts<T>(year: number, partitions: Array<TimeSeriesPartition<T>>): Promise<void> {
-    const subject = this.timeSeries.schema.subjectId
-    const reporter = this.timeSeries.schema.reporterId
-    const feed = this.timeSeries.schema.topicId
+    const subject = this.timeSeries.summary.subject
+    const reporter = this.timeSeries.summary.reporter
+    const feed = this.timeSeries.summary.topic
 
     function createCSV (partitions: Array<TimeSeriesPartition<T>>): string {
       const csv = partitions.map(partition => {
@@ -56,8 +56,8 @@ class AggregatesPublisher<T> {
       return csv.join('')
     }
 
-    const schema = this.timeSeries.schema
-    const key = formAggregatesKey(schema.subjectId, schema.reporterId, schema.topicId, year)
+    const summary = this.timeSeries.summary
+    const key = formAggregatesKey(summary.subject, summary.reporter, summary.topic, year)
     const report = createCSV(partitions)
     await this.snapshot.putObject(key, report)
   }

@@ -28,10 +28,10 @@ export class CDCCase extends Model<CDCCase> implements TimeSeriesEvent<CDCCase> 
     uscdiPatientDateOfBirth?: Date
 
   @Column
-    uscdiPatientRace?: string
+    uscdiPatientRaceCategory?: string
 
   @Column
-    uscdiPatientEthnicity?: string
+    uscdiPatientEthnicityGroup?: string
 
   @Column
     uscdiPatientSexAtBirth?: string

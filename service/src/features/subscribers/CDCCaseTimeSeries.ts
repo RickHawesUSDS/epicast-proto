@@ -5,6 +5,7 @@ import { FeedDictionary } from '@/epicast/FeedDictionary'
 import { TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesMetadata, MutableTimeSeries, TimeSeriesDeletedEvent } from '@/epicast/TimeSeries'
 import { assert } from 'console'
 import { getLogger } from 'log4js'
+import { FeedSummary } from '@/epicast/FeedSummary'
 
 const logger = getLogger('CDC_CASE_TIME_SERIES')
 
@@ -48,18 +49,26 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     return { lastUpdatedAt: lastUpdated.eventUpdatedAt, lastEventAt: lastCase.eventAt }
   }
 
-  schema: FeedDictionary = {
-    epicastVersion: 1.0,
-    subjectId: 'epicast',
-    reporterId: 'demo',
-    topicId: 'feed1',
+  dictionary: FeedDictionary = {
+    topic: 'feed1',
+    reporter: 'demoserver',
     validFrom: new Date(1900, 1, 1), // Early date
     namespaces: [],
     elements: []
   }
 
-  updateSchema (newSchema: FeedDictionary): void {
-    this.schema = newSchema
+  summary: FeedSummary = {
+    epicastVersion: '0.1',
+    subject: 'epicast',
+    reporter: 'demoserver',
+    topic: 'feed1',
+    sourceUrl: 'xyz',
+    sourceFeeds: [],
+    lastUpdated: new Date()
+  }
+
+  updateDictionary (newDictionary: FeedDictionary): void {
+    this.dictionary = newDictionary
   }
 
   async upsertEvents (events: CDCCase[]): Promise<void> {

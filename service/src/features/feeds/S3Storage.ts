@@ -1,14 +1,14 @@
 import { DeleteObjectCommand, GetObjectCommand, HeadBucketCommand, HeadObjectCommand, ListObjectsCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { fromIni } from '@aws-sdk/credential-providers'
 import { getLogger } from '@/utils/loggers'
-import { FeedBucket, BucketObject } from '@/epicast/FeedBucket'
+import { FeedStorage, StorageObject } from '@/epicast/FeedStorage'
 import { ReadStream } from 'fs'
 import { Readable } from 'stream'
 import { parseISO } from 'date-fns'
 import { FileData, FileArray } from 'chonky'
 import path from 'path/posix'
 
-const logger = getLogger('BUCKET')
+const logger = getLogger('STORAGE')
 export const REGION = 'us-west-2'
 export const BUCKET_NAME = 'epicast-demoserver'
 export const CREDS_PROFILE = 'epicast-demo'
@@ -21,7 +21,7 @@ function getS3Client (): S3Client {
   })
 }
 
-export class S3Bucket implements FeedBucket {
+export class S3Storage implements FeedStorage {
   private readonly s3Client = getS3Client()
   readonly folder: string
   readonly bucket = BUCKET_NAME
@@ -45,7 +45,7 @@ export class S3Bucket implements FeedBucket {
     }
   }
 
-  async listObjects (prefix: string): Promise<BucketObject[]> {
+  async listObjects (prefix: string): Promise<StorageObject[]> {
     const listResponse = await this.s3Client.send(new ListObjectsCommand({
       Bucket: this.bucket,
       Prefix: path.join(this.folder, prefix)
@@ -61,7 +61,7 @@ export class S3Bucket implements FeedBucket {
     }
   }
 
-  async putObject (name: string, body: string | ReadStream): Promise<BucketObject> {
+  async putObject (name: string, body: string | ReadStream): Promise<StorageObject> {
     logger.debug(`put object: ${name}`)
     const putResponse = await this.s3Client.send(new PutObjectCommand({
       Bucket: this.bucket,
@@ -114,6 +114,10 @@ export class S3Bucket implements FeedBucket {
     if (deleteResponse.$metadata.httpStatusCode !== 204) {
       return await this.handleError(`delete error: ${name}, ${deleteResponse.$metadata.httpStatusCode ?? 0}`)
     }
+  }
+
+  formUrl (name: string): string {
+    return path.join(this.bucket, this.folder, name)
   }
 
   async getFileData (prefix: string): Promise<FileArray> {

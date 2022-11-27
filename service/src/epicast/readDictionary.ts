@@ -4,23 +4,23 @@ import { getLogger } from 'log4js'
 
 import { MutableTimeSeries } from './TimeSeries'
 import { FeedDictionary } from './FeedDictionary'
-import { DICTIONARY_FOLDER } from './feedBucketKeys'
+import { DICTIONARY_FOLDER } from './feedStorageKeys'
 import { Snapshot } from './Snapshot'
 
-const logger = getLogger('READ_SCHEMA_SERVICE')
+const logger = getLogger('READ_DICTIONARY_SERVICE')
 
-export async function readSchema<T> (fromSnapshot: Snapshot, mutatingTimeSeries: MutableTimeSeries<T>): Promise<void> {
-  const publishedBlobKey = await findLastSchemaKey(fromSnapshot, mutatingTimeSeries.schema.validFrom)
+export async function readDictionary<T> (fromSnapshot: Snapshot, mutatingTimeSeries: MutableTimeSeries<T>): Promise<void> {
+  const publishedBlobKey = await findLastDictionaryKey(fromSnapshot, mutatingTimeSeries.dictionary.validFrom)
   if (publishedBlobKey === null) return
-  logger.info('Reading schema: $0', publishedBlobKey)
+  logger.info('Reading dictionary: $0', publishedBlobKey)
 
   const publishedBlob = await fromSnapshot.getObject(publishedBlobKey)
-  const newSchema = YAML.parse(publishedBlob) as FeedDictionary
+  const newDictionary = YAML.parse(publishedBlob) as FeedDictionary
 
-  mutatingTimeSeries.updateSchema(newSchema)
+  mutatingTimeSeries.updateDictionary(newDictionary)
 }
 
-async function findLastSchemaKey (fromSnapshot: Snapshot, afterDate: Date | null): Promise<string | null> {
+async function findLastDictionaryKey (fromSnapshot: Snapshot, afterDate: Date | null): Promise<string | null> {
   let objects = await fromSnapshot.listObjects(DICTIONARY_FOLDER)
   if (objects.length === 0) return null
   if (objects.length === 1) {
@@ -34,6 +34,6 @@ async function findLastSchemaKey (fromSnapshot: Snapshot, afterDate: Date | null
   if (objects.length === 0) return null
 
   logger.debug(`objects  ${objects[0].lastModified.toISOString()}`)
-  const lastSchema = objects.reduce((a, b) => isAfter(a.lastModified, b.lastModified) ? a : b)
-  return lastSchema.key
+  const lastDictionary = objects.reduce((a, b) => isAfter(a.lastModified, b.lastModified) ? a : b)
+  return lastDictionary.key
 }
