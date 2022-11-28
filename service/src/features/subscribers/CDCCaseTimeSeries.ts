@@ -42,16 +42,24 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
   }
 
   async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
-    const lastUpdated = await CDCCase.findOne({ order: [['eventUpdatedAt', 'DESC']] })
-    if (lastUpdated === null) return null
-    const lastCase = await CDCCase.findOne({ order: [['eventAt', 'DESC']] })
-    if (lastCase === null) return null
-    return { lastUpdatedAt: lastUpdated.eventUpdatedAt, lastEventAt: lastCase.eventAt }
+    const lastUpdatedEvent = await CDCCase.findOne({ order: [['eventUpdatedAt', 'DESC']] })
+    if (lastUpdatedEvent === null) return null
+    const lastEvent = await CDCCase.findOne({ order: [['eventAt', 'DESC']] })
+    if (lastEvent === null) return null
+    const firstEvent = await CDCCase.findOne({ order: [['eventAt', 'ASC']] })
+    if (firstEvent === null) return null
+    const count = await CDCCase.count({})
+    return {
+      count: count,
+      updatedAt: lastUpdatedEvent.eventUpdatedAt,
+      firstEventAt: firstEvent.eventAt,
+      lastEventAt: lastEvent.eventAt
+    }
   }
 
   dictionary: FeedDictionary = {
-    topic: 'feed1',
-    reporter: 'demoserver',
+    topic: 'cases',
+    reporter: 'cdc',
     validFrom: new Date(1900, 1, 1), // Early date
     namespaces: [],
     elements: []
@@ -59,12 +67,18 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
 
   summary: FeedSummary = {
     epicastVersion: '0.1',
-    subject: 'epicast',
-    reporter: 'demoserver',
-    topic: 'feed1',
+    subject: 'us',
+    reporter: 'cdc',
+    topic: 'cases',
     sourceUrl: 'xyz',
-    sourceFeeds: [],
-    lastUpdated: new Date()
+    descriptions: [{
+      isoCultureCode: 'en-us',
+      subjectFullName: 'USA',
+      reporterFullName: 'Centers for Disease Control and Prevention',
+      topicFullName: 'Demo cases',
+      feedDetails: 'This a fake feed for demonstration purposes'
+    }],
+    contacts: [ { email: 'xyz@dummy.com' }]
   }
 
   updateDictionary (newDictionary: FeedDictionary): void {

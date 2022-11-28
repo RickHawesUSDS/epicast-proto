@@ -33,7 +33,7 @@ class TimeSeriesReader<T> {
     const lastPublished = this.lastModifiedOf(publishedObjects)
     const metadata = await this.timeSeries.fetchMetadata()
     if (metadata !== null) {
-      publishedObjects = publishedObjects.filter((object) => isAfter(object.lastModified, metadata.lastUpdatedAt))
+      publishedObjects = publishedObjects.filter((object) => isAfter(object.lastModified, metadata.updatedAt))
     }
     logger.debug(`${this.snapshot.version} has ${publishedObjects.length} objects to read`)
 

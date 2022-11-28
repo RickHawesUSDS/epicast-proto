@@ -1,3 +1,4 @@
+import { TimeSeriesMetadata } from "./TimeSeries"
 
 export interface FeedSummary {
   epicastVersion: string
@@ -5,10 +6,13 @@ export interface FeedSummary {
   reporter: string
   topic: string
   sourceUrl: string
-  sourceFeeds: FeedSummary[]
-  descriptions?: FeedDescription[]
-  contacts?: FeedContact[]
-  lastUpdated: Date
+  descriptions: FeedDescription[]
+  contacts: FeedContact[]
+  sourceFeeds?: FeedSummary[]
+  eventCount?: number
+  updatedAt?: string
+  firstEventAt?: string
+  lastEventAt?: string
 }
 
 export interface FeedDescription {
@@ -22,4 +26,13 @@ export interface FeedDescription {
 export interface FeedContact {
   email?: string
   telephone?: string
+}
+
+export function updateFeedSummary(initial: FeedSummary, timeSeriesMetadata: TimeSeriesMetadata): FeedSummary {
+  const updated = {...initial}
+  updated.eventCount = timeSeriesMetadata.count
+  updated.firstEventAt = timeSeriesMetadata.firstEventAt.toISOString()
+  updated.lastEventAt = timeSeriesMetadata.lastEventAt.toISOString()
+  updated.updatedAt = timeSeriesMetadata.updatedAt.toISOString()
+  return updated
 }

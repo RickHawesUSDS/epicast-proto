@@ -45,7 +45,9 @@ export interface TimeSeriesEvent<T> {
 }
 
 export interface TimeSeriesMetadata {
-  lastUpdatedAt: Date
+  count: number
+  updatedAt: Date
+  firstEventAt: Date
   lastEventAt: Date
 }
 

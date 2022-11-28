@@ -6,9 +6,9 @@ import pathPosix from 'node:path/posix'
 // Define where to put objects and how to name them in a feed's storage
 //
 
-export const DESCRIPTION_FOLDER = ''
-export const DESCRIPTION_EXTENSION = 'yaml'
-export const DESCRIPTION_KEY = 'description.yaml'
+export const SUMMARY_FOLDER = ''
+export const SUMMARY_EXTENSION = 'yaml'
+export const SUMMARY_KEY = 'summary.yaml'
 
 export const LOG_FOLDER = 'logs'
 export const LOG_EXTENSION = 'log'

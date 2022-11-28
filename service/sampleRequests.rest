@@ -75,5 +75,8 @@ GET http://localhost:3001/api/feed/metadata?prefix=snapshots/
 ### Get feed snapshot
 GET http://localhost:3001/api/feed/content?file=snapshots/1.csv
 
+### Get summary
+GET http://localhost:3001/api/feed/content?file=summary.yaml
+
 ###
 GET http://localhost:3001/api/feed/content?file=time_series/20221101T000000-07:00--P1M.csv

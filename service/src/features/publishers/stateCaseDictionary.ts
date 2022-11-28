@@ -1,8 +1,8 @@
 import { FeedDictionary } from '@/epicast/FeedDictionary'
 
 export const stateCaseDictionary: FeedDictionary = {
-  topic: 'feed1',
-  reporter: 'demoserver',
+  topic: 'cases',
+  reporter: 'caphd',
   validFrom: new Date(2022, 10, 1),
   namespaces: [
     {
