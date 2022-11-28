@@ -32,16 +32,13 @@ export default function CDCCasesTable() {
   const getCDCDictionaryQuery = useQuery(
     [cdcCasesDictionary],
     async () => await fetchCDCCaseDictionary(),
-    {
-    }
+    {}
   )
 
   const getCDCCasesQuery = useQuery(
     [cdcCases],
     async () => await fetchAllCDCCases('desc'),
-    {
-      refetchInterval: 5000 //ms
-    }
+    {}
   )
 
   let content = ''

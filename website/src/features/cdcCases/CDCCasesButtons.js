@@ -8,18 +8,18 @@ export default function CDCCasesButtons(props) {
   const readCDCCaseFeedMutation = useMutation({
     mutationFn: async () => { return await readCDCCaseFeed() },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [cdcCases, cdcCasesDictionary] })
+      await queryClient.invalidateQueries({ queryKey: [cdcCases] })
     }
   })
   const getCDCCaseSubcriberQuery = useQuery(
     [cdcCasesSubscriber],
     fetchCDCCaseSubscriber,
-    { refetchInterval: 5000 }
+    { refetchInterval: 5000 },
   )
   const setSubscriberAutomaticMutation = useMutation({
     mutationFn: async (params) => { return await setCDCCaseSubscriber(params.automatic) },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [cdcCases, cdcCasesDictionary] })
+      await queryClient.invalidateQueries({ queryKey: [cdcCases] })
     }
   })
 
@@ -38,16 +38,23 @@ export default function CDCCasesButtons(props) {
   let subscriberStatus = ''
   let automatic = false
   if (getCDCCaseSubcriberQuery.isFetched && subscriber.reading) {
-    subscriberStatus = 'reading...'
+    subscriberStatus = 'Reading...'
   } else if (getCDCCaseSubcriberQuery.isFetched && !subscriber.reading) {
     automatic = subscriber.automatic
-    const lastPublished = subscriber.lastPublished !== undefined ? subscriber.lastPublished : 'na'
-    subscriberStatus = `Last Published: ${lastPublished}`
+    const publishedStatus = subscriber.publishedAt !== undefined ? subscriber.publishedAt : 'never'
+    const publishedAt = subscriber.publishedAt ? new Date(subscriber.publishedAt).getTime() : undefined
+    subscriberStatus = `Published at: ${publishedStatus}`
+    queryClient.invalidateQueries({
+      predicate: (query) => {
+        return publishedAt !== undefined && query.state.dataUpdatedAt < publishedAt &&
+          (query.queryKey[0] === cdcCases || query.queryKey[0] === cdcCasesDictionary)
+      }
+    })
   } else if (getCDCCaseSubcriberQuery.isError) {
     subscriberStatus = `Query Error: ${getCDCCaseSubcriberQuery.error}`
   }
 
-  const isLoading = readCDCCaseFeedMutation.isLoading
+  const isBusy = readCDCCaseFeedMutation.isLoading || (getCDCCaseSubcriberQuery.isFetched && subscriber.reading)
   return (
     <Grid container spacing={2}>
       <Grid item xs={6}>
@@ -67,7 +74,7 @@ export default function CDCCasesButtons(props) {
             }
             label='Automatic Reading'
           />
-          <Button disabled={isLoading || automatic} onClick={() => readCDCCaseFeedMutation.mutate()} color='primary' variant='outlined'>Read Feed</Button>
+          <Button disabled={isBusy || automatic} onClick={() => readCDCCaseFeedMutation.mutate()} color='primary' variant='outlined'>Read Feed</Button>
         </div>
       </Grid>
     </Grid>

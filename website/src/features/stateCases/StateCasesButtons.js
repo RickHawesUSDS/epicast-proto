@@ -36,7 +36,7 @@ export default function StateCasesButtons(props) {
       }
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [stateCases, stateCasesDictionary] })
+      await queryClient.invalidateQueries({ queryKey: [stateCases] })
     }
   })
 
@@ -105,7 +105,7 @@ export default function StateCasesButtons(props) {
         control={
           <Checkbox name={question.name} checked={checked.has(question.name)} onChange={handleCheckboxChange} />
         }
-        label={question.displayName}
+        label={question.descriptions[0].displayName}
       />
     ))
   )

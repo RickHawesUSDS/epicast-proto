@@ -2,7 +2,7 @@ import { MutableTimeSeries } from '../../epicast/TimeSeries'
 import { FeedStorage } from '../../epicast/FeedStorage'
 
 export class FeedSubscriber<T> {
-  model: FeedSubscriberModel = { automatic: false, lastChecked: undefined, reading: false, lastPublished: undefined }
+  model: FeedSubscriberModel = { automatic: false, reading: false, publishedAt: undefined }
   storage: FeedStorage
   timeSeries: MutableTimeSeries<T>
   timer: NodeJS.Timeout | undefined
@@ -10,14 +10,6 @@ export class FeedSubscriber<T> {
   constructor(fromStorage: FeedStorage, toTimeSeries: MutableTimeSeries<T>) {
     this.storage = fromStorage
     this.timeSeries = toTimeSeries
-  }
-
-  setLastChecked(newLastPublished?: Date): FeedSubscriber<T> {
-    this.model = { ...this.model, lastChecked: new Date() }
-    if (newLastPublished !== undefined) {
-      this.model = { ...this.model, lastPublished: newLastPublished }
-    }
-    return this
   }
 
   startAutomatic(timer: NodeJS.Timeout): FeedSubscriber<T> {
@@ -32,10 +24,10 @@ export class FeedSubscriber<T> {
     return this
   }
 
-  setReading(newReading: boolean, newLastPublished?: Date): FeedSubscriber<T> {
+  setReading(newReading: boolean, newPublishedAt?: Date): FeedSubscriber<T> {
     this.model = { ...this.model, reading: newReading }
-    if (newLastPublished !== undefined) {
-      this.model = { ...this.model, lastPublished: newLastPublished }
+    if (newPublishedAt !== undefined) {
+      this.model = { ...this.model, publishedAt: newPublishedAt }
     }
     return this
   }
@@ -43,7 +35,6 @@ export class FeedSubscriber<T> {
 
 export interface FeedSubscriberModel {
   readonly automatic: boolean
-  readonly lastChecked?: Date
   readonly reading?: boolean
-  readonly lastPublished?: Date
+  readonly publishedAt?: Date
 }
