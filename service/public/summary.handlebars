@@ -1,6 +1,7 @@
 # Feed Summary
+
 #
-# Describes the feed and its content.
+# Describes the feed
 #
 
 # version of the epicast that the feed conforms to
@@ -44,6 +45,22 @@ sourceFeeds:
   sourceUrl: {{ this.sourceUrl }}
   # real code will have the source feed's source feeds listed here as well to provide the full tree
 {{/each}}
+
+#
+# Basic information about the content of this feed besides its sources
+#
+{{#if eventCount }}
+eventCount: {{ eventCount }}
+{{/if}}
+{{#if updatedAt }}
+updatedAt: {{ updatedAt }}
+{{/if}}
+{{#if firstEventAt }}
+firstEventAt: {{ firstEventAt }}
+{{/if}}
+{{#if lastEventAt }}
+lastEventAt: {{ lastEventAt }}
+{{/if}}
 
 
 

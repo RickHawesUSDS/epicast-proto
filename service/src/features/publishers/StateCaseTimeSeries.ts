@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { addDays, addMonths, endOfDay, startOfDay, startOfMonth } from 'date-fns'
+import { addDays, addMonths, endOfDay, set, startOfDay, startOfMonth } from 'date-fns'
 import { Op, Order, WhereOptions } from 'sequelize'
 
 import { StateCase } from '@/features/publishers/StateCase'
@@ -122,8 +122,8 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
         ]
       })
       const lastCaseDate = stateCase?.eventAt != null ? stateCase.eventAt : now
+      let adjustedCaseDate = set(new Date(lastCaseDate), { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds(), milliseconds: now.getMilliseconds() })
       const countOfLastCaseDate = await this.countEvents({ interval: { start: startOfDay(lastCaseDate), end: endOfDay(lastCaseDate) } })
-      let adjustedCaseDate = lastCaseDate
       if (countOfLastCaseDate > 5) adjustedCaseDate = addDays(adjustedCaseDate, 1)
       return adjustedCaseDate
     }
