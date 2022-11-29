@@ -16,16 +16,16 @@ const DESIRED_MAX_MONTHLY_COUNT = 10000 / 30
 
 const logger = getLogger('PUBLISH_TIME_SERIES_SERVICE')
 
-export async function publishTimeseries<T> (toSnapshot: MutableSnapshot, timeseries: TimeSeries<T>): Promise<number> {
+export async function publishTimeseries (toSnapshot: MutableSnapshot, timeseries: TimeSeries): Promise<number> {
   logger.info(`publishing timeseries: ${timeseries.summary.subject}-${timeseries.summary.reporter}`)
   const publisher = new TimeSeriesPublisher(toSnapshot, timeseries)
   return await publisher.publish()
 }
-class TimeSeriesPublisher<T> {
+class TimeSeriesPublisher {
   snapshot: MutableSnapshot
-  timeSeries: TimeSeries<T>
+  timeSeries: TimeSeries
 
-  constructor (toSnapshot: MutableSnapshot, timeseries: TimeSeries<T>) {
+  constructor (toSnapshot: MutableSnapshot, timeseries: TimeSeries) {
     this.snapshot = toSnapshot
     this.timeSeries = timeseries
   }
@@ -83,7 +83,7 @@ class TimeSeriesPublisher<T> {
   }
 
   async publishNewPartitions (): Promise<number> {
-    const fetchNewEvents = async (lastPublishedPeriod: Period | undefined): Promise<[Array<TimeSeriesEvent<T>>, Date, Date]> => {
+    const fetchNewEvents = async (lastPublishedPeriod: Period | undefined): Promise<[TimeSeriesEvent[], Date, Date]> => {
       // Get the events
       if (lastPublishedPeriod === undefined) {
         const events = await this.timeSeries.fetchEvents({})
@@ -115,7 +115,7 @@ class TimeSeriesPublisher<T> {
     return partitions.length
   }
 
-  async makeRightSizedPartitions (events: Array<TimeSeriesEvent<T>>, startDate: Date, endDate: Date, lastPublishedPeriod?: Period): Promise<Array<TimeSeriesPartition<T>>> {
+  async makeRightSizedPartitions (events: TimeSeriesEvent[], startDate: Date, endDate: Date, lastPublishedPeriod?: Period): Promise<TimeSeriesPartition[]> {
     assert(isBefore(startDate, endDate), 'end before start date')
     assert(
       lastPublishedPeriod === undefined ||
@@ -126,7 +126,7 @@ class TimeSeriesPublisher<T> {
     if (events.length === 0) return []
 
     // This code basically decides between daily and monthly partitions based on partition size.
-    let partitions: Array<TimeSeriesPartition<T>> = []
+    let partitions: TimeSeriesPartition[] = []
     const monthlyPartitions = makeCasePartions(events, Frequency.MONTHLY, startDate, endDate)
     // look at each monthly partition and decide if it is too large
     for (let index = 0; index < monthlyPartitions.length; index++) {
@@ -148,8 +148,8 @@ class TimeSeriesPublisher<T> {
     return partitions
   }
 
-  async putPartition (period: Period, events: Array<TimeSeriesEvent<T>>): Promise<void> {
-    function formatValue (event: TimeSeriesEvent<T>, element: FeedElement): string {
+  async putPartition (period: Period, events: TimeSeriesEvent[]): Promise<void> {
+    function formatValue (event: TimeSeriesEvent, element: FeedElement): string {
       let result: string
       if (element.type === 'date') {
         const value = event.getValue(element.name) as Date
@@ -160,7 +160,7 @@ class TimeSeriesPublisher<T> {
       return result
     }
 
-    function createCSV (events: Array<TimeSeriesEvent<T>>, elements: FeedElement[]): string {
+    function createCSV (events: TimeSeriesEvent[], elements: FeedElement[]): string {
       const csv = events.map(event => {
         const values = elements.map(element => formatValue(event, element))
         return stringify(values)
@@ -175,9 +175,9 @@ class TimeSeriesPublisher<T> {
     await this.snapshot.putObject(key, report)
   }
 
-  async putDeletedPartition (period: Period, events: Array<TimeSeriesEvent<T>>): Promise<void> {
+  async putDeletedPartition (period: Period, events: TimeSeriesEvent[]): Promise<void> {
     const key = formDeletedKey(period)
-    const createCSV = (events: Array<TimeSeriesEvent<T>>): string => {
+    const createCSV = (events: TimeSeriesEvent[]): string => {
       const csvRow: string[] = [stringify(['eventId', 'replacedBy'])]
       for (const event of events) {
         csvRow.push(stringify([event.eventId.toString(), event.eventReplacedBy?.toString()]))
@@ -189,11 +189,11 @@ class TimeSeriesPublisher<T> {
     await this.snapshot.putObject(key, deleted)
   }
 
-  firstEventDate (events: Array<TimeSeriesEvent<T>>): Date | undefined {
+  firstEventDate (events: TimeSeriesEvent[]): Date | undefined {
     return events.at(0)?.eventAt
   }
 
-  lastEventDate (events: Array<TimeSeriesEvent<T>>): Date | undefined {
+  lastEventDate (events: TimeSeriesEvent[]): Date | undefined {
     return events.at(-1)?.eventAt
   }
 

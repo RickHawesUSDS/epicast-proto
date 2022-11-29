@@ -2,7 +2,7 @@ import { EventElementName, TimeSeriesEvent } from '@/epicast/TimeSeries'
 import { Table, Column, Model, PrimaryKey, Index } from 'sequelize-typescript'
 
 @Table({ tableName: 'cdcCases' })
-export class CDCCase extends Model<CDCCase> implements TimeSeriesEvent<CDCCase> {
+export class CDCCase extends Model<CDCCase> implements TimeSeriesEvent {
   @PrimaryKey
   @Column
     eventId!: string

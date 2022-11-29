@@ -3,19 +3,19 @@ import { Period } from '@/epicast/Period'
 import { isAfter, isWithinInterval } from 'date-fns'
 import { TimeSeriesEvent } from './TimeSeries'
 
-export class TimeSeriesPartition<T> {
+export class TimeSeriesPartition {
   period: Period
-  events: Array<TimeSeriesEvent<T>>
+  events: TimeSeriesEvent[]
 
-  constructor (period: Period, events: Array<TimeSeriesEvent<T>>) {
+  constructor (period: Period, events: TimeSeriesEvent[]) {
     this.period = period
     this.events = events
   }
 }
 
-export function makeCasePartions<T> (events: Array<TimeSeriesEvent<T>>, frequency: Frequency, optionalStartDate?: Date, optionalEndDate?: Date): Array<TimeSeriesPartition<T>> {
+export function makeCasePartions (events: TimeSeriesEvent[], frequency: Frequency, optionalStartDate?: Date, optionalEndDate?: Date): TimeSeriesPartition[] {
   if (events.length === 0) return []
-  const partions: Array<TimeSeriesPartition<T>> = []
+  const partions: TimeSeriesPartition[] = []
   const startDate = optionalStartDate !== undefined ? optionalStartDate : events[0].eventAt
   const endDate = optionalEndDate !== undefined ? optionalEndDate : events[events.length - 1].eventAt
   let partitionPeriod = new Period(startDate, frequency)
@@ -27,6 +27,6 @@ export function makeCasePartions<T> (events: Array<TimeSeriesEvent<T>>, frequenc
   return partions
 }
 
-function findCasesForPeriod<T> (events: Array<TimeSeriesEvent<T>>, period: Period): Array<TimeSeriesEvent<T>> {
+function findCasesForPeriod (events: TimeSeriesEvent[], period: Period): TimeSeriesEvent[] {
   return events.filter((event) => { return isWithinInterval(event.eventAt, period.interval) })
 }

@@ -50,7 +50,7 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
     if (firstEvent === null) return null
     const count = await CDCCase.count({})
     return {
-      count: count,
+      count,
       updatedAt: lastUpdatedEvent.eventUpdatedAt,
       firstEventAt: firstEvent.eventAt,
       lastEventAt: lastEvent.eventAt
@@ -78,7 +78,7 @@ export class CDCCaseTimeSeries implements MutableTimeSeries<CDCCase> {
       topicFullName: 'Demo cases',
       feedDetails: 'This a fake feed for demonstration purposes'
     }],
-    contacts: [ { email: 'xyz@dummy.com' }]
+    contacts: [{ email: 'xyz@dummy.com' }]
   }
 
   updateDictionary (newDictionary: FeedDictionary): void {

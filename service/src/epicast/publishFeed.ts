@@ -6,7 +6,7 @@ import { publishAggregates } from './publishAggregates'
 import { publishSummary } from './publishSummary'
 import { SnapshotWriter } from './Snapshot'
 
-export async function publishFeed<T> (toStorage: FeedStorage, timeSeries: TimeSeries<T>): Promise<void> {
+export async function publishFeed (toStorage: FeedStorage, timeSeries: TimeSeries): Promise<void> {
   const toSnapshot = new SnapshotWriter(toStorage)
   await toSnapshot.initialize()
   await publishDictionary(toSnapshot, timeSeries.dictionary)

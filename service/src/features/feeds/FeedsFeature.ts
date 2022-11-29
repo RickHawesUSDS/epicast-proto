@@ -9,21 +9,21 @@ export class FeedsFeature implements Feature {
 
   name = 'feed'
 
-  getRoutes(): [string, Router] {
+  getRoutes (): [string, Router] {
     return ['feed', feedRouter]
   }
 
-  getModelPaths(): string[] {
+  getModelPaths (): string[] {
     return []
   }
 
-  async init(after: InitEvent): Promise<void> {
+  async init (after: InitEvent): Promise<void> {
     if (after === InitEvent.AFTER_DB) {
       await resetStorage(this.storage)
     }
   }
 
-  async reset(): Promise<void> {
+  async reset (): Promise<void> {
     await resetStorage(this.storage)
   }
 }

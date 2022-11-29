@@ -7,24 +7,24 @@ export class FeedSubscriber<T> {
   timeSeries: MutableTimeSeries<T>
   timer: NodeJS.Timeout | undefined
 
-  constructor(fromStorage: FeedStorage, toTimeSeries: MutableTimeSeries<T>) {
+  constructor (fromStorage: FeedStorage, toTimeSeries: MutableTimeSeries<T>) {
     this.storage = fromStorage
     this.timeSeries = toTimeSeries
   }
 
-  startAutomatic(timer: NodeJS.Timeout): FeedSubscriber<T> {
+  startAutomatic (timer: NodeJS.Timeout): FeedSubscriber<T> {
     this.model = { ...this.model, automatic: true }
     this.timer = timer
     return this
   }
 
-  stopAutomatic(): FeedSubscriber<T> {
+  stopAutomatic (): FeedSubscriber<T> {
     this.timer = undefined
     this.model = { ...this.model, automatic: false }
     return this
   }
 
-  setReading(newReading: boolean, newPublishedAt?: Date): FeedSubscriber<T> {
+  setReading (newReading: boolean, newPublishedAt?: Date): FeedSubscriber<T> {
     this.model = { ...this.model, reading: newReading }
     if (newPublishedAt !== undefined) {
       this.model = { ...this.model, publishedAt: newPublishedAt }

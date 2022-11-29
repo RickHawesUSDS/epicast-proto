@@ -6,7 +6,7 @@ export const FIRST_TIMEOUT = 5000
 export const REPEAT_TIMEOUT = 10000
 const logger = getLogger('FEED_SUBSCRIBER_CONTROLLER')
 
-export function updateFeedSubscriber<T>(feedSubscriber: FeedSubscriber<T>, newValue: FeedSubscriberModel): FeedSubscriberModel {
+export function updateFeedSubscriber<T> (feedSubscriber: FeedSubscriber<T>, newValue: FeedSubscriberModel): FeedSubscriberModel {
   if (newValue.automatic) {
     const timer = setTimeout(automaticReadFeed, FIRST_TIMEOUT, feedSubscriber)
     feedSubscriber.startAutomatic(timer)
@@ -17,7 +17,7 @@ export function updateFeedSubscriber<T>(feedSubscriber: FeedSubscriber<T>, newVa
   return feedSubscriber.model
 }
 
-function automaticReadFeed<T>(feedSubscriber: FeedSubscriber<T>): void {
+function automaticReadFeed<T> (feedSubscriber: FeedSubscriber<T>): void {
   logger.info('Reading timeSeries automatically')
   feedSubscriber.setReading(true)
   readFeed(feedSubscriber.storage, feedSubscriber.timeSeries).then((publishedAt) => {

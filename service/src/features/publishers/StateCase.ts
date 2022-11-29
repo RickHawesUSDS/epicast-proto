@@ -2,7 +2,7 @@ import { TimeSeriesEvent, EventElementName } from '@/epicast/TimeSeries'
 import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt, Index } from 'sequelize-typescript'
 
 @Table({ tableName: 'stateCases' })
-export class StateCase extends Model<StateCase> implements TimeSeriesEvent<StateCase> {
+export class StateCase extends Model<StateCase> implements TimeSeriesEvent {
   @PrimaryKey
   @Column
     eventId!: string

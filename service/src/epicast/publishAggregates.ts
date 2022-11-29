@@ -10,16 +10,16 @@ import { formatISO } from 'date-fns'
 
 const logger = getLogger('PUBLISH_AGREGATES_SERVICE')
 
-export async function publishAggregates<T> (toSnapshot: MutableSnapshot, fromTimeSeries: TimeSeries<T>): Promise<void> {
+export async function publishAggregates (toSnapshot: MutableSnapshot, fromTimeSeries: TimeSeries): Promise<void> {
   const publisher = new AggregatesPublisher(toSnapshot, fromTimeSeries)
   await publisher.publish()
 }
 
-class AggregatesPublisher<T> {
+class AggregatesPublisher {
   snapshot: MutableSnapshot
-  timeSeries: TimeSeries<T>
+  timeSeries: TimeSeries
 
-  constructor (toSnapshot: MutableSnapshot, fromTimeSeries: TimeSeries<T>) {
+  constructor (toSnapshot: MutableSnapshot, fromTimeSeries: TimeSeries) {
     this.snapshot = toSnapshot
     this.timeSeries = fromTimeSeries
   }
@@ -35,12 +35,12 @@ class AggregatesPublisher<T> {
     }
   }
 
-  async publishDailyCounts<T>(year: number, partitions: Array<TimeSeriesPartition<T>>): Promise<void> {
+  async publishDailyCounts (year: number, partitions: TimeSeriesPartition[]): Promise<void> {
     const subject = this.timeSeries.summary.subject
     const reporter = this.timeSeries.summary.reporter
     const feed = this.timeSeries.summary.topic
 
-    function createCSV (partitions: Array<TimeSeriesPartition<T>>): string {
+    function createCSV (partitions: TimeSeriesPartition[]): string {
       const csv = partitions.map(partition => {
         const rows: string[] = []
         const genderGrouping = groupBy(partition.events, (e) => e.getValue('personSexAtBirth'))

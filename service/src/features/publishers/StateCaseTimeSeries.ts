@@ -26,14 +26,13 @@ export const initialFeedSummary: FeedSummary = {
     topicFullName: 'Demo cases',
     feedDetails: 'This a fake feed for demonstration purposes'
   }],
-  contacts: [ { email: 'xyz@dummy.com' }]
+  contacts: [{ email: 'xyz@dummy.com' }]
 }
 
-
-export class StateCaseTimeSeries implements TimeSeries<StateCase> {
+export class StateCaseTimeSeries implements TimeSeries {
   lastCaseNumber = 1
 
-  async fetchEvents(options: TimeSeriesFindOptions): Promise<StateCase[]> {
+  async fetchEvents (options: TimeSeriesFindOptions): Promise<StateCase[]> {
     const whereClause: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       whereClause.eventAt = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -58,7 +57,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return await StateCase.findAll({ where: whereClause, order: orderClause })
   }
 
-  async countEvents(options: TimeSeriesCountOptions): Promise<number> {
+  async countEvents (options: TimeSeriesCountOptions): Promise<number> {
     const where: WhereOptions<StateCase> = {}
     if (options.interval !== undefined) {
       where.eventAt = { [Op.between]: [options.interval.start, options.interval.end] }
@@ -78,7 +77,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return await StateCase.count({ where })
   }
 
-  async fetchMetadata(): Promise<TimeSeriesMetadata | null> {
+  async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
     const lastUpdatedEvent = await StateCase.findOne({ order: [['eventUpdatedAt', 'DESC']] })
     if (lastUpdatedEvent === null) return null
     const lastEvent = await StateCase.findOne({ order: [['eventAt', 'DESC']] })
@@ -87,7 +86,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     if (firstEvent === null) return null
     const count = await StateCase.count({ where: { eventIsDeleted: { [Op.not]: true } } })
     return {
-      count: count,
+      count,
       updatedAt: lastUpdatedEvent.eventUpdatedAt,
       firstEventAt: firstEvent.eventAt,
       lastEventAt: lastEvent.eventAt
@@ -98,19 +97,19 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
 
   dictionary = new MutableFeedDictionary(stateCaseDictionary)
 
-  addFeedElement(element: FeedElement): boolean {
+  addFeedElement (element: FeedElement): boolean {
     return this.dictionary.addElement(element)
   }
 
-  deleteFeedElement(name: string): boolean {
+  deleteFeedElement (name: string): boolean {
     return this.dictionary.deleteElement(name)
   }
 
-  resetDictionary(): void {
+  resetDictionary (): void {
     this.dictionary = new MutableFeedDictionary(stateCaseDictionary)
   }
 
-  async insertFakeStateCases(numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
+  async insertFakeStateCases (numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
     const decideOnDate = async (): Promise<Date> => {
       const now = new Date()
       if (numberOfDays * numberPerDay > 10000) {
@@ -159,14 +158,14 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     return casesAdded
   }
 
-  async deduplicate(): Promise<void> {
-    function isDuplicate(a: StateCase, b: StateCase): boolean {
+  async deduplicate (): Promise<void> {
+    function isDuplicate (a: StateCase, b: StateCase): boolean {
       return a.uscdiPatientFirstName === b.uscdiPatientFirstName &&
         a.uscdiPatientLastName === b.uscdiPatientLastName &&
         a.uscdiPatientEmail === b.uscdiPatientEmail
     }
 
-    async function findDuplicates(cases: StateCase[], found: (duplicate: StateCase, original: StateCase) => Promise<void>): Promise<number> {
+    async function findDuplicates (cases: StateCase[], found: (duplicate: StateCase, original: StateCase) => Promise<void>): Promise<number> {
       // This algorithm only works if duplicates are consecutive as is the case for our code
       let duplicateCount = 0
       for (let i = 0; i < cases.length; i++) {
@@ -193,7 +192,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     logger.debug(`Found duplicates: ${duplicateCount}`)
   }
 
-  private fakeStateCase(stateCase: StateCase, eventAt: Date): void {
+  private fakeStateCase (stateCase: StateCase, eventAt: Date): void {
     stateCase.uscdiPatientFirstName = faker.name.firstName()
     stateCase.uscdiPatientLastName = faker.name.lastName()
     stateCase.uscdiPatientAddress = faker.address.streetAddress()
@@ -218,7 +217,7 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     this.fakeVariableElements(stateCase)
   }
 
-  private fakeVariableElements(stateCase: StateCase): void {
+  private fakeVariableElements (stateCase: StateCase): void {
     for (const variableElementName of variableDictionaryElementNames) {
       const index = this.dictionary.elements.findIndex(e => e.name === variableElementName)
       if (index !== -1) {
@@ -227,11 +226,11 @@ export class StateCaseTimeSeries implements TimeSeries<StateCase> {
     }
   }
 
-  private setStateCase(to: StateCase, from: StateCase): void {
+  private setStateCase (to: StateCase, from: StateCase): void {
     Object.assign(to, from)
   }
 
-  private static sample(codeset: string[]): string {
+  private static sample (codeset: string[]): string {
     const random = Math.floor(Math.random() * codeset.length)
     return codeset[random]
   }

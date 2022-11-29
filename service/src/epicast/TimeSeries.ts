@@ -2,9 +2,9 @@ import { Interval } from 'date-fns'
 import { FeedDictionary } from './FeedDictionary'
 import { FeedSummary } from './FeedSummary'
 
-export interface TimeSeries<T> {
+export interface TimeSeries {
   fetchMetadata: () => Promise<TimeSeriesMetadata | null>
-  fetchEvents: (options: TimeSeriesFindOptions) => Promise<Array<TimeSeriesEvent<T>>>
+  fetchEvents: (options: TimeSeriesFindOptions) => Promise<TimeSeriesEvent[]>
   countEvents: (options: TimeSeriesCountOptions) => Promise<number>
 
   readonly dictionary: FeedDictionary
@@ -31,7 +31,7 @@ export interface TimeSeriesCountOptions {
 export const eventElementNames = ['eventId', 'eventAt', 'eventSubject', 'eventReporter', 'eventTopic', 'eventUpdatedAt', 'eventIsDeleted', 'eventReplacedBy']
 export type EventElementName = typeof eventElementNames[number]
 
-export interface TimeSeriesEvent<T> {
+export interface TimeSeriesEvent {
   readonly eventId: string
   readonly eventAt: Date
   readonly eventSubject: string
@@ -41,7 +41,6 @@ export interface TimeSeriesEvent<T> {
   readonly eventIsDeleted?: boolean
   readonly eventReplacedBy?: string
   getValue: (name: EventElementName | string) => any
-  get model(): T
 }
 
 export interface TimeSeriesMetadata {
@@ -63,4 +62,4 @@ export interface TimeSeriesMutator<T> {
   createEvent: (names: string[], values: any[]) => T
 }
 
-export type MutableTimeSeries<T> = TimeSeries<T> & TimeSeriesMutator<T>
+export type MutableTimeSeries<T> = TimeSeries & TimeSeriesMutator<T>
