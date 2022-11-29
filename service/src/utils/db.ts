@@ -1,18 +1,18 @@
-// Sequelize ORM (Typescript version)
-import { Sequelize } from 'sequelize-typescript'
+import { MongoClient, Db } from 'mongodb'
 import { getLogger } from '@/utils/loggers'
 
-const logger = getLogger('DB')
+const MONGODB_URI = 'mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=demoserver'
 
-// Connect to the database
-const db = new Sequelize({
-  database: 'some_db',
-  dialect: 'sqlite',
-  username: 'root',
-  password: '',
-  storage: ':memory:',
-  logging: msg => logger.debug(msg),
-  modelPaths: []
-})
+const logger = getLogger('MONGO')
 
-export { db, Sequelize }
+export const client = new MongoClient(MONGODB_URI)
+client.on('commandStarted', (event) => logger.debug(event))
+client.on('commandSucceeded', (event) => logger.debug(event))
+client.on('commandFailed', (event) => logger.debug(event))
+
+export async function attachToDb (): Promise<Db> {
+  logger.info('Connecting to Mongo...')
+  await client.connect()
+  await client.db('admin').command({ ping: 1 })
+  return client.db('epicast_demo')
+}

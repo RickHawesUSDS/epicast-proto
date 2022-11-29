@@ -1,14 +1,10 @@
 import { faker } from '@faker-js/faker'
 import { addDays, addMonths, endOfDay, set, startOfDay, startOfMonth } from 'date-fns'
-import { Op, Order, WhereOptions } from 'sequelize'
-
-import { StateCase } from '@/features/publishers/StateCase'
-import { TimeSeries, TimeSeriesCountOptions, TimeSeriesFindOptions, TimeSeriesMetadata } from '@/epicast/TimeSeries'
 import { stateCaseDictionary, variableDictionaryElementNames } from './stateCaseDictionary'
-import { MutableFeedDictionary } from '@/epicast/FeedDictionary'
-import { FeedElement } from '@/epicast/FeedElement'
 import { getLogger } from '@/utils/loggers'
 import { FeedSummary } from '@/epicast/FeedSummary'
+import { MongoTimeSeries } from './MongoTimeSeries'
+import { MongoTimeSeriesEvent } from './MongoTimeSeriesEvent'
 
 const logger = getLogger('STATE_CASE_TIME_SERIES')
 
@@ -29,98 +25,21 @@ export const initialFeedSummary: FeedSummary = {
   contacts: [{ email: 'xyz@dummy.com' }]
 }
 
-export class StateCaseTimeSeries implements TimeSeries {
+export class StateCaseTimeSeries extends MongoTimeSeries {
   lastCaseNumber = 1
 
-  async fetchEvents (options: TimeSeriesFindOptions): Promise<StateCase[]> {
-    const whereClause: WhereOptions<StateCase> = {}
-    if (options.interval !== undefined) {
-      whereClause.eventAt = { [Op.between]: [options.interval.start, options.interval.end] }
-    } else if (options.after !== undefined) {
-      whereClause.eventAt = { [Op.gt]: options.after }
-    } else if (options.before !== undefined) {
-      whereClause.eventAt = { [Op.lt]: options.before }
-    }
-    if (options.updatedAfter !== undefined) {
-      whereClause.eventUpdatedAt = { [Op.gt]: options.updatedAfter }
-    }
-    if (options.isDeleted !== undefined) {
-      whereClause.eventIsDeleted = options.isDeleted
-    } else {
-      whereClause.eventIsDeleted = { [Op.not]: true }
-    }
-
-    const orderClause: Order = [
-      ['eventAt', (options?.sortDescending ?? false) ? 'DESC' : 'ASC'],
-      ['eventId', (options?.sortDescending ?? false) ? 'DESC' : 'ASC']
-    ]
-    return await StateCase.findAll({ where: whereClause, order: orderClause })
+  constructor () {
+    super('stateCases', stateCaseDictionary, initialFeedSummary)
   }
 
-  async countEvents (options: TimeSeriesCountOptions): Promise<number> {
-    const where: WhereOptions<StateCase> = {}
-    if (options.interval !== undefined) {
-      where.eventAt = { [Op.between]: [options.interval.start, options.interval.end] }
-    } else if (options.after !== undefined) {
-      where.eventAt = { [Op.gt]: options.after }
-    } else if (options.before !== undefined) {
-      where.eventAt = { [Op.lt]: options.before }
-    }
-    if (options.updatedAfter !== undefined) {
-      where.eventUpdatedAt = { [Op.gt]: options.updatedAfter }
-    }
-    if (options.isDeleted !== undefined) {
-      where.eventIsDeleted = options.isDeleted
-    } else {
-      where.eventIsDeleted = { [Op.not]: true }
-    }
-    return await StateCase.count({ where })
-  }
-
-  async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
-    const lastUpdatedEvent = await StateCase.findOne({ order: [['eventUpdatedAt', 'DESC']] })
-    if (lastUpdatedEvent === null) return null
-    const lastEvent = await StateCase.findOne({ order: [['eventAt', 'DESC']] })
-    if (lastEvent === null) return null
-    const firstEvent = await StateCase.findOne({ order: [['eventAt', 'ASC']] })
-    if (firstEvent === null) return null
-    const count = await StateCase.count({ where: { eventIsDeleted: { [Op.not]: true } } })
-    return {
-      count,
-      updatedAt: lastUpdatedEvent.eventUpdatedAt,
-      firstEventAt: firstEvent.eventAt,
-      lastEventAt: lastEvent.eventAt
-    }
-  }
-
-  summary = initialFeedSummary
-
-  dictionary = new MutableFeedDictionary(stateCaseDictionary)
-
-  addFeedElement (element: FeedElement): boolean {
-    return this.dictionary.addElement(element)
-  }
-
-  deleteFeedElement (name: string): boolean {
-    return this.dictionary.deleteElement(name)
-  }
-
-  resetDictionary (): void {
-    this.dictionary = new MutableFeedDictionary(stateCaseDictionary)
-  }
-
-  async insertFakeStateCases (numberOfDays: number, numberPerDay: number): Promise<StateCase[]> {
+  async insertFakeStateCases (numberOfDays: number, numberPerDay: number): Promise<MongoTimeSeriesEvent[]> {
     const decideOnDate = async (): Promise<Date> => {
       const now = new Date()
       if (numberOfDays * numberPerDay > 10000) {
         return startOfMonth(addMonths(now, 1))
       }
-      const stateCase = await StateCase.findOne({
-        order: [
-          ['eventAt', 'DESC']
-        ]
-      })
-      const lastCaseDate = stateCase?.eventAt != null ? stateCase.eventAt : now
+      const stateCase = await this.fetchLastEvent()
+      const lastCaseDate = stateCase?.eventAt ?? now
       let adjustedCaseDate = set(new Date(lastCaseDate), { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds(), milliseconds: now.getMilliseconds() })
       const countOfLastCaseDate = await this.countEvents({ interval: { start: startOfDay(lastCaseDate), end: endOfDay(lastCaseDate) } })
       if (countOfLastCaseDate > 5) adjustedCaseDate = addDays(adjustedCaseDate, 1)
@@ -128,14 +47,14 @@ export class StateCaseTimeSeries implements TimeSeries {
     }
 
     let duplicateCount = 0
-    const generateNewCase = (newCaseDate: Date, lastCase?: StateCase): StateCase => {
-      let stateCase: StateCase
+    const generateNewCase = (newCaseDate: Date, lastCase?: MongoTimeSeriesEvent): MongoTimeSeriesEvent => {
+      let stateCase: MongoTimeSeriesEvent
       if (lastCase !== undefined && Math.random() < 0.2) {
-        stateCase = new StateCase()
+        stateCase = new MongoTimeSeriesEvent()
         this.setStateCase(stateCase, lastCase)
         duplicateCount += 1
       } else {
-        stateCase = new StateCase()
+        stateCase = new MongoTimeSeriesEvent()
         this.fakeStateCase(stateCase, newCaseDate)
       }
       stateCase.eventId = `CA${this.lastCaseNumber++}`
@@ -143,29 +62,29 @@ export class StateCaseTimeSeries implements TimeSeries {
     }
 
     const firstDate = await decideOnDate()
-    const casesAdded: StateCase[] = []
+    const casesAdded: MongoTimeSeriesEvent[] = []
     for (let day = 0; day < numberOfDays; day++) {
       const newCaseDate = addDays(firstDate, day)
-      let lastCase: StateCase | undefined
+      let lastCase: MongoTimeSeriesEvent | undefined
       for (let i = 0; i < numberPerDay; i++) {
         const stateCase = generateNewCase(newCaseDate, lastCase)
-        await stateCase.save()
         casesAdded.push(stateCase)
         lastCase = stateCase
       }
     }
+    await this.upsertEvents(casesAdded)
     logger.debug(`Duplicate cases added: ${duplicateCount}`)
     return casesAdded
   }
 
   async deduplicate (): Promise<void> {
-    function isDuplicate (a: StateCase, b: StateCase): boolean {
+    function isDuplicate (a: MongoTimeSeriesEvent, b: MongoTimeSeriesEvent): boolean {
       return a.uscdiPatientFirstName === b.uscdiPatientFirstName &&
         a.uscdiPatientLastName === b.uscdiPatientLastName &&
         a.uscdiPatientEmail === b.uscdiPatientEmail
     }
 
-    async function findDuplicates (cases: StateCase[], found: (duplicate: StateCase, original: StateCase) => Promise<void>): Promise<number> {
+    async function findDuplicates (cases: MongoTimeSeriesEvent[], found: (duplicate: MongoTimeSeriesEvent, original: MongoTimeSeriesEvent) => Promise<void>): Promise<number> {
       // This algorithm only works if duplicates are consecutive as is the case for our code
       let duplicateCount = 0
       for (let i = 0; i < cases.length; i++) {
@@ -183,8 +102,8 @@ export class StateCaseTimeSeries implements TimeSeries {
     }
 
     logger.info('Deduplicating state cases')
-    const cases = await this.fetchEvents({ sortDescending: false })
-    const duplicateCount = await findDuplicates(cases, async (duplicate, original) => {
+    const events = await this.fetchAllEvents()
+    const duplicateCount = await findDuplicates(events, async (duplicate, original) => {
       duplicate.eventIsDeleted = true
       duplicate.eventReplacedBy = original.eventId
       await duplicate.save()
@@ -192,7 +111,7 @@ export class StateCaseTimeSeries implements TimeSeries {
     logger.debug(`Found duplicates: ${duplicateCount}`)
   }
 
-  private fakeStateCase (stateCase: StateCase, eventAt: Date): void {
+  private fakeStateCase (stateCase: MongoTimeSeriesEvent, eventAt: Date): void {
     stateCase.uscdiPatientFirstName = faker.name.firstName()
     stateCase.uscdiPatientLastName = faker.name.lastName()
     stateCase.uscdiPatientAddress = faker.address.streetAddress()
@@ -217,16 +136,16 @@ export class StateCaseTimeSeries implements TimeSeries {
     this.fakeVariableElements(stateCase)
   }
 
-  private fakeVariableElements (stateCase: StateCase): void {
+  private fakeVariableElements (stateCase: MongoTimeSeriesEvent): void {
     for (const variableElementName of variableDictionaryElementNames) {
       const index = this.dictionary.elements.findIndex(e => e.name === variableElementName)
       if (index !== -1) {
-        stateCase.set(variableElementName as keyof StateCase, 'fake response')
+        stateCase.set(variableElementName as keyof MongoTimeSeriesEvent, 'fake response')
       }
     }
   }
 
-  private setStateCase (to: StateCase, from: StateCase): void {
+  private setStateCase (to: MongoTimeSeriesEvent, from: MongoTimeSeriesEvent): void {
     Object.assign(to, from)
   }
 

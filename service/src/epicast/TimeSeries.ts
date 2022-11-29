@@ -57,8 +57,8 @@ export interface TimeSeriesDeletedEvent {
 
 export interface TimeSeriesMutator<T> {
   updateDictionary: (newDictionary: FeedDictionary) => void
-  upsertEvents: (events: T[]) => void
-  deleteEvents: (events: TimeSeriesDeletedEvent[]) => void
+  upsertEvents: (events: T[]) => Promise<void>
+  deleteEvents: (events: TimeSeriesDeletedEvent[]) => Promise<void>
   createEvent: (names: string[], values: any[]) => T
 }
 

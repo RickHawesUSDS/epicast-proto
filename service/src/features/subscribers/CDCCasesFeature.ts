@@ -1,8 +1,8 @@
 import { FeedStorage } from '@/epicast/FeedStorage'
+import { Db } from 'mongodb'
 import { Router } from 'express'
-import { join } from 'path/posix'
 import { Feature, InitEvent } from '../Feature'
-import { CDCCase } from './CDCCase'
+import { MongoTimeSeriesEvent } from '../publishers/MongoTimeSeriesEvent'
 import cdcCaseRouter from './cdcCasesRoutes'
 import { CDCCaseTimeSeries } from './CDCCaseTimeSeries'
 import { FeedSubscriber } from './FeedSubscriber'
@@ -10,7 +10,7 @@ import { updateFeedSubscriber } from './updateFeedSubscriber'
 
 export class CDCCasesFeature implements Feature {
   cdcCaseTimeSeries: CDCCaseTimeSeries
-  feedSubscriber: FeedSubscriber<CDCCase>
+  feedSubscriber: FeedSubscriber<MongoTimeSeriesEvent>
 
   constructor (storage: FeedStorage) {
     this.cdcCaseTimeSeries = new CDCCaseTimeSeries()
@@ -23,19 +23,16 @@ export class CDCCasesFeature implements Feature {
     return ['cdcCases', cdcCaseRouter]
   }
 
-  getModelPaths (): string[] {
-    return [join(__dirname, './CDCCase.ts')]
-  }
-
-  async init (after: InitEvent): Promise<void> {
-    if (after === InitEvent.AFTER_ROUTES) {
+  async init (during: InitEvent, db: Db): Promise<void> {
+    if (during === InitEvent.AFTER_DB) {
+      await this.cdcCaseTimeSeries.initialize(db)
+    }
+    if (during === InitEvent.AFTER_ROUTES) {
       updateFeedSubscriber(this.feedSubscriber, { automatic: true })
     }
   }
 
   async reset (): Promise<void> {
-    await CDCCase.destroy({
-      truncate: true
-    })
+    await this.cdcCaseTimeSeries.dropAllEvents()
   }
 }

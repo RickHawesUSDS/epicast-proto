@@ -17,10 +17,6 @@ export class SystemFeature implements Feature {
     return ['system', systemRoutes]
   }
 
-  getModelPaths (): string[] {
-    return []
-  }
-
   async init (after: InitEvent): Promise<void> {
   }
 

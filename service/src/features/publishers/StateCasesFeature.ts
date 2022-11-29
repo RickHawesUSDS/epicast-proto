@@ -1,7 +1,6 @@
+import { Db } from 'mongodb'
 import { Router } from 'express'
-import { join } from 'path/posix'
 import { Feature, InitEvent } from '../Feature'
-import { StateCase } from './StateCase'
 import stateCasesRouter from './stateCasesRoutes'
 import { StateCaseTimeSeries } from './StateCaseTimeSeries'
 
@@ -16,18 +15,15 @@ export class StateCasesFeature implements Feature {
     return ['stateCases', stateCasesRouter]
   }
 
-  getModelPaths (): string[] {
-    return [join(__dirname, './StateCase.ts')]
-  }
-
-  async init (after: InitEvent): Promise<void> {
+  async init (during: InitEvent, db: Db): Promise<void> {
+    if (during === InitEvent.AFTER_DB) {
+      await this.stateCaseTimeSeries.initialize(db)
+    }
   }
 
   async reset (): Promise<void> {
-    await StateCase.destroy({
-      truncate: true
-    })
     this.stateCaseTimeSeries.resetDictionary()
+    await this.stateCaseTimeSeries.dropAllEvents()
     await this.stateCaseTimeSeries.insertFakeStateCases(DAYS_OF_FAKE, FAKES_PER_DAY)
   }
 }

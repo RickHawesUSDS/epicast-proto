@@ -5,7 +5,7 @@
 import 'module-alias/register'
 import { config } from 'dotenv'
 
-import app from '@/server/app'
+import { app, expressApp } from '@/server/app'
 import Debug from 'debug'
 import http from 'http'
 import { bootstrapLogger } from '@/utils/loggers'
@@ -13,19 +13,20 @@ config()
 
 const debug = Debug('server:server')
 bootstrapLogger()
+app.init().catch(error => console.error(error))
 
 /**
  * Get port from environment and store in Express.
  */
 
 const port = normalizePort(process.env.PORT ?? '3001')
-app.set('port', port)
+expressApp.set('port', port)
 
 /**
  * Create HTTP server.
  */
 
-const server = http.createServer(app)
+const server = http.createServer(expressApp)
 
 /**
  * Listen on provided port, on all network interfaces.

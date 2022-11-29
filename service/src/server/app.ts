@@ -2,9 +2,10 @@
 import express from 'express'
 import path from 'path'
 import cookieParser from 'cookie-parser'
+import { Db } from 'mongodb'
 
 import { getLogger } from '../utils/loggers'
-import { db, Sequelize } from '../utils/db'
+import { attachToDb } from '../utils/db'
 import indexRouter from './indexRoutes'
 import { SystemFeature } from '../features/system/SystemFeature'
 import { FeedsFeature } from '../features/feeds/FeedsFeature'
@@ -14,14 +15,14 @@ import { Feature, InitEvent } from '@/features/Feature'
 import { StateCaseTimeSeries } from '@/features/publishers/StateCaseTimeSeries'
 import { CDCCaseTimeSeries } from '@/features/subscribers/CDCCaseTimeSeries'
 import { FeedSubscriber } from '@/features/subscribers/FeedSubscriber'
-import { CDCCase } from '@/features/subscribers/CDCCase'
 import { S3Storage } from '@/features/feeds/S3Storage'
+import { MongoTimeSeriesEvent } from '@/features/publishers/MongoTimeSeriesEvent'
 
 const logger = getLogger('APP')
 
 // The application state is put into every request to share with the request
 export interface AppState {
-  db: Sequelize
+  db?: Db
   systemFeature: SystemFeature
   feedsFeature: FeedsFeature
   stateCasesFeature: StateCasesFeature
@@ -40,12 +41,12 @@ export function getFeedStorage (req: express.Request): S3Storage {
   return req.state.feedsFeature.storage
 }
 
-export function getCDCSubscriber (req: express.Request): FeedSubscriber<CDCCase> {
+export function getCDCSubscriber (req: express.Request): FeedSubscriber<MongoTimeSeriesEvent> {
   return req.state.cdcCasesFeature.feedSubscriber
 }
 
 class App {
-  app: express.Application
+  expressApp: express.Application
   state: AppState
   features: Feature[]
 
@@ -55,7 +56,7 @@ class App {
     const cdcCasesFeature = new CDCCasesFeature(feedsFeature.storage)
     const systemFeature = new SystemFeature([feedsFeature, stateCasesFeature, cdcCasesFeature])
 
-    this.state = { db, feedsFeature, systemFeature, stateCasesFeature, cdcCasesFeature }
+    this.state = { feedsFeature, systemFeature, stateCasesFeature, cdcCasesFeature }
 
     this.features = [
       this.state.systemFeature,
@@ -64,49 +65,41 @@ class App {
       this.state.cdcCasesFeature
     ]
 
-    this.app = express()
+    this.expressApp = express()
     this.config()
-    this.init().catch(error => logger.error(error))
   }
 
   async init (): Promise<void> {
+    logger.info('Starting init sequence...')
+    this.state.db = await attachToDb()
     for (const feature of this.features) {
-      await feature.init(InitEvent.BEFORE_DB)
-    }
-    await this.databaseSetup()
-    for (const feature of this.features) {
-      await feature.init(InitEvent.AFTER_DB)
+      await feature.init(InitEvent.AFTER_DB, this.state.db)
     }
     this.routerSetup()
     for (const feature of this.features) {
-      await feature.init(InitEvent.AFTER_ROUTES)
+      await feature.init(InitEvent.AFTER_ROUTES, this.state.db)
     }
   }
 
   private config (): void {
-    this.app.use(express.json())
-    this.app.use(express.urlencoded({ extended: false }))
-    this.app.use(cookieParser())
-    this.app.use(express.static(path.join(__dirname, 'public')))
+    this.expressApp.use(express.json())
+    this.expressApp.use(express.urlencoded({ extended: false }))
+    this.expressApp.use(cookieParser())
+    this.expressApp.use(express.static(path.join(__dirname, 'public')))
   }
 
   private routerSetup (): void {
-    this.app.use((req, _res, next) => {
+    this.expressApp.use((req, _res, next) => {
       req.state = this.state
       next()
     })
-    this.app.use('/', indexRouter)
+    this.expressApp.use('/', indexRouter)
     for (const feature of this.features) {
       const [path, router] = feature.getRoutes()
-      this.app.use('/api/' + path, router)
+      this.expressApp.use('/api/' + path, router)
     }
-  }
-
-  private async databaseSetup (): Promise<void> {
-    const modelPaths = this.features.flatMap(f => f.getModelPaths())
-    this.state.db.addModels(modelPaths)
-    await this.state.db.sync()
   }
 }
 
-export default new App().app
+export const app = new App()
+export const expressApp = app.expressApp

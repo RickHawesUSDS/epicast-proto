@@ -79,4 +79,4 @@ GET http://localhost:3001/api/feed/content?file=snapshots/1.csv
 GET http://localhost:3001/api/feed/content?file=summary.yaml
 
 ###
-GET http://localhost:3001/api/feed/content?file=time_series/20221101T000000-07:00--P1M.csv
+GET http://localhost:3001/api/feeyd/content?file=time_series/20221101T000000-07:00--P1M.csv

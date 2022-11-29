@@ -28,7 +28,8 @@ export interface FeedContact {
   telephone?: string
 }
 
-export function updateFeedSummary (initial: FeedSummary, timeSeriesMetadata: TimeSeriesMetadata): FeedSummary {
+export function updateFeedSummary (initial: FeedSummary, timeSeriesMetadata: TimeSeriesMetadata | null): FeedSummary {
+  if (timeSeriesMetadata === null) return initial
   const updated = { ...initial }
   updated.eventCount = timeSeriesMetadata.count
   updated.firstEventAt = timeSeriesMetadata.firstEventAt.toISOString()

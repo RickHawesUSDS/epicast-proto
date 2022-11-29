@@ -5,7 +5,7 @@ import { FeedStorage, StorageObject } from '@/epicast/FeedStorage'
 import { ReadStream } from 'fs'
 import { Readable } from 'stream'
 import { parseISO } from 'date-fns'
-import { FileData, FileArray } from 'chonky'
+import { FileData, FileArray } from './FileArray'
 import path from 'path/posix'
 
 const logger = getLogger('STORAGE')
