@@ -24,6 +24,7 @@
     "log4js": "^6.7.0",
     "minio": "^7.0.32",
     "module-alias": "^2.2.2",
+    "mongodb": "^4.12.1",
     "morgan": "~1.9.1",
     "npm": "^8.19.2",
     "reflect-metadata": "^0.1.13",
