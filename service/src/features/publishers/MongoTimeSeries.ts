@@ -33,6 +33,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
   async initialize (db: Db): Promise<void> {
     logger.info(`Initializing ${this.collectionName}...`)
     this.collection = db.collection(this.collectionName)
+    await this.collection.drop()
     await this.collection.createIndex({ eventUpdatedAt: 1 })
     await this.collection.createIndex({ eventAt: 1 })
   }
@@ -64,10 +65,11 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
       eventId: order
     }
 
-    return await this.collection
+    const rawEvents = await this.collection
       .find(whereClause)
       .sort(sortClause)
       .toArray()
+    return rawEvents.map(e => new MongoTimeSeriesEvent(e))
   }
 
   async countEvents (options: TimeSeriesCountOptions): Promise<number> {
@@ -95,7 +97,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
 
   async upsertEvents (events: MongoTimeSeriesEvent[]): Promise<void> {
     if (this.collection === undefined) return
-    logger.debug(`Upsert events...: ${events.length}`)
+    logger.debug(`Upserting ${events.length} events...`)
     if (events.length === 0) return
     const updatedAt = new Date()
     for (const event of events) {
@@ -112,7 +114,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
 
   async deleteEvents (events: TimeSeriesDeletedEvent[]): Promise<void> {
     if (this.collection === undefined) return
-    logger.debug(`Delete events...: ${events.length}`)
+    logger.debug(`Deleting ${events.length} events...`)
     if (events.length === 0) return
     const updatedAt = new Date()
     for (const event of events) {
@@ -128,11 +130,11 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
 
   createEvent (names: string[], values: any[]): MongoTimeSeriesEvent {
     assert(names.length === values.length)
-    const record = new MongoTimeSeriesEvent()
+    const record: any = {}
     for (let i = 0; i < names.length; i++) {
       record[names[i]] = values[i]
     }
-    return record
+    return new MongoTimeSeriesEvent(record)
   }
 
   async fetchMetadata (): Promise<TimeSeriesMetadata | null> {

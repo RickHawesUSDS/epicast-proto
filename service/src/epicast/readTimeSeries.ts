@@ -28,7 +28,7 @@ class TimeSeriesReader<T> {
 
   async read (): Promise<Date | undefined> {
     const snapshotVersion = this.snapshot.version?.toString() ?? 'unpublished'
-    logger.info(`Reading: ${snapshotVersion}`)
+    logger.info(`Reading ${snapshotVersion} snapshot`)
     let publishedObjects = await this.snapshot.listObjects(TIMESERIES_FOLDER)
     if (publishedObjects.length === 0) return
     const lastPublished = this.lastModifiedOf(publishedObjects)
@@ -36,7 +36,7 @@ class TimeSeriesReader<T> {
     if (metadata !== null) {
       publishedObjects = publishedObjects.filter((object) => isAfter(object.lastModified, metadata.updatedAt))
     }
-    logger.debug(`${snapshotVersion} has ${publishedObjects.length} objects to read`)
+    logger.debug(`Snapshot ${snapshotVersion} has ${publishedObjects.length} objects to read`)
 
     const events = await this.fetchEvents(publishedObjects)
     await this.timeSeries.upsertEvents(events)

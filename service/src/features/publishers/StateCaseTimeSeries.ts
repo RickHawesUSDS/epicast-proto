@@ -50,12 +50,10 @@ export class StateCaseTimeSeries extends MongoTimeSeries {
     const generateNewCase = (newCaseDate: Date, lastCase?: MongoTimeSeriesEvent): MongoTimeSeriesEvent => {
       let stateCase: MongoTimeSeriesEvent
       if (lastCase !== undefined && Math.random() < 0.2) {
-        stateCase = new MongoTimeSeriesEvent()
-        this.setStateCase(stateCase, lastCase)
+        stateCase = new MongoTimeSeriesEvent(lastCase)
         duplicateCount += 1
       } else {
-        stateCase = new MongoTimeSeriesEvent()
-        this.fakeStateCase(stateCase, newCaseDate)
+        stateCase = this.fakeStateCase(newCaseDate)
       }
       stateCase.eventId = `CA${this.lastCaseNumber++}`
       return stateCase
@@ -111,7 +109,8 @@ export class StateCaseTimeSeries extends MongoTimeSeries {
     logger.debug(`Found duplicates: ${duplicateCount}`)
   }
 
-  private fakeStateCase (stateCase: MongoTimeSeriesEvent, eventAt: Date): void {
+  private fakeStateCase (eventAt: Date): MongoTimeSeriesEvent {
+    const stateCase: any = {}
     stateCase.uscdiPatientFirstName = faker.name.firstName()
     stateCase.uscdiPatientLastName = faker.name.lastName()
     stateCase.uscdiPatientAddress = faker.address.streetAddress()
@@ -134,6 +133,7 @@ export class StateCaseTimeSeries extends MongoTimeSeries {
     stateCase.eventReporter = 'demo'
     stateCase.eventTopic = 'feed1'
     this.fakeVariableElements(stateCase)
+    return new MongoTimeSeriesEvent(stateCase)
   }
 
   private fakeVariableElements (stateCase: MongoTimeSeriesEvent): void {
@@ -143,10 +143,6 @@ export class StateCaseTimeSeries extends MongoTimeSeries {
         stateCase.set(variableElementName as keyof MongoTimeSeriesEvent, 'fake response')
       }
     }
-  }
-
-  private setStateCase (to: MongoTimeSeriesEvent, from: MongoTimeSeriesEvent): void {
-    Object.assign(to, from)
   }
 
   private static sample (codeset: string[]): string {
