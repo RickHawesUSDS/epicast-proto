@@ -1,20 +1,16 @@
-import { Router } from 'express'
-import { Feature, InitEvent } from '../Feature'
+import { Request, Router } from 'express'
+import { Feature, InitEvent } from '../../server/Feature'
 import feedRouter from './feedRoutes'
 import { resetStorage } from './resetStorage'
-import { S3Storage, FEED_FOLDER } from './S3Storage'
+import { S3Storage } from './S3Storage'
 
 export class FeedsFeature implements Feature {
-  storage = new S3Storage(FEED_FOLDER)
+  storage = new S3Storage()
 
-  name = 'feed'
+  name = 'feeds'
 
   getRoutes (): [string, Router] {
-    return ['feed', feedRouter]
-  }
-
-  getModelPaths (): string[] {
-    return []
+    return [this.name, feedRouter]
   }
 
   async init (after: InitEvent): Promise<void> {
@@ -26,4 +22,8 @@ export class FeedsFeature implements Feature {
   async reset (): Promise<void> {
     await resetStorage(this.storage)
   }
+}
+
+export function getFeedStorage (req: Request): S3Storage {
+  return req.state.feedsFeature.storage
 }

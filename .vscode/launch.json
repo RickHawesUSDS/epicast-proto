@@ -1,13 +1,14 @@
 {
     "version": "0.2.0",
     "configurations": [
+
         {
-            "command": "export NODE_OPTIONS='--inspect --trace-deprecation --abort-on-uncaught-exception' && ts-node ./bin/www.ts",
+            "command": "yarn debug",
             "name": "server debug",
             "request": "launch",
             "type": "node-terminal",
-            "localRoot": "${workspaceFolder}/server",
-            "cwd": "${workspaceFolder}/server"
+            "localRoot": "${workspaceFolder}/service",
+            "cwd": "${workspaceFolder}/service"
         },
         {
             "name": "Attach to Chrome",
@@ -20,8 +21,8 @@
             "name": "Launch Chrome",
             "request": "launch",
             "type": "chrome",
-            "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder/client}"
+            "url": "http://localhost:4000",
+            "webRoot": "${workspaceFolder/website}"
         },
         {
             "type": "node",

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "export NODE_OPTIONS='--trace-deprecation --abort-on-uncaught-exception' && export NODE_ENV=development && nodemon --exec ts-node ./bin/www.ts",
-    "debug": "export NODE_OPTIONS='--trace-deprecation --abort-on-uncaught-exception' && export NODE_ENV=development && ts-node-dev --inspect=5555 --files --transpile-only --respawn ./bin/www.ts",
+    "debug": "export NODE_OPTIONS='--trace-deprecation --abort-on-uncaught-exception --inspect' && export NODE_ENV=development && ts-node  --files --transpile-only ./bin/www.ts",
     "build": "sh etc/build.sh"
   },
   "dependencies": {

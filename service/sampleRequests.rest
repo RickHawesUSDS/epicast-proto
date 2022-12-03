@@ -1,26 +1,26 @@
 ### Reset the demo
-POST http://localhost:3001/api/system/reset
+POST http://localhost:4001/api/system/reset
 
 ### Get all cases
-GET http://localhost:3001/api/stateCases?sort=desc
+GET http://localhost:4001/api/agencies/cphd.ca.gov/?sort=desc
 
 ### Add a random case
-POST http://localhost:3001/api/stateCases/random
+POST http://localhost:4001/api/agencies/cphd.ca.gov/random
 
 ### Add a 20 random cases
-POST http://localhost:3001/api/stateCases/random?numOfDays=2&numPerDay=10
+POST http://localhost:4001/api/agencies/cphd.ca.gov/random?numOfDays=2&numPerDay=10
 
 ### Add multiple random cases
-POST http://localhost:3001/api/stateCases/random?numOfDays=5&numPerDay=3000
+POST http://localhost:4001/api/agencies/cphd.ca.gov/random?numOfDays=5&numPerDay=3000
 
 ### Publish cases
-POST http://localhost:3001/api/stateCases/publish
+POST http://localhost:4001/api/agencies/cphd.ca.gov/publish
 
 ### Get the dictionary
-GET http://localhost:3001/api/stateCases/dictionary
+GET http://localhost:4001/api/agencies/cphd.ca.gov/dictionary
 
 ### Change the dictionary
-PUT http://localhost:3001/api/stateCases/dictionary/us_caQuestion1
+PUT http://localhost:4001/api/agencies/cphd.ca.gov/dictionary/us_caQuestion1
 content-type: application/json
 
 {
@@ -37,46 +37,47 @@ content-type: application/json
 }
 
 ###
-DELETE http://localhost:3001/api/stateCases/dictionary/us_caQuestion1
+DELETE http://localhost:4001/api/agencies/cphd.ca.gov/dictionary/us_caQuestion1
 
-### Get all the cdcCases
-GET http://localhost:3001/api/cdcCases
+### Get all CDC events
+GET http://localhost:4001/api/agencies/cdc.gov
 
-### Get CDC caseCases dictionary
-GET http://localhost:3001/api/cdcCases/dictionary
+### Get CDC dictionary
+GET http://localhost:4001/api/agencies/cdc.gov/dictionary
 
 ### Get the subscriber
-GET http://localhost:3001/api/cdcCases/subscriber
+GET http://localhost:4001/api/agencies/cdc.gov/subscribers
+
 
 ### Read the feed once
-POST http://localhost:3001/api/cdcCases/subscriber/once'
+POST http://localhost:4001/api/agencies/cdc.gov/subscribers/cases.cphd.ca.gov/read
 
 ### Start automatic feed reading
-POST http://localhost:3001/api/cdcCases/subscriber
+POST http://localhost:4001/api/agencies/cdc.gov/subscribers
 content-type: application/json
 
 { "automatic": true }
 
 ### Stop automatic feed reading
-POST http://localhost:3001/api/cdcCases/subscriber
+POST http://localhost:4001/api/agencies/cdc.gov/subscribers
 content-type: application/json
 
 { "automatic": false }
 
 ### Deduplicate the state feed
-POST http://localhost:3001/api/stateCases/deduplicate
+POST http://localhost:4001/api/agencies/cphd.ca.gov/deduplicate
 
 ### List feed
-GET http://localhost:3001/api/feed/metadata?prefix=/
+GET http://localhost:4001/api/feeds/metadata?prefix=
 
 ### List feed
-GET http://localhost:3001/api/feed/metadata?prefix=snapshots/
+GET http://localhost:4001/api/feeds/metadata?prefix=cphd.ca.gov/cases/snapshots/
 
 ### Get feed snapshot
-GET http://localhost:3001/api/feed/content?file=snapshots/1.csv
+GET http://localhost:4001/api/feeds/content?file=cphd.ca.gov/cases/snapshots/1.csv
 
 ### Get summary
-GET http://localhost:3001/api/feed/content?file=summary.yaml
+GET http://localhost:4001/api/feeds/content?file=cphd.ca.gov/cases/summary.yaml
 
 ###
-GET http://localhost:3001/api/feeyd/content?file=time_series/20221101T000000-07:00--P1M.csv
+GET http://localhost:4001/api/feeds/content?file=cphd.ca.gov/cases/time_series/20221101T000000-07:00--P1M.csv

@@ -23,12 +23,8 @@ function getS3Client (): S3Client {
 
 export class S3Storage implements FeedStorage {
   private readonly s3Client = getS3Client()
-  readonly folder: string
   readonly bucket = BUCKET_NAME
-
-  constructor (folder: string) {
-    this.folder = folder
-  }
+  readonly uri = `s3://${this.bucket}`
 
   private async handleError (description: string): Promise<never> {
     logger.error(description)
@@ -39,7 +35,7 @@ export class S3Storage implements FeedStorage {
     logger.debug('about to connect to s3')
     const headResponse = await this.s3Client.send(new HeadBucketCommand({ Bucket: this.bucket }))
     if (headResponse.$metadata.httpStatusCode === 200) {
-      logger.info(`Connected to: ${this.bucket} ${this.folder}`)
+      logger.info(`Connected to: ${this.bucket}`)
     } else {
       return await this.handleError(`Cannot connect to: ${this.bucket}`)
     }
@@ -48,12 +44,12 @@ export class S3Storage implements FeedStorage {
   async listObjects (prefix: string): Promise<StorageObject[]> {
     const listResponse = await this.s3Client.send(new ListObjectsCommand({
       Bucket: this.bucket,
-      Prefix: path.join(this.folder, prefix)
+      Prefix: prefix
     }))
     if (listResponse.$metadata.httpStatusCode === 200) {
       return listResponse.Contents?.map(obj => {
         const lastModified = (obj.LastModified != null) ? parseISO(obj.LastModified.toISOString()) : new Date()
-        const key = this.relativeKeyFromKey(obj.Key)
+        const key = obj.Key ?? ''
         return { key, lastModified }
       }) ?? []
     } else {
@@ -65,7 +61,7 @@ export class S3Storage implements FeedStorage {
     logger.debug(`put object: ${name}`)
     const putResponse = await this.s3Client.send(new PutObjectCommand({
       Bucket: this.bucket,
-      Key: path.join(this.folder, name),
+      Key: name,
       Body: body
     }))
     if (putResponse.$metadata.httpStatusCode !== 200) {
@@ -74,8 +70,7 @@ export class S3Storage implements FeedStorage {
     return { key: name, versionId: putResponse.VersionId, lastModified: new Date() }
   }
 
-  async getObject (name: string, versionId?: string): Promise<string> {
-    const key = path.join(this.folder, name)
+  async getObject (key: string, versionId?: string): Promise<string> {
     const getResponse = await this.s3Client.send(new GetObjectCommand({
       Bucket: this.bucket,
       Key: key,
@@ -89,15 +84,15 @@ export class S3Storage implements FeedStorage {
       }
       return result
     } else {
-      return await this.handleError(`get error: ${name}, ${getResponse.$metadata.httpStatusCode ?? 0}`)
+      return await this.handleError(`get error: ${key}, ${getResponse.$metadata.httpStatusCode ?? 0}`)
     }
   }
 
-  async doesObjectExist (name: string): Promise<boolean> {
+  async doesObjectExist (key: string): Promise<boolean> {
     try {
       const headResponse = await this.s3Client.send(new HeadObjectCommand({
         Bucket: this.bucket,
-        Key: path.join(this.folder, name)
+        Key: key
       }))
       return headResponse.$metadata.httpStatusCode === 200
     } catch (error) {
@@ -105,27 +100,26 @@ export class S3Storage implements FeedStorage {
     }
   }
 
-  async deleteObject (name: string): Promise<void> {
-    logger.debug(`delete object: ${name}`)
+  async deleteObject (key: string): Promise<void> {
+    logger.debug(`delete object: ${key}`)
     const deleteResponse = await this.s3Client.send(new DeleteObjectCommand({
       Bucket: this.bucket,
-      Key: path.join(this.folder, name)
+      Key: key
     }))
     if (deleteResponse.$metadata.httpStatusCode !== 204) {
-      return await this.handleError(`delete error: ${name}, ${deleteResponse.$metadata.httpStatusCode ?? 0}`)
+      return await this.handleError(`delete error: ${key}, ${deleteResponse.$metadata.httpStatusCode ?? 0}`)
     }
   }
 
   formUrl (name: string): string {
-    return path.join(this.bucket, this.folder, name)
+    return path.join(this.bucket, name)
   }
 
   async getFileData (prefix: string): Promise<FileArray> {
     const chonkyFiles: FileArray = []
-    const fullPrefix = path.join(this.folder, prefix)
     const listResponse = await this.s3Client.send(new ListObjectsCommand({
       Bucket: this.bucket,
-      Prefix: fullPrefix,
+      Prefix: prefix,
       Delimiter: '/'
     }))
 
@@ -138,7 +132,7 @@ export class S3Storage implements FeedStorage {
       chonkyFiles.push(
         ...s3Objects.map(
           (object): FileData => ({
-            id: this.relativeKeyFromKey(object.Key),
+            id: object.Key ?? '',
             name: path.basename(object.Key ?? ''),
             modDate: object.LastModified,
             size: object.Size
@@ -151,7 +145,7 @@ export class S3Storage implements FeedStorage {
       chonkyFiles.push(
         ...s3Prefixes.map(
           (prefix): FileData => ({
-            id: this.relativeKeyFromKey(prefix.Prefix),
+            id: prefix.Prefix ?? '',
             name: path.basename(prefix.Prefix ?? ''),
             isDir: true
           })
@@ -159,13 +153,5 @@ export class S3Storage implements FeedStorage {
       )
     }
     return chonkyFiles
-  }
-
-  private relativeKeyFromKey (key?: string): string {
-    if (this.folder === '' || key === undefined) {
-      return key ?? ''
-    } else {
-      return key.slice(this.folder.length + 1)
-    }
   }
 }

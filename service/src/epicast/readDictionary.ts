@@ -10,7 +10,7 @@ import { Snapshot } from './Snapshot'
 const logger = getLogger('READ_DICTIONARY_SERVICE')
 
 export async function readDictionary<T> (fromSnapshot: Snapshot, mutatingTimeSeries: MutableTimeSeries<T>): Promise<void> {
-  const publishedBlobKey = await findLastDictionaryKey(fromSnapshot, mutatingTimeSeries.dictionary.validFrom)
+  const publishedBlobKey = findLastDictionaryKey(fromSnapshot, mutatingTimeSeries.dictionary.validFrom)
   if (publishedBlobKey === null) return
   logger.info('Reading dictionary: $0', publishedBlobKey)
 
@@ -20,9 +20,12 @@ export async function readDictionary<T> (fromSnapshot: Snapshot, mutatingTimeSer
   mutatingTimeSeries.updateDictionary(newDictionary)
 }
 
-async function findLastDictionaryKey (fromSnapshot: Snapshot, afterDate: Date | null): Promise<string | null> {
-  let objects = await fromSnapshot.listObjects(DICTIONARY_FOLDER)
-  if (objects.length === 0) return null
+function findLastDictionaryKey (fromSnapshot: Snapshot, afterDate: Date | null): string | null {
+  let objects = fromSnapshot.listObjects(DICTIONARY_FOLDER)
+  if (objects.length === 0) {
+    logger.debug(`No dictionaries in ${fromSnapshot.uri}`)
+    return null
+  }
   if (objects.length === 1) {
     return objects[0].key
   }

@@ -39,7 +39,7 @@ export class MutableFeedDictionary implements FeedDictionary {
 
   constructor (initDictionary: FeedDictionary) {
     this.topic = initDictionary.topic
-    this.reporter = initDictionary.topic
+    this.reporter = initDictionary.reporter
     this.validFrom = initDictionary.validFrom
     this.namespaces = initDictionary.namespaces
     this.elements = initDictionary.elements

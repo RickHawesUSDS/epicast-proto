@@ -1,10 +1,16 @@
 import { Period } from '@/epicast/Period'
 import { formatISO } from 'date-fns'
 import pathPosix from 'node:path/posix'
+import { FeedStorage } from './FeedStorage'
+import { FeedSummary } from './FeedSummary'
 
 //
 // Define where to put objects and how to name them in a feed's storage
 //
+
+export const formFolder = (feedSummary: FeedSummary): string => {
+  return pathPosix.join(feedSummary.reporter.toLowerCase(), feedSummary.topic.toLowerCase())
+}
 
 export const SUMMARY_FOLDER = ''
 export const SUMMARY_EXTENSION = 'yaml'
@@ -67,6 +73,9 @@ export const formSnapshotKey = (version: number): string => {
 export const versionFromSnapshotKey = (key: string): number => {
   const fileName = pathPosix.parse(key).name
   return parseInt(fileName)
+}
+export const formSnaphotUri = (storage: FeedStorage, folder: string, version: number) => {
+  return `${storage.uri}/${folder}/${formSnapshotKey(version)}`
 }
 
 export const AGGREGATES_FOLDER = 'aggregates'

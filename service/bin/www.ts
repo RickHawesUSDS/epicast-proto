@@ -6,35 +6,40 @@ import 'module-alias/register'
 import { config } from 'dotenv'
 
 import { app, expressApp } from '@/server/app'
-import Debug from 'debug'
 import http from 'http'
 import { bootstrapLogger } from '@/utils/loggers'
 config()
 
-const debug = Debug('server:server')
+// const debug = Debug('server:server')
 bootstrapLogger()
-app.init().catch(error => console.error(error))
 
 /**
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT ?? '3001')
+const port = normalizePort(process.env.PORT ?? '4001')
 expressApp.set('port', port)
 
-/**
- * Create HTTP server.
- */
+initialize().catch((error) => console.log(error))
 
-const server = http.createServer(expressApp)
+async function initialize (): Promise<void> {
+  /**
+   * Initialize app
+   */
+  await app.init()
 
-/**
- * Listen on provided port, on all network interfaces.
- */
+  /**
+   * Create HTTP server.
+   */
+  const server = http.createServer(expressApp)
 
-server.listen(port, () => console.log('🚀 ~ server launch  ~ port', port))
-server.on('error', onError)
-server.on('listening', onListening)
+  /**
+   * Listen on provided port, on all network interfaces.
+   */
+
+  server.listen(port, () => console.log('🚀 ~ server launch  ~ port', port))
+  server.on('error', onError)
+}
 
 /**
  * Normalize a port into a number, string, or false.
@@ -80,14 +85,4 @@ function onError (error: { syscall: string, code: string }): void {
     default:
       throw new Error(error.code)
   }
-}
-
-/**
- * Event listener for HTTP server "listening" event.
- */
-
-function onListening (): void {
-  const addr = server.address()
-  const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + port.toString()
-  debug('Listening on ' + bind)
 }

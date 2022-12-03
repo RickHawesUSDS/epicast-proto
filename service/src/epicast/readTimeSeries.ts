@@ -27,8 +27,8 @@ class TimeSeriesReader<T> {
   }
 
   async read (): Promise<Date | undefined> {
-    const snapshotVersion = this.snapshot.version?.toString() ?? 'unpublished'
-    logger.info(`Reading ${snapshotVersion} snapshot`)
+    const snapshotVersion = this.snapshot.version?.toString() ?? 'empty'
+    logger.info(`Reading: ${this.snapshot.uri}; snapshot version: ${snapshotVersion} `)
     let publishedObjects = await this.snapshot.listObjects(TIMESERIES_FOLDER)
     if (publishedObjects.length === 0) return
     const lastPublished = this.lastModifiedOf(publishedObjects)
@@ -84,8 +84,12 @@ class TimeSeriesReader<T> {
         default: return column
       }
     })
-    const names = elements.map((element) => element.name)
-    return this.timeSeries.createEvent(names, values)
+    const names = elements.map(element => element.name)
+    const eventValues: any = {}
+    for (let i = 0; i < names.length; i++) {
+      eventValues[names[i]] = values[i]
+    }
+    return this.timeSeries.createEvent(eventValues)
   }
 
   async fetchDeletedEvents (publishedObjects: StorageObject[]): Promise<TimeSeriesDeletedEvent[]> {
@@ -102,7 +106,7 @@ class TimeSeriesReader<T> {
     if (rows.length === 0) throw new Error('invalid object')
 
     return rows.slice(1).map((row) => {
-      return { eventId: Number.parseFloat(row[0]), replaceBy: row[1].length > 0 ? Number.parseFloat(row[1]) : undefined }
+      return { eventId: row[0], replaceBy: row[1].length > 0 ? row[1] : undefined }
     })
   }
 

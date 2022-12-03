@@ -1,14 +1,40 @@
 import { Db, Collection } from 'mongodb'
 
-import { MongoTimeSeriesEvent } from '@/features/publishers/MongoTimeSeriesEvent'
-import { MutableTimeSeries, TimeSeriesCountOptions, TimeSeriesDeletedEvent, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata } from '@/epicast/TimeSeries'
+import { EventElementName, MutableTimeSeries, TimeSeriesCountOptions, TimeSeriesDeletedEvent, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata } from '@/epicast/TimeSeries'
 import { FeedDictionary, MutableFeedDictionary } from '@/epicast/FeedDictionary'
 import { FeedSummary, updateFeedSummary } from '@/epicast/FeedSummary'
 import { FeedElement } from '@/epicast/FeedElement'
 import { getLogger } from '@/utils/loggers'
-import assert from 'assert'
 
 const logger = getLogger('MONGO_TIME_SERIES')
+
+export class MongoTimeSeriesEvent implements TimeSeriesEvent {
+  eventId!: string
+  eventAt!: Date
+  eventSubject!: string
+  eventReporter!: string
+  eventTopic!: string
+  eventIsDeleted?: boolean
+  eventReplacedBy?: string
+  eventUpdatedAt!: Date
+  [name: string]: any
+
+  constructor (from: any) {
+    Object.assign(this, from)
+  }
+
+  getValue (name: EventElementName): any {
+    return this[name]
+  }
+
+  get _id (): string {
+    return this.eventId
+  }
+
+  set _id (id: string) {
+    this.eventId = id
+  }
+}
 
 export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> {
   collection?: Collection<MongoTimeSeriesEvent>
@@ -17,26 +43,36 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
   collectionName: string
   private readonly initialDictionary: FeedDictionary
   private readonly initialFeedSummary: FeedSummary
+  private lastEventNumber: number = 1
+
+  /// Setup Methods
 
   constructor (
     collectionName: string,
-    initialDictionary: FeedDictionary,
-    initialSummary: FeedSummary
+    initialSummary: FeedSummary,
+    initialDictionary: FeedDictionary
   ) {
     this.collectionName = collectionName
-    this.initialDictionary = initialDictionary
-    this.dictionary = new MutableFeedDictionary(initialDictionary)
+    this.initialDictionary = { ...initialDictionary, reporter: initialSummary.reporter }
+    this.dictionary = new MutableFeedDictionary(this.initialDictionary)
     this.summary = initialSummary
     this.initialFeedSummary = initialSummary
   }
 
   async initialize (db: Db): Promise<void> {
-    logger.info(`Initializing ${this.collectionName}...`)
+    logger.info(`Initializing ${this.collectionName} for ${this.summary.reporter} ...`)
     this.collection = db.collection(this.collectionName)
-    await this.collection.drop()
+    await this.collection.deleteMany({})
     await this.collection.createIndex({ eventUpdatedAt: 1 })
     await this.collection.createIndex({ eventAt: 1 })
   }
+
+  async reset (): Promise<void> {
+    await this.dropAllEvents()
+    this.resetDictionary()
+  }
+
+  /// TimeSeries Methods
 
   async fetchEvents (options: TimeSeriesFindOptions): Promise<TimeSeriesEvent[]> {
     if (this.collection === undefined) return []
@@ -95,6 +131,25 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
     return await this.collection.countDocuments(whereClause)
   }
 
+  async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
+    if (this.collection === undefined) return null
+    const lastUpdatedEvent = await this.fetchLastUpdatedEvent()
+    if (lastUpdatedEvent === null) return null
+    const lastEvent = await this.fetchLastEvent()
+    if (lastEvent === null) return null
+    const firstEvent = await this.fetchFirstEvent()
+    if (firstEvent === null) return null
+    const count = await this.countAll()
+    return {
+      count,
+      updatedAt: lastUpdatedEvent.eventUpdatedAt,
+      firstEventAt: firstEvent.eventAt,
+      lastEventAt: lastEvent.eventAt
+    }
+  }
+
+  /// Mutable TimeSeries methods
+
   async upsertEvents (events: MongoTimeSeriesEvent[]): Promise<void> {
     if (this.collection === undefined) return
     logger.debug(`Upserting ${events.length} events...`)
@@ -128,30 +183,19 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
     this.summary = updateFeedSummary(this.initialFeedSummary, metadata)
   }
 
-  createEvent (names: string[], values: any[]): MongoTimeSeriesEvent {
-    assert(names.length === values.length)
-    const record: any = {}
-    for (let i = 0; i < names.length; i++) {
-      record[names[i]] = values[i]
+  createEvent (eventValues: any): MongoTimeSeriesEvent {
+    const updatedValues = {
+      ...eventValues,
+      eventId: this.generateNextId(),
+      eventUpdatedAt: new Date()
     }
-    return new MongoTimeSeriesEvent(record)
+    return new MongoTimeSeriesEvent(updatedValues)
   }
 
-  async fetchMetadata (): Promise<TimeSeriesMetadata | null> {
-    if (this.collection === undefined) return null
-    const lastUpdatedEvent = await this.fetchLastUpdatedEvent()
-    if (lastUpdatedEvent === null) return null
-    const lastEvent = await this.fetchLastEvent()
-    if (lastEvent === null) return null
-    const firstEvent = await this.fetchFirstEvent()
-    if (firstEvent === null) return null
-    const count = await this.countAll()
-    return {
-      count,
-      updatedAt: lastUpdatedEvent.eventUpdatedAt,
-      firstEventAt: firstEvent.eventAt,
-      lastEventAt: lastEvent.eventAt
-    }
+  /// Additional methods
+
+  private generateNextId (): string {
+    return `${this.dictionary.reporter}.${this.lastEventNumber++}`
   }
 
   async fetchLastUpdatedEvent (): Promise<MongoTimeSeriesEvent | null> {
@@ -187,7 +231,8 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
 
   async dropAllEvents (): Promise<void> {
     if (this.collection === undefined) return
-    await this.collection.drop()
+    await this.collection.deleteMany({})
+    this.summary = updateFeedSummary(this.initialFeedSummary, null)
   }
 
   /// Dictionary Methods

@@ -3,20 +3,13 @@ import express from 'express'
 import path from 'path'
 import cookieParser from 'cookie-parser'
 import { Db } from 'mongodb'
-
 import { getLogger } from '../utils/loggers'
 import { attachToDb } from '../utils/db'
 import indexRouter from './indexRoutes'
 import { SystemFeature } from '../features/system/SystemFeature'
 import { FeedsFeature } from '../features/feeds/FeedsFeature'
-import { StateCasesFeature } from '@/features/publishers/StateCasesFeature'
-import { CDCCasesFeature } from '@/features/subscribers/CDCCasesFeature'
-import { Feature, InitEvent } from '@/features/Feature'
-import { StateCaseTimeSeries } from '@/features/publishers/StateCaseTimeSeries'
-import { CDCCaseTimeSeries } from '@/features/subscribers/CDCCaseTimeSeries'
-import { FeedSubscriber } from '@/features/subscribers/FeedSubscriber'
-import { S3Storage } from '@/features/feeds/S3Storage'
-import { MongoTimeSeriesEvent } from '@/features/publishers/MongoTimeSeriesEvent'
+import { Feature, InitEvent } from '@/server/Feature'
+import { AgenciesFeature } from '@/features/agencies/AgenciesFeature'
 
 const logger = getLogger('APP')
 
@@ -25,24 +18,7 @@ export interface AppState {
   db?: Db
   systemFeature: SystemFeature
   feedsFeature: FeedsFeature
-  stateCasesFeature: StateCasesFeature
-  cdcCasesFeature: CDCCasesFeature
-}
-
-export function getStateCaseTimeSeries (req: express.Request): StateCaseTimeSeries {
-  return req.state.stateCasesFeature.stateCaseTimeSeries
-}
-
-export function getCDCCaseTimeSeries (req: express.Request): CDCCaseTimeSeries {
-  return req.state.cdcCasesFeature.cdcCaseTimeSeries
-}
-
-export function getFeedStorage (req: express.Request): S3Storage {
-  return req.state.feedsFeature.storage
-}
-
-export function getCDCSubscriber (req: express.Request): FeedSubscriber<MongoTimeSeriesEvent> {
-  return req.state.cdcCasesFeature.feedSubscriber
+  agenciesFeature: AgenciesFeature
 }
 
 class App {
@@ -52,17 +28,15 @@ class App {
 
   constructor () {
     const feedsFeature = new FeedsFeature()
-    const stateCasesFeature = new StateCasesFeature()
-    const cdcCasesFeature = new CDCCasesFeature(feedsFeature.storage)
-    const systemFeature = new SystemFeature([feedsFeature, stateCasesFeature, cdcCasesFeature])
+    const agenciesFeature = new AgenciesFeature()
+    const systemFeature = new SystemFeature([feedsFeature, agenciesFeature])
 
-    this.state = { feedsFeature, systemFeature, stateCasesFeature, cdcCasesFeature }
+    this.state = { systemFeature, feedsFeature, agenciesFeature }
 
     this.features = [
       this.state.systemFeature,
       this.state.feedsFeature,
-      this.state.stateCasesFeature,
-      this.state.cdcCasesFeature
+      this.state.agenciesFeature
     ]
 
     this.expressApp = express()
@@ -73,11 +47,11 @@ class App {
     logger.info('Starting init sequence...')
     this.state.db = await attachToDb()
     for (const feature of this.features) {
-      await feature.init(InitEvent.AFTER_DB, this.state.db)
+      await feature.init(InitEvent.AFTER_DB, this.state)
     }
     this.routerSetup()
     for (const feature of this.features) {
-      await feature.init(InitEvent.AFTER_ROUTES, this.state.db)
+      await feature.init(InitEvent.AFTER_ROUTES, this.state)
     }
   }
 

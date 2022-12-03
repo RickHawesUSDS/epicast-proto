@@ -1,9 +1,69 @@
 import { FeedDictionary } from '@/epicast/FeedDictionary'
+import { FeedSummary } from '@/epicast/FeedSummary'
 
-export const stateCaseDictionary: FeedDictionary = {
-  topic: 'cases',
-  reporter: 'caphd',
-  validFrom: new Date(2022, 10, 1),
+export const commonTopic = 'cases'
+export const commonTopicFullName = 'Demonstration cases'
+
+// Initial summary for the feeds
+//
+export const initialCASummary: FeedSummary = {
+  epicastVersion: '0.1',
+  subject: 'ca.us',
+  reporter: 'cphd.ca.gov',
+  topic: commonTopic,
+  sourceUrl: '',
+  sourceFeeds: [],
+  descriptions: [{
+    isoCultureCode: 'en-us',
+    subjectFullName: 'California',
+    reporterFullName: 'California Public Health Department',
+    topicFullName: commonTopicFullName,
+    feedDetails: 'This a fake feed for demonstration purposes'
+  }],
+  contacts: [{ email: 'fake@cphd.ca.gov' }]
+}
+
+export const initialAZSummary: FeedSummary = {
+  epicastVersion: '0.1',
+  subject: 'az.us',
+  reporter: 'azphs.gov',
+  topic: commonTopic,
+  sourceUrl: '',
+  sourceFeeds: [],
+  descriptions: [{
+    isoCultureCode: 'en-us',
+    subjectFullName: 'Arizona',
+    reporterFullName: 'Arizona Public Health Service',
+    topicFullName: commonTopicFullName,
+    feedDetails: 'This a fake feed for demonstration purposes'
+  }],
+  contacts: [{ email: 'fake@azphs.gov' }]
+}
+
+export const initialCDCSummary: FeedSummary = {
+  epicastVersion: '0.1',
+  subject: 'us',
+  reporter: 'cdc.gov',
+  topic: commonTopic,
+  sourceUrl: '',
+  sourceFeeds: [],
+  descriptions: [{
+    isoCultureCode: 'en-us',
+    subjectFullName: 'United States of America',
+    reporterFullName: 'Centers for Disease Control and Prevention',
+    topicFullName: commonTopicFullName,
+    feedDetails: 'This a fake feed for demonstration purposes'
+  }],
+  contacts: [{ email: 'fake@cdc.gov' }]
+}
+
+// An initial feed dictionary that is shared between all feeds.
+// will be modified by individual feeds
+//
+export const initialCaseDictionary: FeedDictionary = {
+  topic: commonTopic,
+  reporter: 'varies', // dummy data
+  validFrom: new Date(), // dummy value
   namespaces: [
     {
       namespace: 'cdc',

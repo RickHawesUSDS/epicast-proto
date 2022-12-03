@@ -51,15 +51,15 @@ export interface TimeSeriesMetadata {
 }
 
 export interface TimeSeriesDeletedEvent {
-  eventId: number
-  replaceBy: number | undefined
+  eventId: string
+  replaceBy?: string
 }
 
 export interface TimeSeriesMutator<T> {
   updateDictionary: (newDictionary: FeedDictionary) => void
   upsertEvents: (events: T[]) => Promise<void>
   deleteEvents: (events: TimeSeriesDeletedEvent[]) => Promise<void>
-  createEvent: (names: string[], values: any[]) => T
+  createEvent: (eventValues: any) => T
 }
 
 export type MutableTimeSeries<T> = TimeSeries & TimeSeriesMutator<T>

@@ -1,6 +1,6 @@
 import { getLogger } from '@/utils/loggers'
 import { Router } from 'express'
-import { Feature, InitEvent } from '../Feature'
+import { Feature } from '../../server/Feature'
 import systemRoutes from './systemRoutes'
 
 export const logger = getLogger('RESET_SYSTEM')
@@ -14,10 +14,10 @@ export class SystemFeature implements Feature {
   }
 
   getRoutes (): [string, Router] {
-    return ['system', systemRoutes]
+    return [this.name, systemRoutes]
   }
 
-  async init (after: InitEvent): Promise<void> {
+  async init (): Promise<void> {
   }
 
   async reset (): Promise<void> {

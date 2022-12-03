@@ -1,9 +1,10 @@
 import { compareDesc, parseISO, formatISO } from 'date-fns'
 import { parse, stringify } from 'csv-string'
 import { Mutex } from 'async-mutex'
+import { join } from 'path'
 
 import { StorageObject, FeedStorage } from './FeedStorage'
-import { formSnapshotKey, SNAPSHOT_FOLDER, versionFromSnapshotKey } from './feedStorageKeys'
+import { formSnaphotUri, formSnapshotKey, SNAPSHOT_FOLDER, versionFromSnapshotKey } from './feedStorageKeys'
 import assert from 'assert'
 import { getLogger } from '@/utils/loggers'
 
@@ -12,6 +13,7 @@ const logger = getLogger('SNAPSHOT')
 export interface Snapshot {
   readonly version?: number
   readonly createdAt?: Date
+  readonly uri?: string
   listObjects: (prefix: string) => StorageObject[]
   doesObjectExist: (key: string) => boolean
   getObject: (key: string) => Promise<string>
@@ -26,60 +28,70 @@ export type MutableSnapshot = Snapshot & SnapshotMutator
 
 export class SnapshotReader implements Snapshot {
   storage: FeedStorage
-  stoargeObjects: StorageObject[] = []
+  folder: string
+  storageObjects: StorageObject[] = []
   createdAt?: Date
   feedVersion?: number
-  readCalled: boolean
+  loadCalled: boolean
 
-  constructor (fromStorage: FeedStorage) {
+  constructor (fromStorage: FeedStorage, feedFolder: string) {
+    this.folder = feedFolder
     this.storage = fromStorage
-    this.readCalled = false
+    this.loadCalled = false
   }
 
-  async read (): Promise<void> {
+  async load (): Promise<void> {
     const mutex = new Mutex()
     await mutex.runExclusive(async () => {
-      if (this.readCalled) throw Error('Read must not be called twice')
-      this.readCalled = true
-      const snapshotObjects = await this.storage.listObjects(SNAPSHOT_FOLDER)
+      if (this.loadCalled) throw Error('Read must not be called twice')
+      this.loadCalled = true
+      const snapshotObjects = await this.storage.listObjects(this.formKey(SNAPSHOT_FOLDER))
       if (snapshotObjects.length === 0) return
       const lastSnapshotObject = snapshotObjects.sort((a, b) => compareDesc(a.lastModified, b.lastModified))[0]
-
       this.feedVersion = versionFromSnapshotKey(lastSnapshotObject.key)
       this.createdAt = lastSnapshotObject.lastModified
       const snapshotRaw = await this.storage.getObject(lastSnapshotObject.key, lastSnapshotObject.versionId)
       const rows = parse(snapshotRaw)
       if (rows.length === 0) throw Error('empty snapshot')
-      this.stoargeObjects = rows.map((row) => {
+      this.storageObjects = rows.map((row) => {
         return { key: row[0], versionId: row[1], lastModified: parseISO(row[2]) }
       })
     })
   }
 
   get version (): number | undefined {
-    if (!this.readCalled) throw Error('Read must be called before this method')
+    if (!this.loadCalled) throw Error('Read must be called before this method')
     return this.feedVersion
   }
 
+  get uri (): string | undefined {
+    if (!this.loadCalled) return
+    return formSnaphotUri(this.storage, this.folder, this.feedVersion ?? 0)
+  }
+
   listObjects (prefix: string): StorageObject[] {
-    if (!this.readCalled) throw Error('Read must be called before this method')
+    if (!this.loadCalled) throw Error('Read must be called before this method')
     // production code would work to make this search more efficient
-    return this.stoargeObjects
-      .filter((object) => object.key.startsWith(prefix))
+    return this.storageObjects
+      .filter(object => object.key.startsWith(prefix))
   }
 
   doesObjectExist (key: string): boolean {
-    if (!this.readCalled) throw Error('Read must be called before this method')
-    return this.stoargeObjects.findIndex((object) => object.key === key) !== -1
+    if (!this.loadCalled) throw Error('Read must be called before this method')
+    return this.storageObjects.findIndex(object => object.key === key) !== -1
   }
 
   async getObject (key: string): Promise<string> {
-    if (!this.readCalled) throw Error('Read must be called before this method')
-    const index = this.stoargeObjects.findIndex((object) => object.key === key)
+    if (!this.loadCalled) throw Error('Read must be called before this method')
+    const index = this.storageObjects.findIndex((object) => object.key === key)
     if (index === -1) throw Error('Object does not exist')
-    const versionId = this.stoargeObjects[index].versionId
+    const versionId = this.storageObjects[index].versionId
     if (versionId === undefined) throw Error('versioning is not enabled on storage or some other error')
-    return await this.storage.getObject(key, versionId)
+    return await this.storage.getObject(this.formKey(key), versionId)
+  }
+
+  formKey (path: string): string {
+    return join(this.folder, path)
   }
 }
 
@@ -89,7 +101,7 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
   isModified = false
 
   async initialize (): Promise<void> {
-    await super.read()
+    await super.load()
     if (this.feedVersion !== undefined) {
       this.feedVersion = this.feedVersion + 1
     } else {
@@ -102,12 +114,14 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
   async putObject (key: string, value: string): Promise<void> {
     if (!this.initializedCalled) throw Error('Initialized must be called')
     logger.info(`Put of object: ${key}`)
-    const writtenObject = await this.storage.putObject(key, value)
-    const index = this.stoargeObjects.findIndex((object) => object.key === key)
+    const writtenObject = await this.storage.putObject(this.formKey(key), value)
+    const snapshotKey = writtenObject.key.substring(this.folder.length + 1)
+    const snapshotObject: StorageObject = { ...writtenObject, key: snapshotKey}
+    const index = this.storageObjects.findIndex(object => object.key === key)
     if (index === -1) {
-      this.stoargeObjects.push(writtenObject)
+      this.storageObjects.push(snapshotObject)
     } else {
-      this.stoargeObjects[index] = writtenObject
+      this.storageObjects[index] = snapshotObject
     }
     this.isModified = true
   }
@@ -115,23 +129,24 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
   async deleteObject (key: string): Promise<void> {
     if (!this.initializedCalled) throw Error('Initialized must be called')
     logger.info(`Delete of object: ${key}`)
-    const index = this.stoargeObjects.findIndex((object) => object.key === key)
+    const index = this.storageObjects.findIndex((object) => object.key === key)
     if (index !== -1) {
-      await this.storage.deleteObject(key)
-      this.stoargeObjects.splice(index)
+      await this.storage.deleteObject(this.formKey(key))
+      this.storageObjects.splice(index)
       this.isModified = true
     }
   }
 
   async publish (): Promise<void> {
     if (!this.isModified) return
-    const csv = this.stoargeObjects.map(object => {
+    const csv = this.storageObjects.map(object => {
       assert(object.versionId !== undefined)
       const values = [object.key, object.versionId, formatISO(object.lastModified)]
       return stringify(values)
     })
     const raw = csv.join('')
     assert(this.feedVersion !== undefined)
-    await this.storage.putObject(formSnapshotKey(this.feedVersion), raw)
+    const key = this.formKey(formSnapshotKey(this.feedVersion))
+    await this.storage.putObject(key, raw)
   }
 }

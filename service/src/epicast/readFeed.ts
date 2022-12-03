@@ -4,9 +4,10 @@ import { MutableTimeSeries } from '@/epicast/TimeSeries'
 import { readDictionary } from './readDictionary'
 import { readTimeSeries } from './readTimeSeries'
 
-export async function readFeed<T> (fromStorage: FeedStorage, timeSeries: MutableTimeSeries<T>): Promise<Date | undefined> {
-  const fromSnapshot = new SnapshotReader(fromStorage)
-  await fromSnapshot.read()
+export async function readFeed<T> (fromStorage: FeedStorage, folder: string, timeSeries: MutableTimeSeries<T>): Promise<Date | undefined> {
+  const fromSnapshot = new SnapshotReader(fromStorage, folder)
+  await fromSnapshot.load()
+  if (fromSnapshot.feedVersion === undefined) return
   await readDictionary(fromSnapshot, timeSeries)
   return await readTimeSeries(fromSnapshot, timeSeries)
 }
