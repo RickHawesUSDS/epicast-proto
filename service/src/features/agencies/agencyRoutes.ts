@@ -159,7 +159,7 @@ router.delete('/:agency/dictionary/:elementName', (req, res, _next) => {
   res.status(204).send()
 })
 
-/// / Subscriber routes
+/// Subscriber routes
 
 /* GET all subscribers */
 router.get('/:agency/subscribers', asyncHandler(async (req, res, _next) => {
@@ -171,6 +171,17 @@ router.get('/:agency/subscribers', asyncHandler(async (req, res, _next) => {
   }
   const models = feedSubscribers.map(f => f.model)
   res.status(200).send(models)
+}))
+
+/* GET one subscriber */
+router.get('/:agency/subscribers/:subscriber', asyncHandler(async (req, res, _next) => {
+  logger.info('Get subscriber')
+  const feedSubscriber = getAgencySubscriber(req)
+  if (feedSubscriber === undefined) {
+    res.status(404).send()
+    return
+  }
+  res.status(200).send(feedSubscriber.model)
 }))
 
 /* Read all subscribers once */
@@ -189,6 +200,8 @@ router.post('/:agency/subscribers/read', asyncHandler(async (req, res, _next) =>
   res.status(200).send(models)
 }))
 
+
+
 /* Read one subscriber once */
 router.post('/:agency/subscribers/:subscriber/read', asyncHandler(async (req, res, _next) => {
   logger.info('Read a feed')
@@ -202,8 +215,8 @@ router.post('/:agency/subscribers/:subscriber/read', asyncHandler(async (req, re
   res.send(model)
 }))
 
-/* Update all subscribers  */
-router.post('/:agency/subscribers/:subscriber', (req, res, _next) => {
+/* Update a subscriber  */
+router.post('/:agency/subscribers', (req, res, _next) => {
   logger.info('Update subscriber')
   const feedSubscribers = getAgencySubscribers(req)
   if (feedSubscribers === undefined) {

@@ -46,8 +46,7 @@ GET http://localhost:4001/api/agencies/cdc.gov
 GET http://localhost:4001/api/agencies/cdc.gov/dictionary
 
 ### Get the subscriber
-GET http://localhost:4001/api/agencies/cdc.gov/subscribers
-
+GET http://localhost:4001/api/agencies/cdc.gov/subscribers/cases.cphd.ca.gov
 
 ### Read the feed once
 POST http://localhost:4001/api/agencies/cdc.gov/subscribers/cases.cphd.ca.gov/read

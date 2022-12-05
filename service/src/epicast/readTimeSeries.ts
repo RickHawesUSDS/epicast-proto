@@ -58,7 +58,7 @@ class TimeSeriesReader<T> {
       const elements: FeedElement[] = []
       for (let col = 0; col < header.length; col++) {
         const name = header[col]
-        const matchedElement = dictionary.elements.find((element) => element.name === name)
+        const matchedElement = dictionary.elements.find(element => element.name === name)
         if (matchedElement !== undefined) {
           elements.push(matchedElement)
         }

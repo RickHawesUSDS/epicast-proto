@@ -5,62 +5,62 @@ export async function resetSystem() {
 }
 
 export async function fetchAllStateCases(sortParam) {
-  const response = await axios.get('/api/agencies/gov.ca.cphd', { params: { sort: sortParam } })
+  const response = await axios.get('/api/agencies/cphd.ca.gov', { params: { sort: sortParam } })
   return response.data
 }
 
 export async function fetchStateCaseDictionary() {
-  const response = await axios.get('/api/agencies/gov.ca.cphd/dictionary')
+  const response = await axios.get('/api/agencies/cphd.ca.gov/dictionary')
   return response.data
 }
 
 export async function addStateCaseElement(element) {
-  const response = await axios.put(`/api/agencies/gov.ca.cphd/dictionary/${element.name}`, element)
+  const response = await axios.put(`/api/agencies/cphd.ca.gov/dictionary/${element.name}`, element)
   return response.data
 }
 
 export async function deleteStateCaseElement(name) {
-  const response = await axios.delete(`/api/agencies/gov.ca.cphd/dictionary/${name}`)
+  const response = await axios.delete(`/api/agencies/cphd.ca.gov/dictionary/${name}`)
   return response.data
 }
 
 export async function addRandomStateCases(numOfDays, numPerDay) {
-  const response = await axios.post(`/api/agencies/gov.ca.cphd/random?numOfDays=${numOfDays}&numPerDay=${numPerDay}`)
+  const response = await axios.post(`/api/agencies/cphd.ca.gov/random?numOfDays=${numOfDays}&numPerDay=${numPerDay}`)
   return response.data
 }
 
 export async function deduplicateStateCases() {
-  const response = await axios.post('/api/agencies/gov.ca.cphd/deduplicate')
+  const response = await axios.post('/api/agencies/cphd.ca.gov/deduplicate')
   return response.data
 }
 
 export async function publishStateCases() {
-  const response = await axios.post('/api/agencies/gov.ca.cphd/publish')
+  const response = await axios.post('/api/agencies/cphd.ca.gov/publish')
   return response.data
 }
 
 export async function fetchAllCDCCases(sortParam) {
-  const response = await axios.get(`/api/agencies/gov.cdc?sort=${sortParam}`)
+  const response = await axios.get(`/api/agencies/cdc.gov?sort=${sortParam}`)
   return response.data
 }
 
 export async function fetchCDCCaseDictionary() {
-  const response = await axios.get('/api/agencies/gov.cdc/dictionary')
+  const response = await axios.get('/api/agencies/cdc.gov/dictionary')
   return response.data
 }
 
 export async function fetchCDCCaseSubscriber() {
-  const response = await axios.get('/api/agencies/gov.cdc/subscriber')
+  const response = await axios.get('/api/agencies/cdc.gov/subscribers/cases.cphd.ca.gov')
   return response.data
 }
 
 export async function readCDCCaseFeed() {
-  const response = await axios.post('/api/agencies/gov.cdc/subscriber/once')
+  const response = await axios.post('/api/agencies/cdc.gov/subscribers/cases.cphd.ca.gov/read')
   return response.data
 }
 
 export async function setCDCCaseSubscriber(automaticValue) {
-  const response = await axios.post('/api/agencies/gov.cdc/subscriber', { automatic: automaticValue })
+  const response = await axios.post('/api/agencies/cdc.gov/subscribers/cases.cphd.ca.gov', { automatic: automaticValue })
   return response.data
 }
 

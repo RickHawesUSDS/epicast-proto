@@ -186,7 +186,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
   createEvent (eventValues: any): MongoTimeSeriesEvent {
     const updatedValues = {
       ...eventValues,
-      eventId: this.generateNextId(),
+      eventId: eventValues.eventId !== undefined ? eventValues.eventId : this.generateNextId(),
       eventUpdatedAt: new Date()
     }
     return new MongoTimeSeriesEvent(updatedValues)
