@@ -1,5 +1,7 @@
 # TODO list
 
+## Beginning
+
 * [x] Demo website
 * [x] State page
 * [x] Publish a timeseries
@@ -31,17 +33,36 @@
 * [x] Make descriptions have a language culture. Add sections to feed elements
 * [x] Multiple feeds per bucket. Change bucket name.
 * [x] FeedSummary published. Provenance and Notes. Reader always looks at the snapshot.
-* [ ] Create aggregating and source timeseries implementations features
-* [ ] Dynamic Sequalize tables. CDCEvent inherits from StateEvent at the sequelize level
+* [x] Replace with Mongo to allow new schemas
+
+## Merged feed
+
+* [ ] Merge dictionaries when multiple imports.
+* [ ] Multiple subjects per feed. Delclare system used. Complete subject reporter. Do we need subject in event?
+* [ ] Merge summaries for the merged feed
+* [ ] Turn on AZ. Initial data in both feeds. AZ feed published.
 * [ ] Make two states feeds and cdc table that merge states together
+
+## Add tests tasks
+
 * [ ] Add EpiCast package tests
+* [ ] Add unit tests for some
+* [ ] Add integrations tests
+
+## Draw an Epi Curve
 
 * [ ] Stratifiers in data dictionary; JS functions
 * [ ] Improve aggregates; age, gender, age+gender,
-* [ ] Export only aggregates from CDC
+* [ ] Public bucket
 * [ ] Draw an EpiCurve from aggregates
+
+## Add validation language
 
 * [ ] Validation language as JS functions
 * [ ] Random errors methods and fix button
 * [ ] Validator service. watcher domain to validate and provide webhooks.
+
+## Add mulit-valued column support
+
+* [ ] Mongo and SQL name approach support in the TimeSeries and Elements.
 * [ ] Multi-value column support.
