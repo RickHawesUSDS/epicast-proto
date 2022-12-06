@@ -6,6 +6,8 @@ import { MutableTimeSeries } from '@/epicast/TimeSeries'
 import { FeedSubscriber } from './FeedSubscriber'
 import { initialCASummary, initialAZSummary, initialCDCSummary, initialCaseDictionary } from './agencyModels'
 import { AppState } from '@/server/app'
+import { insertFakeCases } from './insertFakeCases'
+import { publishFeed } from '@/epicast/publishFeed'
 
 export interface AgencyModel {
   name: string
@@ -64,7 +66,12 @@ export class AgenciesFeature implements Feature {
       }
     }
     if (during === InitEvent.AFTER_ROUTES) {
+      // Initialize AZ
+      insertFakeCases(this.azTimeSeries, 1, 5)
+      publishFeed(state.feedsFeature.storage, this.azTimeSeries)
       this.azSubscriber.startAutomatic()
+
+      // Initialize CA
       this.caSubscriber.stopAutomatic()
     }
   }
