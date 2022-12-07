@@ -5,6 +5,7 @@ import { FeedDictionary, MutableFeedDictionary } from '@/epicast/FeedDictionary'
 import { FeedSummary, updateFeedSummary } from '@/epicast/FeedSummary'
 import { FeedElement } from '@/epicast/FeedElement'
 import { getLogger } from '@/utils/loggers'
+import { mergeDictionaries } from '@/epicast/mergeDictionaries'
 
 const logger = getLogger('MONGO_TIME_SERIES')
 
@@ -40,23 +41,26 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
   collection?: Collection<MongoTimeSeriesEvent>
   dictionary: MutableFeedDictionary
   summary: FeedSummary
-  collectionName: string
-  private readonly initialDictionary: FeedDictionary
-  private readonly initialFeedSummary: FeedSummary
+  private collectionName: string
+  private initialDictionary: FeedDictionary
+  private subscriberDictionaries: FeedDictionary[] = []
+  private initialSummary: FeedSummary
+  private subscriberSummaries: FeedSummary[] = []
+
+
   private lastEventNumber: number = 1
 
   /// Setup Methods
 
   constructor (
-    collectionName: string,
     initialSummary: FeedSummary,
-    initialDictionary: FeedDictionary
+    initialDictionary: FeedDictionary,
   ) {
-    this.collectionName = collectionName
+    this.collectionName = `${initialSummary.subject}.${initialSummary.reporter}`
     this.initialDictionary = { ...initialDictionary, reporter: initialSummary.reporter }
     this.dictionary = new MutableFeedDictionary(this.initialDictionary)
     this.summary = initialSummary
-    this.initialFeedSummary = initialSummary
+    this.initialSummary = initialSummary
   }
 
   async initialize (db: Db): Promise<void> {
@@ -164,7 +168,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
       )
     }
     const metadata = await this.fetchMetadata()
-    this.summary = updateFeedSummary(this.initialFeedSummary, metadata)
+    this.summary = updateFeedSummary(this.initialSummary, metadata)
   }
 
   async deleteEvents (events: TimeSeriesDeletedEvent[]): Promise<void> {
@@ -180,7 +184,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
       )
     }
     const metadata = await this.fetchMetadata()
-    this.summary = updateFeedSummary(this.initialFeedSummary, metadata)
+    this.summary = updateFeedSummary(this.initialSummary, metadata)
   }
 
   createEvent (eventValues: any): MongoTimeSeriesEvent {
@@ -232,7 +236,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
   async dropAllEvents (): Promise<void> {
     if (this.collection === undefined) return
     await this.collection.deleteMany({})
-    this.summary = updateFeedSummary(this.initialFeedSummary, null)
+    this.summary = updateFeedSummary(this.initialSummary, null)
   }
 
   /// Dictionary Methods
@@ -245,11 +249,19 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
     return this.dictionary.deleteElement(name)
   }
 
-  updateDictionary (dictionary: FeedDictionary): void {
-    this.dictionary = new MutableFeedDictionary(dictionary)
+  updateSubscriberDictionary (subscriberDictionary: FeedDictionary): void {
+    const index = this.subscriberDictionaries.findIndex(d => d.reporter === subscriberDictionary.reporter)
+    if (index !== -1) {
+      this.subscriberDictionaries[index] = subscriberDictionary
+    } else {
+      this.subscriberDictionaries.push(subscriberDictionary)
+    }
+    const mergedDictionary = mergeDictionaries(this.summary.reporter, [this.dictionary, subscriberDictionary] )
+    this.dictionary = new MutableFeedDictionary(mergedDictionary)
   }
 
   resetDictionary (): void {
     this.dictionary = new MutableFeedDictionary(this.initialDictionary)
+    this.subscriberDictionaries = []
   }
 }

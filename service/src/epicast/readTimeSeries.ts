@@ -36,7 +36,7 @@ class TimeSeriesReader<T> {
     if (metadata !== null) {
       publishedObjects = publishedObjects.filter((object) => isAfter(object.lastModified, metadata.updatedAt))
     }
-    logger.debug(`Snapshot ${snapshotVersion} has ${publishedObjects.length} objects to read`)
+    logger.debug(`Snapshot ${snapshotVersion} has ${publishedObjects.length} files to read`)
 
     const events = await this.fetchEvents(publishedObjects)
     await this.timeSeries.upsertEvents(events)

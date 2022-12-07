@@ -46,16 +46,12 @@ export class MutableFeedDictionary implements FeedDictionary {
   }
 
   addElement (element: FeedElement): boolean {
-    this.validFrom = new Date()
-    const copy = [...this.elements]
     const index = this.elements.findIndex(e => e.name === element.name)
-    if (index === -1) {
-      copy.push(element)
-    } else {
-      copy[index] = element
-    }
-    this.elements = copy
-    return index === -1
+    if (index !== -1) return false
+
+    this.validFrom = new Date()
+    this.elements.push(element)
+    return true
   }
 
   deleteElement (name: string): boolean {
@@ -66,6 +62,26 @@ export class MutableFeedDictionary implements FeedDictionary {
     copy.splice(index, 1)
     this.elements = copy
     this.validFrom = new Date()
+    return true
+  }
+
+  addNamespace (adding: FeedNamespace): boolean {
+    const index = this.namespaces.findIndex(n => n.namespace === adding.namespace)
+    if (index !== -1) return false
+
+    this.validFrom = new Date()
+    this.namespaces.push(adding)
+    return true
+  }
+
+  deleteNamespace (namespace: string): boolean {
+    const index = this.namespaces.findIndex(n => n.namespace === namespace)
+    if (index === -1) return false
+
+    this.validFrom = new Date()
+    const copy = [...this.namespaces]
+    copy.splice(index, 1)
+    this.namespaces = copy
     return true
   }
 }

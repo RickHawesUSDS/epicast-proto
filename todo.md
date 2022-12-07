@@ -38,8 +38,8 @@
 ## Merged feed
 
 * [ ] Merge dictionaries when multiple imports.
-* [ ] Multiple subjects per feed. Delclare system used. Complete subject reporter. Do we need subject in event?
-* [ ] Merge summaries for the merged feed
+* [ ] Multiple subjects per feed summary. Delclare system used. Complete subject reporter. Do we need subject in event?
+* [ ] Merge summaries for the merged feed. Remove subject.
 * [ ] Turn on AZ. Initial data in both feeds. AZ feed published.
 * [ ] Make two states feeds and cdc table that merge states together
 

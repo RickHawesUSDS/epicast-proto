@@ -18,9 +18,9 @@ export interface AgencyModel {
 export class AgenciesFeature implements Feature {
   name = 'agencies'
 
-  private readonly caTimeSeries = new MongoTimeSeries('ca_cases', initialCASummary, initialCaseDictionary)
-  private readonly azTimeSeries = new MongoTimeSeries('az_cases', initialAZSummary, initialCaseDictionary)
-  private readonly cdcTimeSeries = new MongoTimeSeries('cdc_cases', initialCDCSummary, initialCaseDictionary)
+  private readonly caTimeSeries = new MongoTimeSeries(initialCASummary, initialCaseDictionary)
+  private readonly azTimeSeries = new MongoTimeSeries(initialAZSummary, initialCaseDictionary)
+  private readonly cdcTimeSeries = new MongoTimeSeries(initialCDCSummary, initialCaseDictionary)
 
   private readonly caSubscriber = new FeedSubscriber(this.caTimeSeries.summary, this.cdcTimeSeries)
   private readonly azSubscriber = new FeedSubscriber(this.azTimeSeries.summary, this.cdcTimeSeries)

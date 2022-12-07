@@ -22,14 +22,15 @@ export async function insertFakeCases (timeSeries: MongoTimeSeries, numberOfDays
 
   let duplicateCount = 0
   const generateNewCase = (newCaseDate: Date, lastCase?: MongoTimeSeriesEvent): MongoTimeSeriesEvent => {
-    let sourceCase: MongoTimeSeriesEvent
+    let sourceCase: any
     if (lastCase !== undefined && Math.random() < 0.2) {
-      sourceCase = timeSeries.createEvent(lastCase)
+      sourceCase = {...lastCase}
       duplicateCount += 1
     } else {
       sourceCase = fakeCase(timeSeries, newCaseDate)
     }
-    return sourceCase
+    sourceCase.eventId = undefined // let the create function generate a new event
+    return timeSeries.createEvent(sourceCase)
   }
 
   const firstDate = await decideOnDate()
@@ -48,17 +49,18 @@ export async function insertFakeCases (timeSeries: MongoTimeSeries, numberOfDays
   return casesAdded
 }
 
-function fakeCase (timeSeries: MongoTimeSeries, eventAt: Date): MongoTimeSeriesEvent {
+function fakeCase (timeSeries: MongoTimeSeries, eventAt: Date): any {
+  const state = timeSeries.summary.reporter === 'cphd.ca.gov' ? 'CA' : 'AZ'
   const sourceCase: any = {}
   sourceCase.uscdiPatientFirstName = faker.name.firstName()
   sourceCase.uscdiPatientLastName = faker.name.lastName()
   sourceCase.uscdiPatientAddress = faker.address.streetAddress()
   sourceCase.uscdiPatientCity = faker.address.city()
-  sourceCase.uscdiPatientState = 'CA'
+  sourceCase.uscdiPatientState = state
   sourceCase.uscdiPatientRaceCategory = sample(['White', 'Black or African American', 'American Indian or Alaska Native', 'Asian', 'Native Hawaiian'])
   sourceCase.uscdiPatientSexAtBirth = sample(['Male', 'Female'])
   sourceCase.uscdiPatientEthnicityGroup = sample(['Hispanic or Latino', 'Not Hispanic or Latino'])
-  sourceCase.uscdiPatientPostalCode = faker.address.zipCodeByState('CA')
+  sourceCase.uscdiPatientPostalCode = faker.address.zipCodeByState(state)
   sourceCase.uscdiPatientPhone = faker.phone.number()
   sourceCase.uscdiPatientEmail = faker.internet.email()
   sourceCase.cdcHospitalized = 'N'
@@ -72,7 +74,7 @@ function fakeCase (timeSeries: MongoTimeSeries, eventAt: Date): MongoTimeSeriesE
   sourceCase.eventReporter = timeSeries.summary.reporter
   sourceCase.eventTopic = timeSeries.summary.topic
   fakeVariableElements(timeSeries, sourceCase)
-  return timeSeries.createEvent(sourceCase)
+  return sourceCase
 }
 
 function fakeVariableElements (timeSeries: MongoTimeSeries, sourceCase: MongoTimeSeriesEvent): void {

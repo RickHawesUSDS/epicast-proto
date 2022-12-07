@@ -55,9 +55,10 @@ export const DICTIONARY_EXTENSION = 'yaml'
 export const formDictionaryKey = (topic: string, validFrom: Date): string => {
   return `${DICTIONARY_FOLDER}/${[topic, formatISO(validFrom)].join(FILE_NAME_SEPERATOR)}.${DICTIONARY_EXTENSION}`
 }
-export const splitDictionaryKey = (key: string): string[] => {
+export const splitDictionaryKey = (key: string): [string, string] => {
   const fileName = pathPosix.parse(key).name
-  return fileName.split(FILE_NAME_SEPERATOR, 4)
+  const index = fileName.indexOf(FILE_NAME_SEPERATOR)
+  return [fileName.substring(0, index), fileName.substring(index+1)]
 }
 
 export const FILE_NAME_SEPERATOR = '-'
