@@ -84,7 +84,7 @@ router.post('/:agency/publish', asyncHandler(async (req, res, _next) => {
 
   logger.info('publish state cases')
   const storage = getFeedStorage(req)
-  await publishFeed(storage, timeSeries)
+  await publishFeed(storage, timeSeries, { excludePII: true })
   res.status(200).send('success')
 }))
 
@@ -199,8 +199,6 @@ router.post('/:agency/subscribers/read', asyncHandler(async (req, res, _next) =>
   )
   res.status(200).send(models)
 }))
-
-
 
 /* Read one subscriber once */
 router.post('/:agency/subscribers/:subscriber/read', asyncHandler(async (req, res, _next) => {

@@ -28,7 +28,7 @@ class TimeSeriesReader<T> {
 
   async read (): Promise<Date | undefined> {
     const snapshotVersion = this.snapshot.version?.toString() ?? 'empty'
-    logger.info(`Reading: ${this.snapshot.uri}; snapshot version: ${snapshotVersion} `)
+    logger.info(`Reading: ${this.snapshot.uri ?? 'never'}; snapshot version: ${snapshotVersion} `)
     let publishedObjects = await this.snapshot.listObjects(TIMESERIES_FOLDER)
     if (publishedObjects.length === 0) return
     const lastPublished = this.lastModifiedOf(publishedObjects)

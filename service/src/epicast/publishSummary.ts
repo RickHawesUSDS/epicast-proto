@@ -9,7 +9,10 @@ import { TimeSeries } from './TimeSeries'
 const logger = getLogger('PUBLISH_DICTIONARY_SERVICE')
 const SUMMARY_TEMPLATE_PATH = './public/summary.handlebars'
 
-export async function publishSummary (toSnapshot: MutableSnapshot, timeSeries: TimeSeries): Promise<void> {
+export async function publishSummary (
+  toSnapshot: MutableSnapshot,
+  timeSeries: TimeSeries
+): Promise<void> {
   logger.info('publishing feed summary')
   const timeSeriesMetadata = await timeSeries.fetchMetadata()
   const feedSummary = timeSeriesMetadata !== null ? updateFeedSummary(timeSeries.summary, timeSeriesMetadata, toSnapshot.uri) : timeSeries.summary

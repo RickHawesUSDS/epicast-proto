@@ -60,7 +60,7 @@ export const initialCDCSummary: FeedSummary = {
 // An initial feed dictionary that is shared between all feeds.
 // will be modified by individual feeds
 //
-export const initialCaseDictionary: FeedDictionary = {
+export const initialCommonCaseDictionary: FeedDictionary = {
   topic: commonTopic,
   reporter: 'varies', // dummy data
   validFrom: new Date(), // dummy value
@@ -187,28 +187,6 @@ export const initialCaseDictionary: FeedDictionary = {
     },
     // person elements
     {
-      name: 'uscdiPatientFirstName',
-      namespace: 'uscdi',
-      type: 'string',
-      tags: ['pii'],
-      descriptions: [{
-        isoCultureCode: 'en-us',
-        section: 'patient',
-        displayName: 'First Name'
-      }]
-    },
-    {
-      name: 'uscdiPatientLastName',
-      namespace: 'uscdi',
-      type: 'string',
-      tags: ['pii'],
-      descriptions: [{
-        isoCultureCode: 'en-us',
-        section: 'patient',
-        displayName: 'Last Name'
-      }]
-    },
-    {
       name: 'uscdiPatientDateOfBirth',
       namespace: 'uscdi',
       type: 'date',
@@ -255,28 +233,6 @@ export const initialCaseDictionary: FeedDictionary = {
       }]
     },
     {
-      name: 'uscdiPatientAddress',
-      namespace: 'uscdi',
-      type: 'string',
-      tags: ['pii'],
-      descriptions: [{
-        isoCultureCode: 'en-us',
-        section: 'patient',
-        displayName: 'Address'
-      }]
-    },
-    {
-      name: 'uscdiPatientCity',
-      namespace: 'uscdi',
-      type: 'string',
-      tags: ['pii'],
-      descriptions: [{
-        isoCultureCode: 'en-us',
-        section: 'patient',
-        displayName: 'City'
-      }]
-    },
-    {
       name: 'uscdiPatientState',
       namespace: 'uscdi',
       type: 'string',
@@ -296,6 +252,56 @@ export const initialCaseDictionary: FeedDictionary = {
         isoCultureCode: 'en-us',
         section: 'patient',
         displayName: 'Postal Code'
+      }]
+    }
+  ]
+}
+
+export const initialStateDictionary = {
+  ...initialCommonCaseDictionary,
+  elements: initialCommonCaseDictionary.elements.concat([
+    {
+      name: 'uscdiPatientFirstName',
+      namespace: 'uscdi',
+      type: 'string',
+      tags: ['pii'],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'First Name'
+      }]
+    },
+    {
+      name: 'uscdiPatientLastName',
+      namespace: 'uscdi',
+      type: 'string',
+      tags: ['pii'],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'Last Name'
+      }]
+    },
+    {
+      name: 'uscdiPatientAddress',
+      namespace: 'uscdi',
+      type: 'string',
+      tags: ['pii'],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'Address'
+      }]
+    },
+    {
+      name: 'uscdiPatientCity',
+      namespace: 'uscdi',
+      type: 'string',
+      tags: ['pii'],
+      descriptions: [{
+        isoCultureCode: 'en-us',
+        section: 'patient',
+        displayName: 'City'
       }]
     },
     {
@@ -320,7 +326,7 @@ export const initialCaseDictionary: FeedDictionary = {
         displayName: 'Email'
       }]
     }
-  ]
+  ])
 }
 
 export const variableDictionaryElementNames = [

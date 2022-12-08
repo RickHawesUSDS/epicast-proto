@@ -4,7 +4,7 @@ import agenciesRouter from './agencyRoutes'
 import { MongoTimeSeries, MongoTimeSeriesEvent } from './MongoTimeSeries'
 import { MutableTimeSeries } from '@/epicast/TimeSeries'
 import { FeedSubscriber } from './FeedSubscriber'
-import { initialCASummary, initialAZSummary, initialCDCSummary, initialCaseDictionary } from './agencyModels'
+import { initialCASummary, initialAZSummary, initialCDCSummary, initialStateDictionary, initialCommonCaseDictionary } from './agencyModels'
 import { AppState } from '@/server/app'
 import { insertFakeCases } from './insertFakeCases'
 import { publishFeed } from '@/epicast/publishFeed'
@@ -18,9 +18,9 @@ export interface AgencyModel {
 export class AgenciesFeature implements Feature {
   name = 'agencies'
 
-  private readonly caTimeSeries = new MongoTimeSeries(initialCASummary, initialCaseDictionary)
-  private readonly azTimeSeries = new MongoTimeSeries(initialAZSummary, initialCaseDictionary)
-  private readonly cdcTimeSeries = new MongoTimeSeries(initialCDCSummary, initialCaseDictionary)
+  private readonly caTimeSeries = new MongoTimeSeries(initialCASummary, initialStateDictionary)
+  private readonly azTimeSeries = new MongoTimeSeries(initialAZSummary, initialStateDictionary)
+  private readonly cdcTimeSeries = new MongoTimeSeries(initialCDCSummary, initialCommonCaseDictionary)
 
   private readonly caSubscriber = new FeedSubscriber(this.caTimeSeries.summary, this.cdcTimeSeries)
   private readonly azSubscriber = new FeedSubscriber(this.azTimeSeries.summary, this.cdcTimeSeries)
@@ -67,8 +67,8 @@ export class AgenciesFeature implements Feature {
     }
     if (during === InitEvent.AFTER_ROUTES) {
       // Initialize AZ
-      insertFakeCases(this.azTimeSeries, 1, 5)
-      publishFeed(state.feedsFeature.storage, this.azTimeSeries)
+      await insertFakeCases(this.azTimeSeries, 1, 5)
+      await publishFeed(state.feedsFeature.storage, this.azTimeSeries, { excludePII: true })
       this.azSubscriber.startAutomatic()
 
       // Initialize CA

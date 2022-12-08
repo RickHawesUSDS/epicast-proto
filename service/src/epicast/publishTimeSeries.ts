@@ -11,23 +11,30 @@ import { FeedElement, filterElements } from './FeedElement'
 import { MutableSnapshot } from './Snapshot'
 import { TimeSeriesPartition, makeCasePartions } from './TimeSeriesPartition'
 import { getLogger } from '@/utils/loggers'
+import { PublishFeedOptions } from './publishFeed'
 
 const DESIRED_MAX_MONTHLY_COUNT = 10000 / 30
 
 const logger = getLogger('PUBLISH_TIME_SERIES_SERVICE')
 
-export async function publishTimeseries (toSnapshot: MutableSnapshot, timeseries: TimeSeries): Promise<number> {
+export async function publishTimeseries (
+  toSnapshot: MutableSnapshot,
+  timeseries: TimeSeries,
+  publishOptions: PublishFeedOptions
+): Promise<number> {
   logger.info(`publishing timeseries: ${timeseries.summary.subject}-${timeseries.summary.reporter}`)
-  const publisher = new TimeSeriesPublisher(toSnapshot, timeseries)
+  const publisher = new TimeSeriesPublisher(toSnapshot, timeseries, publishOptions)
   return await publisher.publish()
 }
 class TimeSeriesPublisher {
   snapshot: MutableSnapshot
   timeSeries: TimeSeries
+  publishOptions: PublishFeedOptions
 
-  constructor (toSnapshot: MutableSnapshot, timeseries: TimeSeries) {
+  constructor (toSnapshot: MutableSnapshot, timeseries: TimeSeries, publishOptions: PublishFeedOptions) {
     this.snapshot = toSnapshot
     this.timeSeries = timeseries
+    this.publishOptions = publishOptions
   }
 
   async publish (): Promise<number> {
@@ -169,8 +176,10 @@ class TimeSeriesPublisher {
       return csv.join('')
     }
 
-    const deidentifiedElements = filterElements(this.timeSeries.dictionary.elements, 'pii')
-    const report = createCSV(events, deidentifiedElements)
+    const publishedElements = this.publishOptions.excludePII ?? false
+      ? filterElements(this.timeSeries.dictionary.elements, 'pii')
+      : this.timeSeries.dictionary.elements
+    const report = createCSV(events, publishedElements)
     const key = formTimeSeriesKey(period)
     await this.snapshot.putObject(key, report)
   }

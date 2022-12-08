@@ -58,7 +58,7 @@ export const formDictionaryKey = (topic: string, validFrom: Date): string => {
 export const splitDictionaryKey = (key: string): [string, string] => {
   const fileName = pathPosix.parse(key).name
   const index = fileName.indexOf(FILE_NAME_SEPERATOR)
-  return [fileName.substring(0, index), fileName.substring(index+1)]
+  return [fileName.substring(0, index), fileName.substring(index + 1)]
 }
 
 export const FILE_NAME_SEPERATOR = '-'
@@ -75,7 +75,7 @@ export const versionFromSnapshotKey = (key: string): number => {
   const fileName = pathPosix.parse(key).name
   return parseInt(fileName)
 }
-export const formSnaphotUri = (storage: FeedStorage, folder: string, version: number) => {
+export const formSnaphotUri = (storage: FeedStorage, folder: string, version: number): string => {
   return `${storage.uri}/${folder}/${formSnapshotKey(version)}`
 }
 

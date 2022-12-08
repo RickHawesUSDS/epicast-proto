@@ -24,7 +24,7 @@ export async function insertFakeCases (timeSeries: MongoTimeSeries, numberOfDays
   const generateNewCase = (newCaseDate: Date, lastCase?: MongoTimeSeriesEvent): MongoTimeSeriesEvent => {
     let sourceCase: any
     if (lastCase !== undefined && Math.random() < 0.2) {
-      sourceCase = {...lastCase}
+      sourceCase = { ...lastCase }
       duplicateCount += 1
     } else {
       sourceCase = fakeCase(timeSeries, newCaseDate)

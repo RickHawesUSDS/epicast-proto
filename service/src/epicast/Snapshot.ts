@@ -116,7 +116,7 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
     logger.info(`Put of object: ${key}`)
     const writtenObject = await this.storage.putObject(this.formKey(key), value)
     const snapshotKey = writtenObject.key.substring(this.folder.length + 1)
-    const snapshotObject: StorageObject = { ...writtenObject, key: snapshotKey}
+    const snapshotObject: StorageObject = { ...writtenObject, key: snapshotKey }
     const index = this.storageObjects.findIndex(object => object.key === key)
     if (index === -1) {
       this.storageObjects.push(snapshotObject)

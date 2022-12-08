@@ -1,4 +1,5 @@
-import { FeedDictionary, MutableFeedDictionary } from "./FeedDictionary";
+import { FeedDictionary } from './FeedDictionary'
+import { MutableFeedDictionary } from "./MutableFeedDictionary"
 
 export function mergeDictionaries(reporter: string, dictionaries: FeedDictionary[]): FeedDictionary {
   if (dictionaries.length === 0) throw Error('expected to merge at least one dictionary')
