@@ -80,7 +80,6 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
 
   async fetchEvents (options: TimeSeriesFindOptions): Promise<TimeSeriesEvent[]> {
     if (this.collection === undefined) return []
-    logger.debug('Fetching events...')
     const whereClause: any = {
     }
     if (options.interval !== undefined) {
@@ -109,6 +108,8 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
       .find(whereClause)
       .sort(sortClause)
       .toArray()
+
+    logger.debug(`Fetching ${rawEvents.length} events`)
     return rawEvents.map(e => new MongoTimeSeriesEvent(e))
   }
 
@@ -179,7 +180,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
     for (const event of events) {
       await this.collection.updateOne(
         { _id: event.eventId },
-        { $set: { eventIdDeleted: true, eventReplacedBy: event.replaceBy, eventUpdatedAt: updatedAt } },
+        { $set: { eventIsDeleted: true, eventReplacedBy: event.replaceBy, eventUpdatedAt: updatedAt } },
         { upsert: false }
       )
     }

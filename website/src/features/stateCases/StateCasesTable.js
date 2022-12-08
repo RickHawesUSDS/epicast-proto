@@ -6,14 +6,14 @@ import { Alert } from '@material-ui/lab'
 import { stateCases, stateCasesDictionary } from './stateCasesKeys'
 
 const customWidths = {
-  uscdiPersonFirstName: 140,
-  uscdiPersonLastName: 140,
-  uscdiPersonRace: 200,
-  uscdiPersonEthnicity: 200,
-  uscdiPersonPostalCode: 140,
-  uscdiPersonAddress: 200,
-  uscdiPersonPhone: 200,
-  uscdiPersonEmail: 200,
+  uscdiPatientFirstName: 140,
+  uscdiPatientLastName: 140,
+  uscdiPatientRaceCategory: 200,
+  uscdiPatientEthnicityGroup: 200,
+  uscdiPatientPostalCode: 140,
+  uscdiPatientAddress: 200,
+  uscdiPatientPhone: 200,
+  uscdiPatientEmail: 200,
 }
 
 function makeColumns(dictionary) {

@@ -7,14 +7,14 @@ import { Alert } from '@material-ui/lab'
 import { useQuery } from '@tanstack/react-query'
 
 const customWidths = {
-  personFirstName: 140,
-  personLastName: 140,
-  personRace: 200,
-  personEthnicity: 200,
-  personPostalCode: 140,
-  personAddress: 200,
-  personPhone: 200,
-  personEmail: 200
+  uscdiPatientFirstName: 140,
+  uscdiPatientLastName: 140,
+  uscdiPatientRaceCategory: 200,
+  uscdiPatientEthnicityGroup: 200,
+  uscdiPatientPostalCode: 140,
+  uscdiPatientAddress: 200,
+  uscdiPatientPhone: 200,
+  uscdiPatientEmail: 200,
 }
 
 function makeColumns(dictionary) {
