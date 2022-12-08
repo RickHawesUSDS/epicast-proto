@@ -117,9 +117,10 @@ export class S3Storage implements FeedStorage {
 
   async getFileData (prefix: string): Promise<FileArray> {
     const chonkyFiles: FileArray = []
+    const fixedUpPrefix = prefix === '/' ? '' : prefix
     const listResponse = await this.s3Client.send(new ListObjectsCommand({
       Bucket: this.bucket,
-      Prefix: prefix,
+      Prefix: fixedUpPrefix,
       Delimiter: '/'
     }))
 

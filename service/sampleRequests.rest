@@ -67,7 +67,7 @@ content-type: application/json
 POST http://localhost:4001/api/agencies/cphd.ca.gov/deduplicate
 
 ### List feed
-GET http://localhost:4001/api/feeds/metadata?prefix=
+GET http://localhost:4001/api/feeds/metadata?prefix=azphs.gov/cases/
 
 ### List feed
 GET http://localhost:4001/api/feeds/metadata?prefix=cphd.ca.gov/cases/snapshots/
