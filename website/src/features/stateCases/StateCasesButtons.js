@@ -2,7 +2,7 @@ import React from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, ButtonGroup, Checkbox, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormControl, FormGroup, FormLabel, FormControlLabel, makeStyles } from '@material-ui/core'
 
-import { stateCases } from './stateCasesKeys'
+import { stateCases, stateCasesDictionary } from './stateCasesKeys'
 import { addRandomStateCases, addStateCaseElement, deleteStateCaseElement, fetchStateCaseDictionary, publishStateCases, deduplicateStateCases } from '../api/api'
 import { variableStateCaseElements, localQuestion1, localQuestion2, localQuestion3, neighborQuestion1, neighborQuestion2, cdcQuestion1, cdcQuestion2 } from './variableStateCaseElements'
 
@@ -18,6 +18,7 @@ export default function StateCasesButtons(props) {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [stateCases] })
+      await queryClient.invalidateQueries({ queryKey: [stateCasesDictionary] })
     }
   })
 

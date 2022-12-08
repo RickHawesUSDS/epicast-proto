@@ -28,7 +28,10 @@ function makeColumns(dictionary) {
 }
 
 export default function StateCasesTable() {
-  const dictionaryQuery = useQuery([stateCasesDictionary], async () => { return await fetchStateCaseDictionary() }, {})
+  const dictionaryQuery = useQuery({
+      queryKey: [stateCasesDictionary],
+      queryFn: async () => { return await fetchStateCaseDictionary() },
+  })
   const casesQuery = useQuery([stateCases], async () => { return await fetchAllStateCases('desc') }, {})
 
   let content = ''

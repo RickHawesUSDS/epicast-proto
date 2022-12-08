@@ -9,6 +9,8 @@ export default function CDCCasesButtons(props) {
     mutationFn: async () => { return await readCDCCaseFeed() },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [cdcCases] })
+      await queryClient.invalidateQueries({ queryKey: [cdcCasesDictionary] })
+      await queryClient.invalidateQueries({ queryKey: [cdcCasesSubscriber] })
     }
   })
   const getCDCCaseSubcriberQuery = useQuery(

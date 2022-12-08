@@ -81,7 +81,7 @@ function fakeVariableElements (timeSeries: MongoTimeSeries, sourceCase: MongoTim
   for (const variableElementName of variableDictionaryElementNames) {
     const index = timeSeries.dictionary.elements.findIndex(e => e.name === variableElementName)
     if (index !== -1) {
-      sourceCase.set(variableElementName as keyof MongoTimeSeriesEvent, 'fake response')
+      sourceCase[variableElementName] = 'fake response'
     }
   }
 }
