@@ -2,7 +2,7 @@ import React from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, ButtonGroup, Checkbox, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, FormControl, FormGroup, FormLabel, FormControlLabel, makeStyles } from '@material-ui/core'
 
-import { stateCases, stateCasesDictionary } from './stateCasesKeys'
+import { stateCases } from './stateCasesKeys'
 import { addRandomStateCases, addStateCaseElement, deleteStateCaseElement, fetchStateCaseDictionary, publishStateCases, deduplicateStateCases } from '../api/api'
 import { variableStateCaseElements, localQuestion1, localQuestion2, localQuestion3, neighborQuestion1, neighborQuestion2, cdcQuestion1, cdcQuestion2 } from './variableStateCaseElements'
 
@@ -18,7 +18,6 @@ export default function StateCasesButtons(props) {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: [stateCases] })
-      await queryClient.invalidateQueries({ queryKey: [stateCasesDictionary] })
     }
   })
 
@@ -37,7 +36,7 @@ export default function StateCasesButtons(props) {
       }
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [stateCases] })
+      await queryClient.invalidateQueries()
     }
   })
 
@@ -102,7 +101,7 @@ export default function StateCasesButtons(props) {
 
   const createCheckboxes = (questions) => (
     questions.map((question) => (
-      <FormControlLabel
+      <FormControlLabel key={question.name}
         control={
           <Checkbox name={question.name} checked={checked.has(question.name)} onChange={handleCheckboxChange} />
         }
@@ -116,14 +115,14 @@ export default function StateCasesButtons(props) {
   return (
     <div className={buttonClasses.root} align='right'>
       <ButtonGroup color='primary'>
-        <Button disabled={isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 1, numPerDay: 1 })}>Add 1 Case</Button>
-        <Button disabled={isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 2, numPerDay: 10 })}>Add 20 Cases</Button>
-        <Button disabled={isLoading} onClick={() => addCasesMutation.mutate({ numOfDays: 30, numPerDay: 500 })}>Add 15000 Cases</Button>
+        <Button disabled={isLoading ?? false} onClick={() => addCasesMutation.mutate({ numOfDays: 1, numPerDay: 1 })}>Add 1 Case</Button>
+        <Button disabled={isLoading ?? false} onClick={() => addCasesMutation.mutate({ numOfDays: 2, numPerDay: 10 })}>Add 20 Cases</Button>
+        <Button disabled={isLoading ?? false} onClick={() => addCasesMutation.mutate({ numOfDays: 30, numPerDay: 500 })}>Add 15000 Cases</Button>
       </ButtonGroup>
-      <Button disabled={isLoading} onClick={() => deduplicateMutation.mutate()} color='primary' variant='outlined'>Deduplicate</Button>
-      <Button disabled={isLoading} onClick={() => onChangeDictionaryClick()} color='primary' variant='outlined'>Update Data Elements</Button>
-      <Button disabled={isLoading} onClick={() => publishStateCasesMutation.mutate()} color='primary' variant='outlined'>Publish</Button>
-      <Dialog open={open} onClose={handleClose} maxWidth="" fullWidth="" aria-labelledby="form-dialog-title">
+      <Button disabled={isLoading ?? false} onClick={() => deduplicateMutation.mutate()} color='primary' variant='outlined'>Deduplicate</Button>
+      <Button disabled={isLoading ?? false} onClick={() => onChangeDictionaryClick()} color='primary' variant='outlined'>Update Data Elements</Button>
+      <Button disabled={isLoading ?? false} onClick={() => publishStateCasesMutation.mutate()} color='primary' variant='outlined'>Publish</Button>
+      <Dialog open={open} onClose={handleClose} maxWidth="xl" aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Change Data Dictionary</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -152,7 +151,7 @@ export default function StateCasesButtons(props) {
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button disable={updateStateDictionaryMutation.isLoading} onClick={handleUpdate} color="primary">
+          <Button disabled={updateStateDictionaryMutation.isLoading ?? false} onClick={handleUpdate} color="primary">
             Update
           </Button>
         </DialogActions>

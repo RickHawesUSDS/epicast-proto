@@ -8,9 +8,7 @@ export default function CDCCasesButtons(props) {
   const readCDCCaseFeedMutation = useMutation({
     mutationFn: async () => { return await readCDCCaseFeed() },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [cdcCases] })
-      await queryClient.invalidateQueries({ queryKey: [cdcCasesDictionary] })
-      await queryClient.invalidateQueries({ queryKey: [cdcCasesSubscriber] })
+      await queryClient.invalidateQueries()
     }
   })
   const getCDCCaseSubcriberQuery = useQuery(
@@ -21,11 +19,9 @@ export default function CDCCasesButtons(props) {
   const setSubscriberAutomaticMutation = useMutation({
     mutationFn: async (params) => { return await setCDCCaseSubscriber(params.automatic) },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [cdcCases] })
+      await queryClient.invalidateQueries()
     }
   })
-
-
   const useButtonStyles = makeStyles((theme) => ({
     root: {
       '& > *': {
