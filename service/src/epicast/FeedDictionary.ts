@@ -18,7 +18,7 @@ export interface FeedDictionaryYaml {
   readonly elements: FeedElement[]
 }
 
-export function fromYaml(yaml: FeedDictionaryYaml): FeedDictionary {
+export function fromYaml (yaml: FeedDictionaryYaml): FeedDictionary {
   const validFrom = yaml.validFrom
   return { ...yaml, validFrom: parseISO(validFrom) }
 }

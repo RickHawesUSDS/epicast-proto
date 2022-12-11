@@ -7,6 +7,7 @@ import { StorageObject, FeedStorage } from './FeedStorage'
 import { formSnaphotUri, formSnapshotKey, SNAPSHOT_FOLDER, versionFromSnapshotKey } from './feedStorageKeys'
 import assert from 'assert'
 import { getLogger } from '@/utils/loggers'
+import { upsert } from '@/utils/upsert'
 
 const logger = getLogger('SNAPSHOT')
 
@@ -117,12 +118,7 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
     const writtenObject = await this.storage.putObject(this.formKey(key), value)
     const snapshotKey = writtenObject.key.substring(this.folder.length + 1)
     const snapshotObject: StorageObject = { ...writtenObject, key: snapshotKey }
-    const index = this.storageObjects.findIndex(object => object.key === key)
-    if (index === -1) {
-      this.storageObjects.push(snapshotObject)
-    } else {
-      this.storageObjects[index] = snapshotObject
-    }
+    upsert(this.storageObjects, snapshotObject, o => o.key === key)
     this.isModified = true
   }
 

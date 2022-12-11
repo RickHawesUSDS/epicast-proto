@@ -17,10 +17,10 @@ namespaces:
 {{#each namespaces }}
 - namespace: {{this.namespace}}
 {{#if this.description }}
-description: {{this.description}}
+  description: {{this.description}}
 {{/if}}
 {{#if this.sourceUri }}
-sourceUri: {{ this.sourceUri }}
+  sourceUri: {{ this.sourceUri }}
 {{/if}}
 {{/each}}
 
@@ -39,32 +39,32 @@ sourceUri: {{ this.sourceUri }}
 elements:
 {{#each elements}}
 - name: {{ this.name }}
-type: {{ this.type }}
-{{#if this.isRepeated}}
-isRepeated: {{this.isRepeated}}
-{{/if}}
-{{#if this.codeSet}}
-codeSet: {{this.codeSet}}
-{{/if}}
-{{#if this.validation}}
-validation: {{this.validation}}
-{{/if}}
-tags:
-{{#each this.tags }}
-- {{ this }}
-{{/each}}
-descriptions:
-{{#each this.descriptions }}
-- isoCultureCode: {{ this.isoCultureCode }}
-displayName: {{ this.displayName }}
-{{#if this.section }}
-section: {{ this.section }}
-{{/if}}
-{{#if this.details }}
-details: {{ this.details }}
-{{/if}}
-{{#if this.authorComments }}
-authorComments: {{ this.authorComments }}
-{{/if}}
-{{/each}}
+  type: {{ this.type }}
+  {{#if this.isRepeated}}
+  isRepeated: {{this.isRepeated}}
+  {{/if}}
+  {{#if this.codeSet}}
+  codeSet: {{this.codeSet}}
+  {{/if}}
+  {{#if this.validation}}
+  validation: {{this.validation}}
+  {{/if}}
+  tags:
+  {{#each this.tags }}
+  - {{ this }}
+  {{/each}}
+  descriptions:
+  {{#each this.descriptions }}
+  - isoCultureCode: {{ this.isoCultureCode }}
+    displayName: {{ this.displayName }}
+  {{#if this.section }}
+    section: {{ this.section }}
+  {{/if}}
+  {{#if this.details }}
+    details: {{ this.details }}
+  {{/if}}
+  {{#if this.authorComments }}
+    authorComments: {{ this.authorComments }}
+  {{/if}}
+  {{/each}}
 {{/each}}

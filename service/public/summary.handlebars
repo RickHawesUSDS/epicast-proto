@@ -27,10 +27,10 @@ sourceUri: {{ sourceUri }}
 descriptions:
 {{#each this.descriptions }}
 - isoCultureCode: {{ this.isoCultureCode }}
-reporter: {{ this.reporter }}
-topic: {{ this.topic }}
-subject: {{ this.subject }}
-details: {{ this.details }}
+  reporter: {{ this.reporter }}
+  topic: {{ this.topic }}
+  subject: {{ this.subject }}
+  details: {{ this.details }}
 {{/each}}
 
 # The feeds that contributed to this feed.
@@ -38,8 +38,8 @@ details: {{ this.details }}
 sourceFeeds:
 {{#each feeds }}
 - reporterId: {{this.reporterId}}
-topicId: {{this.topicId}}
-sourceUri: {{ this.sourceUri }}
+  topicId: {{this.topicId}}
+  sourceUri: {{ this.sourceUri }}
 # real code will have the source feed's source feeds listed here as well to provide the full tree
 {{/each}}
 

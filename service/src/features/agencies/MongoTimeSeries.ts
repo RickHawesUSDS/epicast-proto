@@ -3,10 +3,12 @@ import { Db, Collection } from 'mongodb'
 import { EventElementName, MutableTimeSeries, TimeSeriesCountOptions, TimeSeriesDeletedEvent, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata } from '@/epicast/TimeSeries'
 import { FeedDictionary } from '@/epicast/FeedDictionary'
 import { MutableFeedDictionary } from '@/epicast/MutableFeedDictionary'
-import { FeedSummary, updateFeedSummary } from '@/epicast/FeedSummary'
+import { FeedSummary } from '@/epicast/FeedSummary'
+import { updateFeedSummary } from '@/epicast/updateFeedSummary'
 import { FeedElement } from '@/epicast/FeedElement'
 import { getLogger } from '@/utils/loggers'
 import { mergeDictionaries } from '@/epicast/mergeDictionaries'
+import { upsert } from '@/utils/upsert'
 
 const logger = getLogger('MONGO_TIME_SERIES')
 
@@ -169,7 +171,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
       )
     }
     const metadata = await this.fetchMetadata()
-    this.summary = updateFeedSummary(this.initialSummary, metadata)
+    this.summary = updateFeedSummary(this.initialSummary, { metadata })
   }
 
   async deleteEvents (events: TimeSeriesDeletedEvent[]): Promise<void> {
@@ -185,7 +187,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
       )
     }
     const metadata = await this.fetchMetadata()
-    this.summary = updateFeedSummary(this.initialSummary, metadata)
+    this.summary = updateFeedSummary(this.initialSummary, { metadata })
   }
 
   createEvent (eventValues: any): MongoTimeSeriesEvent {
@@ -237,7 +239,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
   async dropAllEvents (): Promise<void> {
     if (this.collection === undefined) return
     await this.collection.deleteMany({})
-    this.summary = updateFeedSummary(this.initialSummary, null)
+    this.summary = this.initialSummary
   }
 
   /// Dictionary Methods
@@ -251,12 +253,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
   }
 
   updateSubscriberDictionary (subscriberDictionary: FeedDictionary): void {
-    const index = this.subscriberDictionaries.findIndex(d => d.reporterId === subscriberDictionary.reporterId)
-    if (index !== -1) {
-      this.subscriberDictionaries[index] = subscriberDictionary
-    } else {
-      this.subscriberDictionaries.push(subscriberDictionary)
-    }
+    upsert(this.subscriberDictionaries, subscriberDictionary, d => d.reporterId === subscriberDictionary.reporterId)
     const mergedDictionary = mergeDictionaries(this.summary.reporterId, [this.dictionary, subscriberDictionary])
     this.dictionary = new MutableFeedDictionary(mergedDictionary)
   }
