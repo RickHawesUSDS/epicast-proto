@@ -16,3 +16,5 @@ export async function attachToDb (): Promise<Db> {
   await client.db('admin').command({ ping: 1 })
   return client.db('epicast_demo')
 }
+
+export { Db }

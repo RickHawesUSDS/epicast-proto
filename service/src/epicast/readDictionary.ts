@@ -1,6 +1,6 @@
 import YAML from 'yaml'
 import { isAfter, isSameSecond, parseISO } from 'date-fns'
-import { getLogger } from 'log4js'
+import { getLogger } from '@/utils/loggers'
 
 import { MutableTimeSeries } from './TimeSeries'
 import { FeedDictionaryYaml, fromYaml } from './FeedDictionary'
