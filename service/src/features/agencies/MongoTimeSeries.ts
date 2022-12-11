@@ -8,7 +8,7 @@ import { updateFeedSummary } from '@/epicast/updateFeedSummary'
 import { FeedElement } from '@/epicast/FeedElement'
 import { getLogger } from '@/server/loggers'
 import { mergeDictionaries } from '@/epicast/mergeDictionaries'
-import { upsert } from '@/utils/upsert'
+import { upsert } from '@/collection/upsert'
 
 const logger = getLogger('MONGO_TIME_SERIES')
 
