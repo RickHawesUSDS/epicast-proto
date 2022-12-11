@@ -1,11 +1,11 @@
 import express from 'express'
-import { getLogger } from '@/utils/loggers'
+import { getLogger } from '@/server/loggers'
 import asyncHandler from 'express-async-handler'
 import { S3Storage } from './S3Storage'
 const router = express.Router()
 const logger = getLogger('FEED_ROUTE')
 
-function getFeedStorage (req: express.Request): S3Storage {
+function getFeedStorage(req: express.Request): S3Storage {
   return req.state.feedsFeature.storage
 }
 

@@ -2,7 +2,7 @@
 import express from 'express'
 import path from 'path'
 import cookieParser from 'cookie-parser'
-import { getLogger } from '../utils/loggers'
+import { getLogger } from './loggers'
 import { attachToDb, Db } from '../features/agencies/mongo'
 import indexRouter from './indexRoutes'
 import { SystemFeature } from '../features/system/SystemFeature'
@@ -25,7 +25,7 @@ class App {
   state: AppState
   features: Feature[]
 
-  constructor () {
+  constructor() {
     const feedsFeature = new FeedsFeature()
     const agenciesFeature = new AgenciesFeature()
     const systemFeature = new SystemFeature([feedsFeature, agenciesFeature])
@@ -42,7 +42,7 @@ class App {
     this.config()
   }
 
-  async init (): Promise<void> {
+  async init(): Promise<void> {
     logger.info('Starting init sequence...')
     this.state.db = await attachToDb()
     for (const feature of this.features) {
@@ -54,14 +54,14 @@ class App {
     }
   }
 
-  private config (): void {
+  private config(): void {
     this.expressApp.use(express.json())
     this.expressApp.use(express.urlencoded({ extended: false }))
     this.expressApp.use(cookieParser())
     this.expressApp.use(express.static(path.join(__dirname, 'public')))
   }
 
-  private routerSetup (): void {
+  private routerSetup(): void {
     this.expressApp.use((req, _res, next) => {
       req.state = this.state
       next()

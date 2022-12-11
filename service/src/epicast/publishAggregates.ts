@@ -4,14 +4,14 @@ import { TimeSeries } from '@/epicast/TimeSeries'
 import { makeCasePartions, TimeSeriesPartition } from '@/epicast/TimeSeriesPartition'
 import { Frequency } from '@/epicast/Frequency'
 import { groupBy } from '@/utils/groupBy'
-import { getLogger } from '@/utils/loggers'
+import { getLogger } from '@/server/loggers'
 import { stringify } from 'csv-string'
 import { formatISO } from 'date-fns'
 import { FeedSummary } from './FeedSummary'
 
 const logger = getLogger('PUBLISH_AGREGATES_SERVICE')
 
-export async function publishAggregates (toSnapshot: MutableSnapshot, fromTimeSeries: TimeSeries): Promise<void> {
+export async function publishAggregates(toSnapshot: MutableSnapshot, fromTimeSeries: TimeSeries): Promise<void> {
   const publisher = new AggregatesPublisher(toSnapshot, fromTimeSeries)
   await publisher.publish()
 }
@@ -23,12 +23,12 @@ class AggregatesPublisher {
   snapshot: MutableSnapshot
   timeSeries: TimeSeries
 
-  constructor (toSnapshot: MutableSnapshot, fromTimeSeries: TimeSeries) {
+  constructor(toSnapshot: MutableSnapshot, fromTimeSeries: TimeSeries) {
     this.snapshot = toSnapshot
     this.timeSeries = fromTimeSeries
   }
 
-  async publish (): Promise<void> {
+  async publish(): Promise<void> {
     logger.info('Publishing an aggregate')
     const events = await this.timeSeries.fetchEvents({ sortDescending: false })
     if (events.length === 0) return
@@ -39,14 +39,14 @@ class AggregatesPublisher {
     }
   }
 
-  async publishDailyCounts (year: number, partitions: TimeSeriesPartition[]): Promise<void> {
+  async publishDailyCounts(year: number, partitions: TimeSeriesPartition[]): Promise<void> {
     const summary = this.timeSeries.summary
     const key = formAggregatesKey(summary.reporterId, summary.topicId, year)
     const report = this.createCSV(summary, partitions)
     await this.snapshot.putObject(key, report)
   }
 
-  createCSV (summary: FeedSummary, partitions: TimeSeriesPartition[]): string {
+  createCSV(summary: FeedSummary, partitions: TimeSeriesPartition[]): string {
     const csv = partitions.map(partition => {
       const rows: string[] = []
       const genderGrouping = groupBy(partition.events, (e) => e.getValue('uscdiPatientSexAtBirth'))

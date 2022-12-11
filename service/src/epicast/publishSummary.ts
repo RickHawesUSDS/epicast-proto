@@ -1,4 +1,4 @@
-import { getLogger } from '@/utils/loggers'
+import { getLogger } from '@/server/loggers'
 import { readFileSync } from 'fs'
 import { compile } from 'handlebars'
 import { SUMMARY_KEY } from './feedStorageKeys'
@@ -9,7 +9,7 @@ import { TimeSeries } from './TimeSeries'
 const logger = getLogger('PUBLISH_DICTIONARY_SERVICE')
 const SUMMARY_TEMPLATE_PATH = './public/summary.handlebars'
 
-export async function publishSummary (
+export async function publishSummary(
   toSnapshot: MutableSnapshot,
   timeSeries: TimeSeries
 ): Promise<void> {

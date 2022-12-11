@@ -7,7 +7,7 @@ import { config } from 'dotenv'
 
 import { app, expressApp } from '@/server/app'
 import http from 'http'
-import { bootstrapLogger } from '@/utils/loggers'
+import { bootstrapLogger } from '@/server/loggers'
 config()
 
 // const debug = Debug('server:server')
@@ -22,7 +22,7 @@ expressApp.set('port', port)
 
 initialize().catch((error) => console.log(error))
 
-async function initialize (): Promise<void> {
+async function initialize(): Promise<void> {
   /**
    * Initialize app
    */
@@ -45,7 +45,7 @@ async function initialize (): Promise<void> {
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort (val: string): number | string | boolean {
+function normalizePort(val: string): number | string | boolean {
   const port = parseInt(val, 10)
 
   if (isNaN(port)) {
@@ -65,7 +65,7 @@ function normalizePort (val: string): number | string | boolean {
  * Event listener for HTTP server "error" event.
  */
 
-function onError (error: { syscall: string, code: string }): void {
+function onError(error: { syscall: string, code: string }): void {
   if (error.syscall !== 'listen') {
     throw new Error(error.code)
   }

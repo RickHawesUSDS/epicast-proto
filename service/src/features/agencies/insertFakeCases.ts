@@ -2,11 +2,11 @@ import { addDays, addMonths, endOfDay, set, startOfDay, startOfMonth } from 'dat
 import { MongoTimeSeries, MongoTimeSeriesEvent } from './MongoTimeSeries'
 import { faker } from '@faker-js/faker'
 import { variableDictionaryElementNames } from './agencyModels'
-import { getLogger } from '@/utils/loggers'
+import { getLogger } from '@/server/loggers'
 
 const logger = getLogger('INSERT_FAKE_CASES')
 
-export async function insertFakeCases (timeSeries: MongoTimeSeries, numberOfDays: number, numberPerDay: number): Promise<MongoTimeSeriesEvent[]> {
+export async function insertFakeCases(timeSeries: MongoTimeSeries, numberOfDays: number, numberPerDay: number): Promise<MongoTimeSeriesEvent[]> {
   const decideOnDate = async (): Promise<Date> => {
     const now = new Date()
     if (numberOfDays * numberPerDay > 10000) {
@@ -49,7 +49,7 @@ export async function insertFakeCases (timeSeries: MongoTimeSeries, numberOfDays
   return casesAdded
 }
 
-function fakeCase (timeSeries: MongoTimeSeries, eventAt: Date): any {
+function fakeCase(timeSeries: MongoTimeSeries, eventAt: Date): any {
   const state = timeSeries.summary.reporterId === 'cphd.ca.gov' ? 'CA' : 'AZ'
   const sourceCase: any = {}
   sourceCase.uscdiPatientFirstName = faker.name.firstName()
@@ -76,7 +76,7 @@ function fakeCase (timeSeries: MongoTimeSeries, eventAt: Date): any {
   return sourceCase
 }
 
-function fakeVariableElements (timeSeries: MongoTimeSeries, sourceCase: MongoTimeSeriesEvent): void {
+function fakeVariableElements(timeSeries: MongoTimeSeries, sourceCase: MongoTimeSeriesEvent): void {
   for (const variableElementName of variableDictionaryElementNames) {
     const index = timeSeries.dictionary.elements.findIndex(e => e.name === variableElementName)
     if (index !== -1) {
@@ -85,7 +85,7 @@ function fakeVariableElements (timeSeries: MongoTimeSeries, sourceCase: MongoTim
   }
 }
 
-function sample (codeset: string[]): string {
+function sample(codeset: string[]): string {
   const random = Math.floor(Math.random() * codeset.length)
   return codeset[random]
 }

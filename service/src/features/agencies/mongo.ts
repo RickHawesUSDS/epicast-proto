@@ -1,5 +1,5 @@
 import { MongoClient, Db } from 'mongodb'
-import { getLogger } from '@/utils/loggers'
+import { getLogger } from '@/server/loggers'
 
 const MONGODB_URI = 'mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=demoserver'
 
@@ -10,7 +10,7 @@ client.on('commandStarted', (event) => logger.debug(event))
 client.on('commandSucceeded', (event) => logger.debug(event))
 client.on('commandFailed', (event) => logger.debug(event))
 
-export async function attachToDb (): Promise<Db> {
+export async function attachToDb(): Promise<Db> {
   logger.info('Connecting to Mongo...')
   await client.connect()
   await client.db('admin').command({ ping: 1 })

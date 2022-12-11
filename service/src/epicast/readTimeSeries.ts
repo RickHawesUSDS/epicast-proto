@@ -4,7 +4,7 @@ import { strict as assert } from 'node:assert'
 
 import { StorageObject } from './FeedStorage'
 import { formDeletedKeyFromTimeSeriesKey, TIMESERIES_FOLDER } from './feedStorageKeys'
-import { getLogger } from '@/utils/loggers'
+import { getLogger } from '@/server/loggers'
 import { MutableTimeSeries, TimeSeriesDeletedEvent } from './TimeSeries'
 import { FeedElement } from './FeedElement'
 import { FeedDictionary } from './FeedDictionary'
@@ -12,7 +12,7 @@ import { Snapshot } from './Snapshot'
 
 const logger = getLogger('READ_TIME_SERIES_CONTROLLER')
 
-export async function readTimeSeries<T> (fromSnapshot: Snapshot, toTimeSeries: MutableTimeSeries<T>): Promise<Date | undefined> {
+export async function readTimeSeries<T>(fromSnapshot: Snapshot, toTimeSeries: MutableTimeSeries<T>): Promise<Date | undefined> {
   const reader = new TimeSeriesReader(fromSnapshot, toTimeSeries)
   return await reader.read()
 }
@@ -21,12 +21,12 @@ class TimeSeriesReader<T> {
   snapshot: Snapshot
   timeSeries: MutableTimeSeries<T>
 
-  constructor (fromSnapshot: Snapshot, toTimeSeries: MutableTimeSeries<T>) {
+  constructor(fromSnapshot: Snapshot, toTimeSeries: MutableTimeSeries<T>) {
     this.snapshot = fromSnapshot
     this.timeSeries = toTimeSeries
   }
 
-  async read (): Promise<Date | undefined> {
+  async read(): Promise<Date | undefined> {
     const snapshotVersion = this.snapshot.version?.toString() ?? 'empty'
     logger.info(`Reading: ${this.snapshot.uri ?? 'never'}; snapshot version: ${snapshotVersion} `)
     let publishedObjects = await this.snapshot.listObjects(TIMESERIES_FOLDER)
@@ -47,14 +47,14 @@ class TimeSeriesReader<T> {
     return lastPublished
   }
 
-  async fetchEvents (publishedObjects: StorageObject[]): Promise<T[]> {
+  async fetchEvents(publishedObjects: StorageObject[]): Promise<T[]> {
     const promises = publishedObjects.map(async (publishedObject) => await this.fetchOnePartition(publishedObject))
     const events = (await Promise.all(promises)).flatMap((partition) => partition)
     return events
   }
 
-  async fetchOnePartition (publishedObject: StorageObject): Promise<T[]> {
-    function matchElements (header: string[], dictionary: FeedDictionary): FeedElement[] {
+  async fetchOnePartition(publishedObject: StorageObject): Promise<T[]> {
+    function matchElements(header: string[], dictionary: FeedDictionary): FeedElement[] {
       const elements: FeedElement[] = []
       for (let col = 0; col < header.length; col++) {
         const name = header[col]
@@ -75,7 +75,7 @@ class TimeSeriesReader<T> {
     return rows.slice(1).map((row) => this.readEvent(row, elements))
   }
 
-  readEvent (row: string[], elements: FeedElement[]): T {
+  readEvent(row: string[], elements: FeedElement[]): T {
     assert(row.length === elements.length)
     const values = row.map((column, index) => {
       switch (elements[index].type) {
@@ -92,13 +92,13 @@ class TimeSeriesReader<T> {
     return this.timeSeries.createEvent(eventValues)
   }
 
-  async fetchDeletedEvents (publishedObjects: StorageObject[]): Promise<TimeSeriesDeletedEvent[]> {
+  async fetchDeletedEvents(publishedObjects: StorageObject[]): Promise<TimeSeriesDeletedEvent[]> {
     const promises = publishedObjects.map(async (publishedObject) => await this.fetchOneDeletedPartition(publishedObject))
     const events = (await Promise.all(promises)).flatMap((partition) => partition)
     return events
   }
 
-  async fetchOneDeletedPartition (publishedObject: StorageObject): Promise<TimeSeriesDeletedEvent[]> {
+  async fetchOneDeletedPartition(publishedObject: StorageObject): Promise<TimeSeriesDeletedEvent[]> {
     const deletedKey = formDeletedKeyFromTimeSeriesKey(publishedObject.key)
     if (!this.snapshot.doesObjectExist(deletedKey)) return []
     const csv = await this.snapshot.getObject(deletedKey)
@@ -110,7 +110,7 @@ class TimeSeriesReader<T> {
     })
   }
 
-  lastModifiedOf (objects: StorageObject[]): Date {
+  lastModifiedOf(objects: StorageObject[]): Date {
     return min(objects.map((o) => o.lastModified))
   }
 }

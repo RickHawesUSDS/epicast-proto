@@ -6,7 +6,7 @@ import { join } from 'path'
 import { StorageObject, FeedStorage } from './FeedStorage'
 import { formSnaphotUri, formSnapshotKey, SNAPSHOT_FOLDER, versionFromSnapshotKey } from './feedStorageKeys'
 import assert from 'assert'
-import { getLogger } from '@/utils/loggers'
+import { getLogger } from '@/server/loggers'
 import { upsert } from '@/utils/upsert'
 
 const logger = getLogger('SNAPSHOT')
@@ -35,13 +35,13 @@ export class SnapshotReader implements Snapshot {
   feedVersion?: number
   loadCalled: boolean
 
-  constructor (fromStorage: FeedStorage, feedFolder: string) {
+  constructor(fromStorage: FeedStorage, feedFolder: string) {
     this.folder = feedFolder
     this.storage = fromStorage
     this.loadCalled = false
   }
 
-  async load (): Promise<void> {
+  async load(): Promise<void> {
     const mutex = new Mutex()
     await mutex.runExclusive(async () => {
       if (this.loadCalled) throw Error('Read must not be called twice')
@@ -60,29 +60,29 @@ export class SnapshotReader implements Snapshot {
     })
   }
 
-  get version (): number | undefined {
+  get version(): number | undefined {
     if (!this.loadCalled) throw Error('Read must be called before this method')
     return this.feedVersion
   }
 
-  get uri (): string | undefined {
+  get uri(): string | undefined {
     if (!this.loadCalled) return
     return formSnaphotUri(this.storage, this.folder, this.feedVersion ?? 0)
   }
 
-  listObjects (prefix: string): StorageObject[] {
+  listObjects(prefix: string): StorageObject[] {
     if (!this.loadCalled) throw Error('Read must be called before this method')
     // production code would work to make this search more efficient
     return this.storageObjects
       .filter(object => object.key.startsWith(prefix))
   }
 
-  doesObjectExist (key: string): boolean {
+  doesObjectExist(key: string): boolean {
     if (!this.loadCalled) throw Error('Read must be called before this method')
     return this.storageObjects.findIndex(object => object.key === key) !== -1
   }
 
-  async getObject (key: string): Promise<string> {
+  async getObject(key: string): Promise<string> {
     if (!this.loadCalled) throw Error('Read must be called before this method')
     const index = this.storageObjects.findIndex((object) => object.key === key)
     if (index === -1) throw Error('Object does not exist')
@@ -91,7 +91,7 @@ export class SnapshotReader implements Snapshot {
     return await this.storage.getObject(this.formKey(key), versionId)
   }
 
-  formKey (path: string): string {
+  formKey(path: string): string {
     return join(this.folder, path)
   }
 }
@@ -101,7 +101,7 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
   initializedCalled = false
   isModified = false
 
-  async initialize (): Promise<void> {
+  async initialize(): Promise<void> {
     await super.load()
     if (this.feedVersion !== undefined) {
       this.feedVersion = this.feedVersion + 1
@@ -112,7 +112,7 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
     this.isModified = false
   }
 
-  async putObject (key: string, value: string): Promise<void> {
+  async putObject(key: string, value: string): Promise<void> {
     if (!this.initializedCalled) throw Error('Initialized must be called')
     logger.info(`Put of object: ${key}`)
     const writtenObject = await this.storage.putObject(this.formKey(key), value)
@@ -122,7 +122,7 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
     this.isModified = true
   }
 
-  async deleteObject (key: string): Promise<void> {
+  async deleteObject(key: string): Promise<void> {
     if (!this.initializedCalled) throw Error('Initialized must be called')
     logger.info(`Delete of object: ${key}`)
     const index = this.storageObjects.findIndex((object) => object.key === key)
@@ -133,7 +133,7 @@ export class SnapshotWriter extends SnapshotReader implements MutableSnapshot {
     }
   }
 
-  async publish (): Promise<void> {
+  async publish(): Promise<void> {
     if (!this.isModified) return
     const csv = this.storageObjects.map(object => {
       assert(object.versionId !== undefined)

@@ -1,5 +1,5 @@
 import express from 'express'
-import { getLogger } from '@/utils/loggers'
+import { getLogger } from '@/server/loggers'
 const router = express.Router()
 const logger = getLogger('INDEX_ROUTE')
 
