@@ -4,7 +4,7 @@ export interface FeedSummary {
   epicastVersion: string
   reporterId: string
   topicId: string
-  sourceUrl: string
+  sourceUri: string
   descriptions: FeedDescription[]
   contacts: FeedContact[]
   sourceFeeds?: FeedSummary[]
@@ -27,7 +27,7 @@ export interface FeedContact {
   telephone?: string
 }
 
-export function updateFeedSummary (
+export function updateFeedSummary(
   initial: FeedSummary,
   timeSeriesMetadata: TimeSeriesMetadata | null,
   snapshotUrl?: string
@@ -38,6 +38,6 @@ export function updateFeedSummary (
   updated.firstEventAt = timeSeriesMetadata.firstEventAt.toISOString()
   updated.lastEventAt = timeSeriesMetadata.lastEventAt.toISOString()
   updated.updatedAt = timeSeriesMetadata.updatedAt.toISOString()
-  updated.sourceUrl = snapshotUrl ?? ''
+  updated.sourceUri = snapshotUrl ?? ''
   return updated
 }

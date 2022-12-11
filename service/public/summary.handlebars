@@ -18,19 +18,19 @@ reporterId: {{ reporterId }}
 #
 topicId: {{ topicId }}
 
-# The source URL for this feed. Points to the URL for the snapshot for this version of the feed.
-sourceUrl: {{ sourceUrl }}
+# The source URI for this feed. Points to the snapshot for this version of the feed.
+sourceUri: {{ sourceUri }}
 
 # Human readable descriptions about the feed by human language.
 # Must have at least one description.
 #
 descriptions:
 {{#each this.descriptions }}
-  - isoCultureCode: {{ this.isoCultureCode }}
-    reporter: {{ this.reporter }}
-    topic: {{ this.topic }}
-    subject: {{ this.subject }}
-    details: {{ this.details }}
+- isoCultureCode: {{ this.isoCultureCode }}
+reporter: {{ this.reporter }}
+topic: {{ this.topic }}
+subject: {{ this.subject }}
+details: {{ this.details }}
 {{/each}}
 
 # The feeds that contributed to this feed.
@@ -38,9 +38,9 @@ descriptions:
 sourceFeeds:
 {{#each feeds }}
 - reporterId: {{this.reporterId}}
-  topicId: {{this.topicId}}
-  sourceUrl: {{ this.sourceUrl }}
-  # real code will have the source feed's source feeds listed here as well to provide the full tree
+topicId: {{this.topicId}}
+sourceUri: {{ this.sourceUri }}
+# real code will have the source feed's source feeds listed here as well to provide the full tree
 {{/each}}
 
 # Basic information about the content of this feed besides its sources
@@ -57,6 +57,3 @@ firstEventAt: {{ firstEventAt }}
 {{#if lastEventAt }}
 lastEventAt: {{ lastEventAt }}
 {{/if}}
-
-
-

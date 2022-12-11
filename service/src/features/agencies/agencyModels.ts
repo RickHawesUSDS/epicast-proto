@@ -11,7 +11,7 @@ export const initialCASummary: FeedSummary = {
   epicastVersion: '0.1',
   reporterId: 'cphd.ca.gov',
   topicId: commonTopic,
-  sourceUrl: '',
+  sourceUri: '',
   sourceFeeds: [],
   descriptions: [{
     isoCultureCode: 'en-us',
@@ -27,7 +27,7 @@ export const initialAZSummary: FeedSummary = {
   epicastVersion: '0.1',
   reporterId: 'azphs.gov',
   topicId: commonTopic,
-  sourceUrl: '',
+  sourceUri: '',
   sourceFeeds: [],
   descriptions: [{
     isoCultureCode: 'en-us',
@@ -43,7 +43,7 @@ export const initialCDCSummary: FeedSummary = {
   epicastVersion: '0.1',
   reporterId: 'cdc.gov',
   topicId: commonTopic,
-  sourceUrl: '',
+  sourceUri: '',
   sourceFeeds: [],
   descriptions: [{
     isoCultureCode: 'en-us',
