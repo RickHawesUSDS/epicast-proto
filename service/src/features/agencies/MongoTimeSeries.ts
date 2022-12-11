@@ -48,7 +48,6 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
   private readonly initialDictionary: FeedDictionary
   private subscriberDictionaries: FeedDictionary[] = []
   private readonly initialSummary: FeedSummary
-  private readonly subscriberSummaries: FeedSummary[] = []
 
   private lastEventNumber: number = 1
 
@@ -261,5 +260,11 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
   resetDictionary(): void {
     this.dictionary = new MutableFeedDictionary(this.initialDictionary)
     this.subscriberDictionaries = []
+  }
+
+  /// Summary Methods
+
+  updateSubscriberSummary(subscriberSummary: FeedSummary): void {
+    this.summary = updateFeedSummary(this.summary, { sourceFeed: subscriberSummary })
   }
 }

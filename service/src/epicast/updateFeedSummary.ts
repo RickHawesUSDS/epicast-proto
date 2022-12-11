@@ -3,7 +3,7 @@ import { FeedSummary } from './FeedSummary'
 import { upsert } from '@/collection/upsert'
 
 export interface SummaryUpdates {
-  metadata: TimeSeriesMetadata | null | undefined
+  metadata?: TimeSeriesMetadata | null
   snapshotUri?: string
   sourceFeed?: FeedSummary
 }

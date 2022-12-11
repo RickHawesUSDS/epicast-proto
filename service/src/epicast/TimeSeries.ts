@@ -55,6 +55,7 @@ export interface TimeSeriesDeletedEvent {
 }
 
 export interface TimeSeriesMutator<T> {
+  updateSubscriberSummary: (subscriberSummary: FeedSummary) => void
   updateSubscriberDictionary: (subscriberDictionary: FeedDictionary) => void
   upsertEvents: (events: T[]) => Promise<void>
   deleteEvents: (events: TimeSeriesDeletedEvent[]) => Promise<void>

@@ -13,7 +13,6 @@ export async function publishSummary(
   toSnapshot: MutableSnapshot,
   timeSeries: TimeSeries
 ): Promise<void> {
-  logger.info('publishing feed summary')
   const timeSeriesMetadata = await timeSeries.fetchMetadata()
   const feedSummary = timeSeriesMetadata !== null
     ? updateFeedSummary(timeSeries.summary, { metadata: timeSeriesMetadata, snapshotUri: toSnapshot.uri })
@@ -22,4 +21,5 @@ export async function publishSummary(
   const compiledSummaryTemplate = compile(summaryTemplate)
   const rawSummary = compiledSummaryTemplate(feedSummary)
   await toSnapshot.putObject(SUMMARY_KEY, rawSummary)
+  logger.info(`Published feed summary for ${feedSummary.reporterId}`)
 }

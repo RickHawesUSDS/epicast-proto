@@ -51,6 +51,9 @@ GET http://localhost:4001/api/agencies/cdc.gov/subscribers/cases.cphd.ca.gov
 ### Read the feed once
 POST http://localhost:4001/api/agencies/cdc.gov/subscribers/cases.cphd.ca.gov/read
 
+### Publish the CDC feed
+POST http://localhost:4001/api/agencies/cdc.gov/publish
+
 ### Start automatic feed reading
 POST http://localhost:4001/api/agencies/cdc.gov/subscribers
 content-type: application/json
@@ -75,8 +78,11 @@ GET http://localhost:4001/api/feeds/metadata?prefix=cphd.ca.gov/cases/snapshots/
 ### Get feed snapshot
 GET http://localhost:4001/api/feeds/content?file=cphd.ca.gov/cases/snapshots/1.csv
 
-### Get summary
+### Get CA summary
 GET http://localhost:4001/api/feeds/content?file=cphd.ca.gov/cases/summary.yaml
+
+### Get CDC summary
+GET http://localhost:4001/api/feeds/content?file=cdc.gov/cases/summary.yaml
 
 ###
 GET http://localhost:4001/api/feeds/content?file=cphd.ca.gov/cases/time_series/20221101T000000-07:00--P1M.csv

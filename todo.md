@@ -40,8 +40,8 @@
 * [x] Merge dictionaries when multiple imports.
 * [x] Multiple subjects per feed summary. Declare system used. Complete subject reporter. Remove subject from feed.
 * [x] Turn on AZ. Initial data in both feeds. AZ feed published.
-* [ ] Merge summaries for the merged feed.
-* [ ] Add pulishing of the CDC feed.
+* [x] Merge summaries for the merged feed.
+* [ ] Add pulishing of the CDC feed. Update UI.
 * [ ] Update UI picture. Allow people to see AZ
 * [ ] Support column name and EpiCast name? Allows people to define feeds with old names.
 

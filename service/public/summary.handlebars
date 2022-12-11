@@ -33,14 +33,33 @@ descriptions:
   details: {{ this.details }}
 {{/each}}
 
-# The feeds that contributed to this feed.
+# The feeds that were merged into this feed.
 #
 sourceFeeds:
-{{#each feeds }}
+{{#each sourceFeeds }}
 - reporterId: {{this.reporterId}}
   topicId: {{this.topicId}}
   sourceUri: {{ this.sourceUri }}
-# real code will have the source feed's source feeds listed here as well to provide the full tree
+  descriptions:
+  {{#each this.descriptions }}
+  - isoCultureCode: {{ this.isoCultureCode }}
+    reporter: {{ this.reporter }}
+    topic: {{ this.topic }}
+    subject: {{ this.subject }}
+    details: {{ this.details }}
+  {{/each}}
+  {{#if this.eventCount }}
+  eventCount: {{ eventCount }}
+  {{/if}}
+  {{#if this.updatedAt }}
+  updatedAt: {{ updatedAt }}
+  {{/if}}
+  {{#if this.firstEventAt }}
+  firstEventAt: {{ firstEventAt }}
+  {{/if}}
+  {{#if this.lastEventAt }}
+  lastEventAt: {{ lastEventAt }}
+  {{/if}}
 {{/each}}
 
 # Basic information about the content of this feed besides its sources
