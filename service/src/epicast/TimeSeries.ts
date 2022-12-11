@@ -28,15 +28,14 @@ export interface TimeSeriesCountOptions {
   updatedAfter?: Date
 }
 
-export const eventElementNames = ['eventId', 'eventAt', 'eventSubject', 'eventReporter', 'eventTopic', 'eventUpdatedAt', 'eventIsDeleted', 'eventReplacedBy']
+export const eventElementNames = ['eventId', 'eventAt', 'eventSubject', 'eventReporterId', 'eventTopicId', 'eventUpdatedAt', 'eventIsDeleted', 'eventReplacedBy']
 export type EventElementName = typeof eventElementNames[number]
 
 export interface TimeSeriesEvent {
   readonly eventId: string
   readonly eventAt: Date
-  readonly eventSubject: string
-  readonly eventReporter: string
-  readonly eventTopic: string
+  readonly eventTopicId: string
+  readonly eventReporterId: string
   readonly eventUpdatedAt: Date
   readonly eventIsDeleted?: boolean
   readonly eventReplacedBy?: string

@@ -1,5 +1,6 @@
 import { FeedDictionary } from '@/epicast/FeedDictionary'
 import { FeedSummary } from '@/epicast/FeedSummary'
+import { requiredElements } from '@/epicast/requiredElements'
 
 export const commonTopic = 'cases'
 export const commonTopicFullName = 'Demonstration cases'
@@ -8,51 +9,48 @@ export const commonTopicFullName = 'Demonstration cases'
 //
 export const initialCASummary: FeedSummary = {
   epicastVersion: '0.1',
-  subject: 'ca.us',
-  reporter: 'cphd.ca.gov',
-  topic: commonTopic,
+  reporterId: 'cphd.ca.gov',
+  topicId: commonTopic,
   sourceUrl: '',
   sourceFeeds: [],
   descriptions: [{
     isoCultureCode: 'en-us',
-    subjectFullName: 'California',
-    reporterFullName: 'California Public Health Department',
-    topicFullName: commonTopicFullName,
-    feedDetails: 'This a fake feed for demonstration purposes'
+    subject: 'California',
+    reporter: 'California Public Health Department',
+    topic: commonTopicFullName,
+    details: 'This a fake feed for demonstration purposes'
   }],
   contacts: [{ email: 'fake@cphd.ca.gov' }]
 }
 
 export const initialAZSummary: FeedSummary = {
   epicastVersion: '0.1',
-  subject: 'az.us',
-  reporter: 'azphs.gov',
-  topic: commonTopic,
+  reporterId: 'azphs.gov',
+  topicId: commonTopic,
   sourceUrl: '',
   sourceFeeds: [],
   descriptions: [{
     isoCultureCode: 'en-us',
-    subjectFullName: 'Arizona',
-    reporterFullName: 'Arizona Public Health Service',
-    topicFullName: commonTopicFullName,
-    feedDetails: 'This a fake feed for demonstration purposes'
+    reporter: 'Arizona Public Health Service',
+    topic: commonTopicFullName,
+    subject: 'Arizona',
+    details: 'This a fake feed for demonstration purposes'
   }],
   contacts: [{ email: 'fake@azphs.gov' }]
 }
 
 export const initialCDCSummary: FeedSummary = {
   epicastVersion: '0.1',
-  subject: 'us',
-  reporter: 'cdc.gov',
-  topic: commonTopic,
+  reporterId: 'cdc.gov',
+  topicId: commonTopic,
   sourceUrl: '',
   sourceFeeds: [],
   descriptions: [{
     isoCultureCode: 'en-us',
-    subjectFullName: 'United States of America',
-    reporterFullName: 'Centers for Disease Control and Prevention',
-    topicFullName: commonTopicFullName,
-    feedDetails: 'This a fake feed for demonstration purposes'
+    reporter: 'Centers for Disease Control and Prevention',
+    topic: commonTopicFullName,
+    subject: 'United States of America',
+    details: 'This a fake feed for demonstration purposes'
   }],
   contacts: [{ email: 'fake@cdc.gov' }]
 }
@@ -61,8 +59,8 @@ export const initialCDCSummary: FeedSummary = {
 // will be modified by individual feeds
 //
 export const initialCommonCaseDictionary: FeedDictionary = {
-  topic: commonTopic,
-  reporter: 'varies', // dummy data
+  topicId: commonTopic,
+  reporterId: 'varies', // dummy data
   validFrom: new Date(), // dummy value
   namespaces: [
     {
@@ -86,73 +84,7 @@ export const initialCommonCaseDictionary: FeedDictionary = {
       description: 'Core EpiCast elements'
     }
   ],
-  elements: [
-    {
-      name: 'eventId',
-      namespace: 'event',
-      type: 'string',
-      tags: [],
-      descriptions: [{
-        isoCultureCode: 'en-us',
-        section: 'event',
-        displayName: 'Event Id'
-      }]
-    },
-    {
-      name: 'eventAt',
-      namespace: 'event',
-      type: 'date',
-      tags: [],
-      descriptions: [{
-        isoCultureCode: 'en-us',
-        section: 'event',
-        displayName: 'Event Time'
-      }]
-    },
-    {
-      name: 'eventSubject',
-      namespace: 'event',
-      type: 'string',
-      tags: [],
-      descriptions: [{
-        isoCultureCode: 'en-us',
-        section: 'event',
-        displayName: 'Event Subject'
-      }]
-    },
-    {
-      name: 'eventReporter',
-      namespace: 'event',
-      type: 'string',
-      tags: [],
-      descriptions: [{
-        isoCultureCode: 'en-us',
-        section: 'event',
-        displayName: 'Event Reporter'
-      }]
-    },
-    {
-      name: 'eventTopic',
-      namespace: 'event',
-      type: 'string',
-      tags: [],
-      descriptions: [{
-        isoCultureCode: 'en-us',
-        section: 'event',
-        displayName: 'Event Topic'
-      }]
-    },
-    {
-      name: 'eventUpdatedAt',
-      namespace: 'event',
-      type: 'date',
-      tags: [],
-      descriptions: [{
-        isoCultureCode: 'en-us',
-        section: 'event',
-        displayName: 'Event Updated Time'
-      }]
-    },
+  elements: requiredElements.concat([
     {
       name: 'cdcOnsetOfSymptoms',
       namespace: 'cdc',
@@ -254,7 +186,7 @@ export const initialCommonCaseDictionary: FeedDictionary = {
         displayName: 'Postal Code'
       }]
     }
-  ]
+  ])
 }
 
 export const initialStateDictionary = {

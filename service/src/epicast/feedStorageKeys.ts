@@ -9,7 +9,7 @@ import { FeedSummary } from './FeedSummary'
 //
 
 export const formFolder = (feedSummary: FeedSummary): string => {
-  return pathPosix.join(feedSummary.reporter.toLowerCase(), feedSummary.topic.toLowerCase())
+  return pathPosix.join(feedSummary.reporterId.toLowerCase(), feedSummary.topicId.toLowerCase())
 }
 
 export const SUMMARY_FOLDER = ''
@@ -62,8 +62,8 @@ export const splitDictionaryKey = (key: string): [string, string] => {
 }
 
 export const FILE_NAME_SEPERATOR = '-'
-export const formFeedName = (subjectId: string, reporterId: string, feedId: string): string => {
-  return [subjectId, reporterId, feedId].join(FILE_NAME_SEPERATOR)
+export const formFeedName = (reporterId: string, topicId: string): string => {
+  return [reporterId, topicId].join(FILE_NAME_SEPERATOR)
 }
 
 export const SNAPSHOT_FOLDER = 'snapshots'
@@ -81,6 +81,6 @@ export const formSnaphotUri = (storage: FeedStorage, folder: string, version: nu
 
 export const AGGREGATES_FOLDER = 'aggregates'
 export const AGGREGATES_EXTENSION = 'csv'
-export const formAggregatesKey = (subjectId: string, reporterId: string, feedId: string, year: number): string => {
-  return `${AGGREGATES_FOLDER}/${subjectId}-${reporterId}-${feedId}-${year}.${AGGREGATES_EXTENSION}`
+export const formAggregatesKey = (reporterId: string, feedId: string, year: number): string => {
+  return `${AGGREGATES_FOLDER}/${reporterId}-${feedId}-${year}.${AGGREGATES_EXTENSION}`
 }

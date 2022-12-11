@@ -2,9 +2,8 @@ import { TimeSeriesMetadata } from './TimeSeries'
 
 export interface FeedSummary {
   epicastVersion: string
-  subject: string
-  reporter: string
-  topic: string
+  reporterId: string
+  topicId: string
   sourceUrl: string
   descriptions: FeedDescription[]
   contacts: FeedContact[]
@@ -17,10 +16,10 @@ export interface FeedSummary {
 
 export interface FeedDescription {
   isoCultureCode: string
-  subjectFullName: string
-  reporterFullName: string
-  topicFullName: string
-  feedDetails: string
+  reporter: string
+  topic: string
+  subject: string
+  details: string
 }
 
 export interface FeedContact {

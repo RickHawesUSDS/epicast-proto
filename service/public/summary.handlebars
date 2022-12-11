@@ -1,52 +1,48 @@
-# Feed Summary
-
 #
-# Describes the feed
+# Feed Summary
 #
 
 # version of the epicast that the feed conforms to
 epicastVersion: 0.2
 
-# Subject, reporter, topic uniquely define a feed. Each value must be registered
-# with the central EpiCast website
+# The reporter and topic uniquely define a feed.
+#
+# The reporter is the organization, system or facility reporting the feed.
+# For cases, this will likely be a name of a public health agency. Reporter names
+# need to be unique. It is common to use the DNS address of the reporter.
+#
+reporterId: {{ reporterId }}
 
-# Subject represent the reporting subject.
-# For cases, the jurisdiction or the population that is the subject of the reporting.
-subject: {{ subject }}
-
-# The reporter is the organization, system or facility reporting on the subject.
-# For cases, this will likely be a name of a public health agency
-reporter: {{ reporter }}
-
-# The topic of the feed. For cases, this will be something like 'covid_19_cases'
-topic: {{ topic }}
+# The topic of the feed. For cases, this will be something like 'covid_19_cases'.
+# Topics are registered with the EpiCast central.
+#
+topicId: {{ topicId }}
 
 # The source URL for this feed. Points to the URL for the snapshot for this version of the feed.
 sourceUrl: {{ sourceUrl }}
 
-# Human viewable descriptions about the feed by language.
-# Must have at least one description. The most complete description should be first.
+# Human readable descriptions about the feed by human language.
+# Must have at least one description.
 #
 descriptions:
 {{#each this.descriptions }}
   - isoCultureCode: {{ this.isoCultureCode }}
-    subjectFullName: {{ this.subjectFullName }}
-    reporterFullName: {{ this.reporterFullName }}
-    topicFullName: {{ this.topicFullName }}
-    feedDetails: {{ this.details }}
+    reporter: {{ this.reporter }}
+    topic: {{ this.topic }}
+    subject: {{ this.subject }}
+    details: {{ this.details }}
 {{/each}}
 
 # The feeds that contributed to this feed.
+#
 sourceFeeds:
 {{#each feeds }}
-- subject: {{this.subject}}
-  reporter: {{this.reporter}}
-  topic: {{this.topic}}
+- reporterId: {{this.reporterId}}
+  topicId: {{this.topicId}}
   sourceUrl: {{ this.sourceUrl }}
   # real code will have the source feed's source feeds listed here as well to provide the full tree
 {{/each}}
 
-#
 # Basic information about the content of this feed besides its sources
 #
 {{#if eventCount }}

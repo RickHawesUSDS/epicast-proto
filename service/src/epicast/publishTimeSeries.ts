@@ -22,7 +22,7 @@ export async function publishTimeseries (
   timeseries: TimeSeries,
   publishOptions: PublishFeedOptions
 ): Promise<number> {
-  logger.info(`publishing timeseries: ${timeseries.summary.subject}-${timeseries.summary.reporter}`)
+  logger.info(`publishing timeseries: ${timeseries.summary.topicId}-${timeseries.summary.reporterId}`)
   const publisher = new TimeSeriesPublisher(toSnapshot, timeseries, publishOptions)
   return await publisher.publish()
 }

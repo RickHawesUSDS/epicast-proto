@@ -7,6 +7,7 @@ import { groupBy } from '@/utils/groupBy'
 import { getLogger } from '@/utils/loggers'
 import { stringify } from 'csv-string'
 import { formatISO } from 'date-fns'
+import { FeedSummary } from './FeedSummary'
 
 const logger = getLogger('PUBLISH_AGREGATES_SERVICE')
 
@@ -14,6 +15,9 @@ export async function publishAggregates (toSnapshot: MutableSnapshot, fromTimeSe
   const publisher = new AggregatesPublisher(toSnapshot, fromTimeSeries)
   await publisher.publish()
 }
+
+// DevNote: this aggregator is just a first implementation. The stratifiers should
+// should be specified as a publish option.
 
 class AggregatesPublisher {
   snapshot: MutableSnapshot
@@ -36,29 +40,25 @@ class AggregatesPublisher {
   }
 
   async publishDailyCounts (year: number, partitions: TimeSeriesPartition[]): Promise<void> {
-    const subject = this.timeSeries.summary.subject
-    const reporter = this.timeSeries.summary.reporter
-    const feed = this.timeSeries.summary.topic
-
-    function createCSV (partitions: TimeSeriesPartition[]): string {
-      const csv = partitions.map(partition => {
-        const rows: string[] = []
-        const genderGrouping = groupBy(partition.events, (e) => e.getValue('personSexAtBirth'))
-        for (const [gender, events] of genderGrouping) {
-          const row = stringify(([subject, reporter, feed, formatISO(partition.period.start), formatISO(partition.period.end), 'gender', gender, events.length]))
-          rows.push(row)
-        }
-        const totalRow = stringify([subject, reporter, feed, formatISO(partition.period.start), formatISO(partition.period.end), '', '', partition.events.length])
-        rows.push(totalRow)
-        return rows.join('')
-      })
-      csv.unshift(stringify(['subject', 'reporter', 'feed', 'period-start', 'period-end', 'stratifier', 'stratum', 'count']))
-      return csv.join('')
-    }
-
     const summary = this.timeSeries.summary
-    const key = formAggregatesKey(summary.subject, summary.reporter, summary.topic, year)
-    const report = createCSV(partitions)
+    const key = formAggregatesKey(summary.reporterId, summary.topicId, year)
+    const report = this.createCSV(summary, partitions)
     await this.snapshot.putObject(key, report)
+  }
+
+  createCSV (summary: FeedSummary, partitions: TimeSeriesPartition[]): string {
+    const csv = partitions.map(partition => {
+      const rows: string[] = []
+      const genderGrouping = groupBy(partition.events, (e) => e.getValue('uscdiPatientSexAtBirth'))
+      for (const [gender, events] of genderGrouping) {
+        const row = stringify(([summary.reporterId, summary.topicId, formatISO(partition.period.start), formatISO(partition.period.end), 'gender', gender, events.length]))
+        rows.push(row)
+      }
+      const totalRow = stringify([summary.reporterId, summary.topicId, formatISO(partition.period.start), formatISO(partition.period.end), '', '', partition.events.length])
+      rows.push(totalRow)
+      return rows.join('')
+    })
+    csv.unshift(stringify(['reporter', 'topic', 'period-start', 'period-end', 'stratifier', 'stratum', 'count']))
+    return csv.join('')
   }
 }

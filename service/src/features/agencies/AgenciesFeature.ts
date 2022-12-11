@@ -32,18 +32,18 @@ export class AgenciesFeature implements Feature {
       subscribers: FeedSubscriber[]
     }
   } = {
-      [initialCDCSummary.reporter]: {
-        name: initialCDCSummary.reporter,
+      [initialCDCSummary.reporterId]: {
+        name: initialCDCSummary.reporterId,
         timeSeries: this.cdcTimeSeries,
         subscribers: [this.caSubscriber, this.azSubscriber]
       },
-      [initialCASummary.reporter]: {
-        name: initialCASummary.reporter,
+      [initialCASummary.reporterId]: {
+        name: initialCASummary.reporterId,
         timeSeries: this.caTimeSeries,
         subscribers: []
       },
-      [initialAZSummary.reporter]: {
-        name: initialAZSummary.reporter,
+      [initialAZSummary.reporterId]: {
+        name: initialAZSummary.reporterId,
         timeSeries: this.azTimeSeries,
         subscribers: []
       }

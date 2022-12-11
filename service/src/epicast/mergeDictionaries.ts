@@ -1,7 +1,7 @@
 import { FeedDictionary } from './FeedDictionary'
-import { MutableFeedDictionary } from "./MutableFeedDictionary"
+import { MutableFeedDictionary } from './MutableFeedDictionary'
 
-export function mergeDictionaries(reporter: string, dictionaries: FeedDictionary[]): FeedDictionary {
+export function mergeDictionaries (reporter: string, dictionaries: FeedDictionary[]): FeedDictionary {
   if (dictionaries.length === 0) throw Error('expected to merge at least one dictionary')
 
   const result = new MutableFeedDictionary(dictionaries[0])
@@ -13,6 +13,6 @@ export function mergeDictionaries(reporter: string, dictionaries: FeedDictionary
       result.addNamespace(namespace)
     }
   }
-  result.reporter = reporter
+  result.reporterId = reporter
   return result
 }

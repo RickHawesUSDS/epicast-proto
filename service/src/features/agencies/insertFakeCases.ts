@@ -50,7 +50,7 @@ export async function insertFakeCases (timeSeries: MongoTimeSeries, numberOfDays
 }
 
 function fakeCase (timeSeries: MongoTimeSeries, eventAt: Date): any {
-  const state = timeSeries.summary.reporter === 'cphd.ca.gov' ? 'CA' : 'AZ'
+  const state = timeSeries.summary.reporterId === 'cphd.ca.gov' ? 'CA' : 'AZ'
   const sourceCase: any = {}
   sourceCase.uscdiPatientFirstName = faker.name.firstName()
   sourceCase.uscdiPatientLastName = faker.name.lastName()
@@ -70,9 +70,8 @@ function fakeCase (timeSeries: MongoTimeSeries, eventAt: Date): any {
   sourceCase.cdcOnsetOfSymptoms = eventAt
 
   sourceCase.eventAt = eventAt
-  sourceCase.eventSubject = timeSeries.summary.subject
-  sourceCase.eventReporter = timeSeries.summary.reporter
-  sourceCase.eventTopic = timeSeries.summary.topic
+  sourceCase.eventReporterId = timeSeries.summary.reporterId
+  sourceCase.eventTopicId = timeSeries.summary.topicId
   fakeVariableElements(timeSeries, sourceCase)
   return sourceCase
 }

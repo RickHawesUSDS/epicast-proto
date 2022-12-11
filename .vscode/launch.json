@@ -3,7 +3,7 @@
     "configurations": [
 
         {
-            "command": "yarn debug",
+            "command": "export NODE_OPTIONS='--trace-deprecation --abort-on-uncaught-exception --inspect' && export NODE_ENV=development && ts-node  --files --transpile-only ./bin/www.ts",
             "name": "server debug",
             "request": "launch",
             "type": "node-terminal",

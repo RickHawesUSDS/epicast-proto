@@ -29,7 +29,7 @@ export class FeedSubscriber {
     toTimeSeries: MutableTimeSeries<MongoTimeSeriesEvent>
   ) {
     this.model = {
-      name: `${fromFeed.topic}.${fromFeed.reporter}`,
+      name: `${fromFeed.topicId}.${fromFeed.reporterId}`,
       automatic: false,
       reading: false,
       publishedAt: undefined

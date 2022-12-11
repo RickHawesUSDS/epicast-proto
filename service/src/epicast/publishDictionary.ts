@@ -17,7 +17,7 @@ export async function publishDictionary (
   dictionary: FeedDictionary,
   publishOptions: PublishFeedOptions
 ): Promise<void> {
-  const dictionaryKey = formDictionaryKey(dictionary.topic, dictionary.validFrom)
+  const dictionaryKey = formDictionaryKey(dictionary.topicId, dictionary.validFrom)
   if (!toSnapshot.doesObjectExist(dictionaryKey)) {
     logger.info('publishing data dictionary')
     const dictionaryTemplate = readFileSync(DICTIONARY_TEMPLATE_PATH, { encoding: 'utf8' })
@@ -34,7 +34,7 @@ function formTemplateContext (dictionary: FeedDictionary, publishOptions: Publis
     : dictionary.elements
   // format stuff in the way that the YAML file wants
   return {
-    topic: dictionary.topic,
+    topic: dictionary.topicId,
     validFrom: formatISO(dictionary.validFrom),
     namespaces: dictionary.namespaces,
     elements: publishedElements
