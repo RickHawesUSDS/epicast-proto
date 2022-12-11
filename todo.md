@@ -38,10 +38,12 @@
 ## Merged feed
 
 * [x] Merge dictionaries when multiple imports.
-* [ ] Multiple subjects per feed summary. Declare system used. Complete subject reporter. Remove subject from feed. 
-* [ ] Merge summaries for the merged feed. Remove subject.
-* [ ] Turn on AZ. Initial data in both feeds. AZ feed published.
-* [ ] Make two states feeds and cdc table that merge states together
+* [x] Multiple subjects per feed summary. Declare system used. Complete subject reporter. Remove subject from feed.
+* [x] Turn on AZ. Initial data in both feeds. AZ feed published.
+* [ ] Merge summaries for the merged feed.
+* [ ] Add pulishing of the CDC feed.
+* [ ] Update UI picture. Allow people to see AZ
+* [ ] Support column name and EpiCast name? Allows people to define feeds with old names.
 
 ## Add tests tasks
 
@@ -51,8 +53,9 @@
 
 ## Draw an Epi Curve
 
+* [ ] Make stratifiers a PublishFeedOption
 * [ ] Stratifiers in data dictionary; JS functions
-* [ ] Improve aggregates; age, gender, age+gender,
+* [ ] Improve aggregate use-case; age-group, gender, age-group+gender,
 * [ ] Public bucket
 * [ ] Draw an EpiCurve from aggregates
 
