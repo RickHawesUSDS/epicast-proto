@@ -43,7 +43,7 @@
 * [x] Merge summaries for the merged feed.
 * [ ] Add pulishing of the CDC feed. Update UI.
 * [ ] Update UI picture. Allow people to see AZ
-* [ ] Support column name and EpiCast name? Allows people to define feeds with old names.
+* [ ] Support EpiCast name and column name? Allows people to define feeds with old names. Define epiCast id as eventId + eventReporter? 
 
 ## Add tests tasks
 

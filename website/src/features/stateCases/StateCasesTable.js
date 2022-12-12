@@ -27,18 +27,20 @@ function makeColumns(dictionary) {
   })
 }
 
-export default function StateCasesTable() {
-  console.log(`rendering state cases`)
+export default function StateCasesTable(props) {
+  const agency = props.agency
+
+  console.log(`rendering state cases for ${agency}`)
   const dictionaryQuery = useQuery({
-    queryKey: [stateCasesDictionary],
+    queryKey: [stateCasesDictionary, agency],
     queryFn: async () => {
-      return await fetchStateCaseDictionary()
+      return await fetchStateCaseDictionary(agency)
     },
   })
   const casesQuery = useQuery({
-    queryKey: [stateCases],
+    queryKey: [stateCases, agency],
     queryFn: async () => {
-      return await fetchAllStateCases('desc')
+      return await fetchAllStateCases('desc', agency)
     },
   })
 

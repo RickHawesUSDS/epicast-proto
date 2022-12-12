@@ -11,27 +11,28 @@ export default function StateCasesButtons(props) {
   const queryClient = useQueryClient()
   const [open, setOpen] = React.useState(false)
   const [checked, setChecked] = React.useState(new Set())
+  const agency = props.agency
 
   const addCasesMutation = useMutation({
     mutationFn: async (params) => {
-      return await addRandomStateCases(params.numOfDays, params.numPerDay)
+      return await addRandomStateCases(params.numOfDays, params.numPerDay, agency)
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [stateCases] })
+      await queryClient.invalidateQueries({ queryKey: [stateCases, agency] })
     }
   })
 
   const publishStateCasesMutation = useMutation({
-    mutationFn: () => publishStateCases()
+    mutationFn: () => publishStateCases(agency)
   })
 
   const updateStateDictionaryMutation = useMutation({
     mutationFn: async () => {
       for (let element of variableStateCaseElements) {
         if (checked.has(element.name)) {
-          await addStateCaseElement(element)
+          await addStateCaseElement(element, agency)
         } else {
-          await deleteStateCaseElement(element.name)
+          await deleteStateCaseElement(element.name, agency)
         }
       }
     },
@@ -42,15 +43,15 @@ export default function StateCasesButtons(props) {
 
   const deduplicateMutation = useMutation({
     mutationFn: async () => {
-      await deduplicateStateCases()
+      await deduplicateStateCases(agency)
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [stateCases] })
+      await queryClient.invalidateQueries({ queryKey: [stateCases, agency] })
     }
   })
 
   const handleClickOpen = async () => {
-    const dictionary = await fetchStateCaseDictionary()
+    const dictionary = await fetchStateCaseDictionary(agency)
     const newChecked = new Set()
     for (let element of variableStateCaseElements) {
       if (dictionary.elements.findIndex(e => e.name === element.name) !== -1) {

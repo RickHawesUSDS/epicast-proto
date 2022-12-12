@@ -4,38 +4,38 @@ export async function resetSystem() {
   return await axios.post('/api/system/reset')
 }
 
-export async function fetchAllStateCases(sortParam) {
-  const response = await axios.get('/api/agencies/cphd.ca.gov', { params: { sort: sortParam } })
+export async function fetchAllStateCases(sortParam, agency) {
+  const response = await axios.get(`/api/agencies/${agency}`, { params: { sort: sortParam } })
   return response.data
 }
 
-export async function fetchStateCaseDictionary() {
-  const response = await axios.get('/api/agencies/cphd.ca.gov/dictionary')
+export async function fetchStateCaseDictionary(agency) {
+  const response = await axios.get(`/api/agencies/${agency}/dictionary`)
   return response.data
 }
 
-export async function addStateCaseElement(element) {
-  const response = await axios.put(`/api/agencies/cphd.ca.gov/dictionary/${element.name}`, element)
+export async function addStateCaseElement(element, agency) {
+  const response = await axios.put(`/api/agencies/${agency}/dictionary/${element.name}`, element)
   return response.data
 }
 
-export async function deleteStateCaseElement(name) {
-  const response = await axios.delete(`/api/agencies/cphd.ca.gov/dictionary/${name}`)
+export async function deleteStateCaseElement(name, agency) {
+  const response = await axios.delete(`/api/agencies/${agency}/dictionary/${name}`)
   return response.data
 }
 
-export async function addRandomStateCases(numOfDays, numPerDay) {
-  const response = await axios.post(`/api/agencies/cphd.ca.gov/random?numOfDays=${numOfDays}&numPerDay=${numPerDay}`)
+export async function addRandomStateCases(numOfDays, numPerDay, agency) {
+  const response = await axios.post(`/api/agencies/${agency}/random?numOfDays=${numOfDays}&numPerDay=${numPerDay}`)
   return response.data
 }
 
-export async function deduplicateStateCases() {
-  const response = await axios.post('/api/agencies/cphd.ca.gov/deduplicate')
+export async function deduplicateStateCases(agency) {
+  const response = await axios.post(`/api/agencies/${agency}/deduplicate`)
   return response.data
 }
 
-export async function publishStateCases() {
-  const response = await axios.post('/api/agencies/cphd.ca.gov/publish')
+export async function publishStateCases(agency) {
+  const response = await axios.post(`/api/agencies/${agency}/publish`)
   return response.data
 }
 

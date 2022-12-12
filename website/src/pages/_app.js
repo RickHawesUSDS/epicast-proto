@@ -4,7 +4,8 @@ import IndexPage from './index'
 import AboutPage from './about'
 import FaqPage from './faq'
 import ResetPage from './reset'
-import StatePage from './state'
+import CAStatePage from './ca'
+import AZStatePage from './az'
 import FeedPage from './feed'
 import CdcPage from './cdc'
 import { Switch, Route, Router } from './../util/router'
@@ -13,7 +14,7 @@ import Footer from './../components/Footer'
 import { ThemeProvider } from './../util/theme'
 import CentralPage from './central'
 
-function App (props) {
+function App(props) {
   return (
     <ThemeProvider>
       <Router>
@@ -33,7 +34,9 @@ function App (props) {
 
             <Route exact path='/reset' component={ResetPage} />
 
-            <Route exact path='/state' component={StatePage} />
+            <Route exact path='/ca' component={CAStatePage} />
+
+            <Route exact path='/az' component={AZStatePage} />
 
             <Route exact path='/feed' component={FeedPage} />
 
