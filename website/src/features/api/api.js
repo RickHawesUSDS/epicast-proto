@@ -49,18 +49,28 @@ export async function fetchCDCCaseDictionary() {
   return response.data
 }
 
-export async function fetchCDCCaseSubscriber() {
-  const response = await axios.get('/api/agencies/cdc.gov/subscribers/cases.cphd.ca.gov')
+export async function fetchCDCCaseSubscribers() {
+  const response = await axios.get('/api/agencies/cdc.gov/subscribers')
+  return response.data
+}
+
+export async function fetchCDCSummary() {
+  const response = await axios.get('/api/agencies/cdc.gov/summary')
   return response.data
 }
 
 export async function readCDCCaseFeed() {
-  const response = await axios.post('/api/agencies/cdc.gov/subscribers/cases.cphd.ca.gov/read')
+  const response = await axios.post('/api/agencies/cdc.gov/subscribers/read')
   return response.data
 }
 
 export async function setCDCCaseSubscriber(automaticValue) {
-  const response = await axios.post('/api/agencies/cdc.gov/subscribers/cases.cphd.ca.gov', { automatic: automaticValue })
+  const response = await axios.post('/api/agencies/cdc.gov/subscribers', { automatic: automaticValue })
+  return response.data
+}
+
+export async function publishCDCCases() {
+  const response = await axios.post(`/api/agencies/cdc.gov/publish`)
   return response.data
 }
 

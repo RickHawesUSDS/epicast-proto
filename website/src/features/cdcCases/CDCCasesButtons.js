@@ -1,26 +1,34 @@
 import { Button, makeStyles, Grid, Box, Switch, FormControlLabel } from '@material-ui/core'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { fetchCDCCaseSubscriber, readCDCCaseFeed, setCDCCaseSubscriber } from '../api/api'
-import { cdcCasesSubscriber, cdcCases, cdcCasesDictionary } from './cdcCasesKeys'
+import { fetchCDCCaseSubscribers, fetchCDCSummary, readCDCCaseFeed, setCDCCaseSubscriber, publishCDCCases } from '../api/api'
+import { cdcCasesSubscriber, cdcCases, cdcCasesDictionary, cdcCasesSummary } from './cdcCasesKeys'
 
 export default function CDCCasesButtons(props) {
   const queryClient = useQueryClient()
+  const getCDCCaseSubcribersQuery = useQuery(
+    [cdcCasesSubscriber],
+    fetchCDCCaseSubscribers,
+    { refetchInterval: 5000 },
+  )
+  const getCDCCaseSummaryQuery = useQuery(
+    [cdcCasesSummary],
+    fetchCDCSummary,
+    { refetchInterval: 5000 },
+  )
   const readCDCCaseFeedMutation = useMutation({
     mutationFn: async () => { return await readCDCCaseFeed() },
     onSuccess: async () => {
       await queryClient.invalidateQueries()
     }
   })
-  const getCDCCaseSubcriberQuery = useQuery(
-    [cdcCasesSubscriber],
-    fetchCDCCaseSubscriber,
-    { refetchInterval: 5000 },
-  )
   const setSubscriberAutomaticMutation = useMutation({
     mutationFn: async (params) => { return await setCDCCaseSubscriber(params.automatic) },
     onSuccess: async () => {
       await queryClient.invalidateQueries()
     }
+  })
+  const publishCDCCasesMutation = useMutation({
+    mutationFn: () => publishCDCCases()
   })
   const useButtonStyles = makeStyles((theme) => ({
     root: {
@@ -31,33 +39,42 @@ export default function CDCCasesButtons(props) {
   }))
 
   const buttonClasses = useButtonStyles()
-  const subscriber = getCDCCaseSubcriberQuery.data
+  const subscribers = getCDCCaseSubcribersQuery.data
+  const isReading = getCDCCaseSubcribersQuery.isFetched && subscribers.reduce((prev, curr, _idx, _array) => prev.reading || curr.reading)
+  const isAutomatic = getCDCCaseSubcribersQuery.isFetched && subscribers.reduce((prev, curr, _idx, _array) => prev.automatic && curr.automatic)
 
-  let subscriberStatus = ''
-  let automatic = false
-  if (getCDCCaseSubcriberQuery.isFetched && subscriber.reading) {
-    subscriberStatus = 'Reading...'
-  } else if (getCDCCaseSubcriberQuery.isFetched && !subscriber.reading) {
-    automatic = subscriber.automatic
-    const publishedStatus = subscriber.publishedAt !== undefined ? subscriber.publishedAt : 'never'
-    const publishedAt = subscriber.publishedAt ? new Date(subscriber.publishedAt).getTime() : undefined
-    subscriberStatus = `Published at: ${publishedStatus}`
-    queryClient.invalidateQueries({
-      predicate: (query) => {
-        return publishedAt !== undefined && query.state.dataUpdatedAt < publishedAt &&
-          (query.queryKey[0] === cdcCases || query.queryKey[0] === cdcCasesDictionary)
+  let status = ''
+  let isBusy = publishCDCCasesMutation.isLoading
+  if (getCDCCaseSubcribersQuery.isError || getCDCCaseSummaryQuery.isError) {
+    status = `Query Error: ${getCDCCaseSubcribersQuery.error} ${getCDCCaseSummaryQuery.error}`
+  } else if (getCDCCaseSubcribersQuery.isFetched && getCDCCaseSummaryQuery.isFetched){
+    if (isReading) {
+      status = 'Reading...'
+      isBusy = true
+    } else {
+      const summary = getCDCCaseSummaryQuery.data
+      if (summary.updatedAt) {
+        status = `Updated at ${summary.updatedAt}`
+        const updatedAt = new Date(summary.updatedAt).getTime()
+        queryClient.invalidateQueries({
+          predicate: (query) => {
+            return query.state.dataUpdatedAt < updatedAt &&
+              (query.queryKey[0] === cdcCases || query.queryKey[0] === cdcCasesDictionary)
+          }
+        })
+      } else {
+        status = 'Never updated'
       }
-    })
-  } else if (getCDCCaseSubcriberQuery.isError) {
-    subscriberStatus = `Query Error: ${getCDCCaseSubcriberQuery.error}`
+    }
+  } else {
+    isBusy = true
   }
 
-  const isBusy = readCDCCaseFeedMutation.isLoading || (getCDCCaseSubcriberQuery.isFetched && subscriber.reading)
   return (
     <Grid container spacing={2}>
       <Grid item xs={6}>
         <Box pl={1} pt={1} color='text.secondary'>
-          {subscriberStatus}
+          {status}
         </Box>
       </Grid>
       <Grid item xs={6}>
@@ -65,14 +82,15 @@ export default function CDCCasesButtons(props) {
           <FormControlLabel
             control={
               <Switch
-                checked={automatic}
+                checked={isAutomatic}
                 color="primary"
                 name='automatic'
                 onChange={(e) => setSubscriberAutomaticMutation.mutate({ automatic: e.target.checked })} />
             }
-            label='Automatic Reading'
+            label='Automatic'
           />
-          <Button disabled={isBusy || automatic} onClick={() => readCDCCaseFeedMutation.mutate()} color='primary' variant='outlined'>Read Feed</Button>
+          <Button disabled={isBusy || isAutomatic} onClick={() => readCDCCaseFeedMutation.mutate()} color='primary' variant='outlined'>Read Subscriptions</Button>
+          <Button disabled={isBusy} onClick={() => publishCDCCasesMutation.mutate()} color='primary' variant='outlined'>Publish</Button>
         </div>
       </Grid>
     </Grid>

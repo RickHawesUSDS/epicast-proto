@@ -1,6 +1,8 @@
 ### Reset the demo
 POST http://localhost:4001/api/system/reset
 
+## CA
+
 ### Get all cases
 GET http://localhost:4001/api/agencies/cphd.ca.gov/?sort=desc
 
@@ -39,11 +41,16 @@ content-type: application/json
 ###
 DELETE http://localhost:4001/api/agencies/cphd.ca.gov/dictionary/us_caQuestion1
 
+## CDC
+
 ### Get all CDC events
 GET http://localhost:4001/api/agencies/cdc.gov
 
 ### Get CDC dictionary
 GET http://localhost:4001/api/agencies/cdc.gov/dictionary
+
+### Get CDC summary
+GET http://localhost:4001/api/agencies/cdc.gov/summary
 
 ### Get the subscriber
 GET http://localhost:4001/api/agencies/cdc.gov/subscribers/cases.cphd.ca.gov
