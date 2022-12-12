@@ -41,9 +41,9 @@
 * [x] Multiple subjects per feed summary. Declare system used. Complete subject reporter. Remove subject from feed.
 * [x] Turn on AZ. Initial data in both feeds. AZ feed published.
 * [x] Merge summaries for the merged feed.
-* [ ] Add pulishing of the CDC feed. Update UI.
-* [ ] Update UI picture. Allow people to see AZ
-* [ ] Support EpiCast name and column name? Allows people to define feeds with old names. Define epiCast id as eventId + eventReporter? 
+* [x] Add pulishing of the CDC feed. Update UI.
+* [x] Update UI picture. Allow people to see AZ.
+* [ ] Support EpiCast name and column name? Allows people to define feeds with old names. Define epiCast id as eventId + eventReporter?
 
 ## Add tests tasks
 
