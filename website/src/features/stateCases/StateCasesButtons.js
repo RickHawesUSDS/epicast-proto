@@ -4,7 +4,7 @@ import { Button, ButtonGroup, Checkbox, Dialog, DialogTitle, DialogContent, Dial
 
 import { stateCases } from './stateCasesKeys'
 import { addRandomStateCases, addStateCaseElement, deleteStateCaseElement, fetchStateCaseDictionary, publishStateCases, deduplicateStateCases } from '../api/api'
-import { variableStateCaseElements, localQuestion1, localQuestion2, localQuestion3, neighborQuestion1, neighborQuestion2, cdcQuestion1, cdcQuestion2 } from './variableStateCaseElements'
+import { variableStateCaseElements, caQuestion1, caQuestion2, caQuestion3, azQuestion1, azQuestion2, cdcQuestion1, cdcQuestion2 } from './variableStateCaseElements'
 
 
 export default function StateCasesButtons(props) {
@@ -130,19 +130,19 @@ export default function StateCasesButtons(props) {
             Update the data dictionary used for this case type using questions from a national and a local question bank.
           </DialogContentText>
           <FormControl component="fieldset" className={buttonClasses.formControl}>
-            <FormLabel component="legend">Local Questions</FormLabel>
+            <FormLabel component="legend">California</FormLabel>
             <FormGroup>
-              {createCheckboxes([localQuestion1, localQuestion2, localQuestion3])}
+              {createCheckboxes([caQuestion1, caQuestion2, caQuestion3])}
             </FormGroup>
           </FormControl>
           <FormControl component="fieldset" className={buttonClasses.formControl}>
-            <FormLabel component="legend">From Neighbor State</FormLabel>
+            <FormLabel component="legend">Arizona</FormLabel>
             <FormGroup>
-              {createCheckboxes([neighborQuestion1, neighborQuestion2])}
+              {createCheckboxes([azQuestion1, azQuestion2])}
             </FormGroup>
           </FormControl>
           <FormControl component="fieldset" className={buttonClasses.formControl}>
-            <FormLabel component="legend">From CDC</FormLabel>
+            <FormLabel component="legend">CDC</FormLabel>
             <FormGroup>
               {createCheckboxes([cdcQuestion1, cdcQuestion2])}
             </FormGroup>
