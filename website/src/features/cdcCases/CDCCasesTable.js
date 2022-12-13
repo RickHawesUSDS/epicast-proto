@@ -22,7 +22,7 @@ function makeColumns(dictionary) {
     return {
       id: element.name,
       label: element.descriptions[0].displayName,
-      minWidth: customWidths[element.name] ?? 100,
+      minWidth: customWidths[element.name] ?? 120,
       dateFormat: element.type === 'date',
     }
   })

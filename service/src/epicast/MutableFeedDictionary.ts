@@ -13,7 +13,7 @@ export class MutableFeedDictionary implements FeedDictionary {
     this.reporterId = initDictionary.reporterId
     this.validFrom = initDictionary.validFrom
     this.namespaces = initDictionary.namespaces
-    this.elements = initDictionary.elements
+    this.elements = initDictionary.elements.concat([])
     this.sortElements()
   }
 

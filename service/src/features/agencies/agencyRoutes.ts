@@ -103,7 +103,7 @@ router.post('/:agency/deduplicate', asyncHandler(async (req, res, _next) => {
 
 /* GET summary */
 router.get('/:agency/summary', asyncHandler(async (req, res, _next) => {
-  logger.info(`Get ${req.params.agency} summary`)
+  logger.info(`Get ${req.params.agency} summary for ${req.params.agency}`)
   const timeSeries = getAgencyTimeSeries(req)
   if (timeSeries === undefined) {
     res.status(404).send()
@@ -117,7 +117,7 @@ router.get('/:agency/summary', asyncHandler(async (req, res, _next) => {
 
 /* GET dictionary */
 router.get('/:agency/dictionary', asyncHandler(async (req, res, _next) => {
-  logger.info(`Get ${req.params.agency} dictionary`)
+  logger.info(`Get ${req.params.agency} dictionary for ${req.params.agency}`)
   const timeSeries = getAgencyTimeSeries(req)
   if (timeSeries === undefined) {
     res.status(404).send()
@@ -136,7 +136,7 @@ router.put('/:agency/dictionary/:elementName', (req, res, _next) => {
     return
   }
 
-  logger.info(`put dictionary element: ${elementName}`)
+  logger.info(`put dictionary element ${elementName} for ${req.params.agency}`)
   logger.debug(`put element ${JSON.stringify(req.body)}`)
   const created = timeSeries.addFeedElement(req.body)
   if (created) {
@@ -155,7 +155,7 @@ router.delete('/:agency/dictionary/:elementName', (req, res, _next) => {
     return
   }
 
-  logger.info(`delete the dictionary element: ${elementName}`)
+  logger.info(`delete the dictionary element ${elementName} for ${req.params.agency}`)
   timeSeries.deleteFeedElement(elementName)
   res.status(204).send()
 })
@@ -164,7 +164,7 @@ router.delete('/:agency/dictionary/:elementName', (req, res, _next) => {
 
 /* GET all subscribers */
 router.get('/:agency/subscribers', asyncHandler(async (req, res, _next) => {
-  logger.info('Get subscribers')
+  logger.info(`Get subscribers for ${req.params.agency}`)
   const feedSubscribers = getAgencySubscribers(req)
   if (feedSubscribers === undefined) {
     res.status(404).send()
@@ -176,7 +176,7 @@ router.get('/:agency/subscribers', asyncHandler(async (req, res, _next) => {
 
 /* GET one subscriber */
 router.get('/:agency/subscribers/:subscriber', asyncHandler(async (req, res, _next) => {
-  logger.info(`Get subscriber ${req.params.subscriber as string}`)
+  logger.info(`Get subscriber ${req.params.subscriber} for ${req.params.agency}`)
   const feedSubscriber = getAgencySubscriber(req)
   if (feedSubscriber === undefined) {
     res.status(404).send()
@@ -187,7 +187,7 @@ router.get('/:agency/subscribers/:subscriber', asyncHandler(async (req, res, _ne
 
 /* Read all subscribers once */
 router.post('/:agency/subscribers/read', asyncHandler(async (req, res, _next) => {
-  logger.info('Read all subscribers')
+  logger.info(`Read all feeds for ${req.params.agency}`)
   const feedSubscribers = getAgencySubscribers(req)
   if (feedSubscribers === undefined) {
     res.status(404).send()
@@ -203,7 +203,7 @@ router.post('/:agency/subscribers/read', asyncHandler(async (req, res, _next) =>
 
 /* Read one subscriber once */
 router.post('/:agency/subscribers/:subscriber/read', asyncHandler(async (req, res, _next) => {
-  logger.info('Read a feed')
+  logger.info(`Read a feed from ${req.params.subscriber} for ${req.params.agency}`)
   const feedSubscriber = getAgencySubscriber(req)
   if (feedSubscriber === undefined) {
     res.status(404).send()
@@ -216,7 +216,7 @@ router.post('/:agency/subscribers/:subscriber/read', asyncHandler(async (req, re
 
 /* Update a subscriber  */
 router.post('/:agency/subscribers', (req, res, _next) => {
-  logger.info('Update subscriber')
+  logger.info(`Update subscribers for ${req.params.agency}`)
   const feedSubscribers = getAgencySubscribers(req)
   if (feedSubscribers === undefined) {
     res.status(404).send()
@@ -231,7 +231,7 @@ router.post('/:agency/subscribers', (req, res, _next) => {
 
 /* Update one subscriber model */
 router.post('/:agency/subscribers/:subscriber', (req, res, _next) => {
-  logger.info('Update subscriber')
+  logger.info(`Update subscriber ${req.params.subscriber} for ${req.params.agency}`)
   const feedSubscriber = getAgencySubscriber(req)
   if (feedSubscriber === undefined) {
     res.status(404).send()
