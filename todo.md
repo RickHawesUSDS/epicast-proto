@@ -52,17 +52,28 @@
 * [ ] Add unit tests for some
 * [ ] Add integrations tests
 
+## Concept mapping
+
+* [ ] Understand FHIR concept map and value sets. Use directly?
+* [ ] value set definition
+* [ ] concept map definition
+* [ ] age -> age_groups
+
 ## Draw an Epi Curve
 
+* [ ] Public bucket
+* [ ] NextJS generates a dummy static site that is published to a bucket
+* [ ] NextJS generates a file explorer
+* [ ] NextJS generates a US design react
 * [ ] Make stratifiers a PublishFeedOption
 * [ ] Stratifiers in data dictionary; JS functions
 * [ ] Improve aggregate use-case; age-group, gender, age-group+gender,
-* [ ] Public bucket
 * [ ] Draw an EpiCurve from aggregates
 
 ## Add validation language
 
 * [ ] Validation language as JS functions
+* [ ] Simple language (booleans, if / else, comparison, built-in functions, empty values)
 * [ ] Random errors methods and fix button
 * [ ] Validator service. watcher domain to validate and provide webhooks.
 
