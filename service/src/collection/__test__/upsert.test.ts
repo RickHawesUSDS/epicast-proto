@@ -1,5 +1,5 @@
 import { upsert } from '../upsert'
-import { test, expect } from 'jest'
+import { test, expect } from '@jest/globals'
 
 test('Add a value not present', () => {
   const array: number[] = [0, 1, 2]

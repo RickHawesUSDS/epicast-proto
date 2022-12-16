@@ -8,9 +8,7 @@
       ]
     },
     "typeRoots": [
-      "src/server/types",
-      "node_modules/@types/jest",
-      "node_modules/@types/node"
+      "./src/server/types",
     ],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,

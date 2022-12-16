@@ -6,7 +6,8 @@ interface X {
 }
 
 test('Group by exercise for number', () => {
-  const array: X[] = [{ value: 1}, {value: 2}, {value: 3}, {value: 4}]
+  const array: X[] = [{ value: 1}, {value: 2}, {value: 2}, {value: 3}]
   const groupByMap = groupBy(array, x => x.value.toString())
-  expect(groupByMap).toMatchObject(new Map({1: [{value: 1}], 2: [{value: 2}], 3: [{value: 3}], 4: [{value: 4}]}))
+  expect(groupByMap.get('1')).toEqual([{value: 1}])
+  expect(groupByMap.get('2')).toEqual([{value: 2}, {value: 2}])
 })
