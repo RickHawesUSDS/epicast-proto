@@ -48,6 +48,7 @@
 
 ## Add tests tasks
 
+* [ ] Add Jest
 * [ ] Add EpiCast package tests
 * [ ] Add unit tests for some
 * [ ] Add integrations tests
