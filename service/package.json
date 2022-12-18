@@ -6,7 +6,7 @@
     "start": "export NODE_OPTIONS='--trace-deprecation --abort-on-uncaught-exception' && export NODE_ENV=dev && nodemon --exec ts-node ./src/index.ts",
     "debug": "export NODE_OPTIONS='--trace-deprecation --abort-on-uncaught-exception --inspect' && export NODE_ENV=dev && ts-node --files --transpile-only ./src/index.ts",
     "build": "sh etc/build.sh",
-    "test": "jest"
+    "test": "export NODE_ENV=test && jest --detectOpenHandles"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.186.0",
@@ -43,7 +43,7 @@
     "@types/node": "^16.10.2",
     "jest": "^29.3.1",
     "nodemon": "^2.0.15",
-    "supertest": "^6.3.3",
+    "pactum": "^3.3.1",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.2.1",
     "ts-node-dev": "^2.0.0",

@@ -1,4 +1,4 @@
-import { getLogger } from '@/server/loggers'
+import { getLogger } from '../server/loggers'
 import { readFileSync } from 'fs'
 import { compile } from 'handlebars'
 import { SUMMARY_KEY } from './feedStorageKeys'

@@ -4,7 +4,7 @@ import { strict as assert } from 'node:assert'
 
 import { StorageObject } from './FeedStorage'
 import { formDeletedKeyFromTimeSeriesKey, TIMESERIES_FOLDER } from './feedStorageKeys'
-import { getLogger } from '@/server/loggers'
+import { getLogger } from '../server/loggers'
 import { MutableTimeSeries, TimeSeriesDeletedEvent } from './TimeSeries'
 import { FeedElement } from './FeedElement'
 import { FeedDictionary } from './FeedDictionary'

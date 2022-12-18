@@ -1,6 +1,6 @@
 import { DeleteObjectCommand, GetObjectCommand, HeadBucketCommand, HeadObjectCommand, ListObjectsCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
-import { getLogger } from '@/server/loggers'
-import { FeedStorage, StorageObject } from '@/epicast/FeedStorage'
+import { getLogger } from '../../server/loggers'
+import { FeedStorage, StorageObject } from '../../epicast/FeedStorage'
 import { ReadStream } from 'fs'
 import { Readable } from 'stream'
 import { parseISO } from 'date-fns'

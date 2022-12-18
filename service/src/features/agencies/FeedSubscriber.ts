@@ -1,10 +1,10 @@
 import { MutableTimeSeries } from '../../epicast/TimeSeries'
-import { FeedSummary } from '@/epicast/FeedSummary'
+import { FeedSummary } from '../../epicast/FeedSummary'
 import { FeedStorage } from '../../epicast/FeedStorage'
 import { MongoTimeSeriesEvent } from './MongoTimeSeries'
-import { readFeed } from '@/epicast/readFeed'
-import { getLogger } from '@/server/loggers'
-import { formFolder } from '@/epicast/feedStorageKeys'
+import { readFeed } from '../../epicast/readFeed'
+import { getLogger } from '../../server/loggers'
+import { formFolder } from '../../epicast/feedStorageKeys'
 
 const logger = getLogger('FEED_SUBSCRIBER')
 const FIRST_TIMEOUT = 5000

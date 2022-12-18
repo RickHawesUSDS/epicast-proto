@@ -1,6 +1,6 @@
 import { TimeSeriesMetadata } from './TimeSeries'
 import { FeedSummary } from './FeedSummary'
-import { upsert } from '@/collection/upsert'
+import { upsert } from '../collection/upsert'
 
 export interface SummaryUpdates {
   metadata?: TimeSeriesMetadata | null

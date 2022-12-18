@@ -1,5 +1,5 @@
 import express from 'express'
-import { getLogger } from '@/server/loggers'
+import { getLogger } from '../../server/loggers'
 import asyncHandler from 'express-async-handler'
 const router = express.Router()
 const logger = getLogger('SYSTEM_ROUTE')

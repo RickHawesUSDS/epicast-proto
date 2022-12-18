@@ -1,10 +1,10 @@
 import express, { Request } from 'express'
 import asyncHandler from 'express-async-handler'
-import { getLogger } from '@/server/loggers'
+import { getLogger } from '../../server/loggers'
 import { MongoTimeSeries } from './MongoTimeSeries'
 import { FeedSubscriber } from './FeedSubscriber'
-import { publishFeed } from '@/epicast/publishFeed'
-import { FeedStorage } from '@/epicast/FeedStorage'
+import { publishFeed } from '../../epicast/publishFeed'
+import { FeedStorage } from '../../epicast/FeedStorage'
 import { deduplicateCases } from './deduplicateCases'
 import { insertFakeCases } from './insertFakeCases'
 

@@ -1,5 +1,5 @@
-import { Frequency } from '@/epicast/Frequency'
-import { Period } from '@/epicast/Period'
+import { Frequency } from './Frequency'
+import { Period } from './Period'
 import { isAfter, isWithinInterval } from 'date-fns'
 import { TimeSeriesEvent } from './TimeSeries'
 

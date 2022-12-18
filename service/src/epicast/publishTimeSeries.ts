@@ -10,7 +10,7 @@ import { TimeSeries, TimeSeriesEvent } from './TimeSeries'
 import { FeedElement, filterElements } from './FeedElement'
 import { MutableSnapshot } from './Snapshot'
 import { TimeSeriesPartition, makeCasePartions } from './TimeSeriesPartition'
-import { getLogger } from '@/server/loggers'
+import { getLogger } from '../server/loggers'
 import { PublishFeedOptions } from './publishFeed'
 
 const DESIRED_MAX_MONTHLY_COUNT = 10000 / 30

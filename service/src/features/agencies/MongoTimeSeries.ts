@@ -1,14 +1,14 @@
 import { Db, Collection } from 'mongodb'
 
 import { EventElementName, MutableTimeSeries, TimeSeriesCountOptions, TimeSeriesDeletedEvent, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata } from '@/epicast/TimeSeries'
-import { FeedDictionary } from '@/epicast/FeedDictionary'
-import { MutableFeedDictionary } from '@/epicast/MutableFeedDictionary'
-import { FeedSummary } from '@/epicast/FeedSummary'
-import { updateFeedSummary } from '@/epicast/updateFeedSummary'
-import { FeedElement } from '@/epicast/FeedElement'
-import { getLogger } from '@/server/loggers'
-import { mergeDictionaries } from '@/epicast/mergeDictionaries'
-import { upsert } from '@/collection/upsert'
+import { FeedDictionary } from '../../epicast/FeedDictionary'
+import { MutableFeedDictionary } from '../../epicast/MutableFeedDictionary'
+import { FeedSummary } from '../../epicast/FeedSummary'
+import { updateFeedSummary } from '../../epicast/updateFeedSummary'
+import { FeedElement } from '../../epicast/FeedElement'
+import { getLogger } from '../../server/loggers'
+import { mergeDictionaries } from '../../epicast/mergeDictionaries'
+import { upsert } from '../../collection/upsert'
 
 const logger = getLogger('MONGO_TIME_SERIES')
 

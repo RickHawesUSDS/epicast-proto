@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs'
-import { getLogger } from '@/server/loggers'
+import { getLogger } from '../server/loggers'
 import { formatISO } from 'date-fns'
 import { compile } from 'handlebars'
 

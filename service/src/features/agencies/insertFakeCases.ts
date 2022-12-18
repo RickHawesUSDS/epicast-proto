@@ -2,7 +2,7 @@ import { addDays, addMonths, endOfDay, set, startOfDay, startOfMonth } from 'dat
 import { MongoTimeSeries, MongoTimeSeriesEvent } from './MongoTimeSeries'
 import { faker } from '@faker-js/faker'
 import { variableDictionaryElementNames } from './agencyModels'
-import { getLogger } from '@/server/loggers'
+import { getLogger } from '../../server/loggers'
 
 const logger = getLogger('INSERT_FAKE_CASES')
 

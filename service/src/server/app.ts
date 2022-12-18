@@ -8,12 +8,25 @@ import { attachToDb, disconnectToDb } from './mongo'
 import indexRouter from './indexRoute'
 import { SystemFeature } from '../features/system/SystemFeature'
 import { FeedsFeature } from '../features/feeds/FeedsFeature'
-import { Feature } from '@/server/Feature'
-import { AgenciesFeature } from '@/features/agencies/AgenciesFeature'
+import { Feature } from '../server/Feature'
+import { AgenciesFeature } from '../features/agencies/AgenciesFeature'
 import { AppState } from './AppState'
 import { S3Client } from '@aws-sdk/client-s3'
 import { Db } from 'mongodb'
 import { getS3Client } from './s3'
+import { config } from 'dotenv-flow'
+import { bootstrapLogger } from './loggers'
+
+
+// Load the .env config file into process.env
+const loaded = config()
+if (loaded.error !== undefined) {
+  throw new Error('Unable to load .env file')
+}
+console.info(`Configured for the ${process.env.NODE_ENV ?? 'not set'} environment`)
+
+// Logger
+bootstrapLogger()
 
 const logger = getLogger('APP')
 
@@ -141,7 +154,7 @@ export class App {
   }
 
   private formAppState (): AppState {
-    if (this.db === undefined || this.s3Client === undefined) throw new Error('App is not initialized')
+    if (this.db === undefined || this.s3Client === undefined) throw new Error('App is not started')
     return { db: this.db, s3Client: this.s3Client, systemFeature: this.systemFeature, feedsFeature: this.feedsFeature, agenciesFeature: this.agenciesFeature }
   }
 
@@ -167,3 +180,5 @@ export class App {
     }
   }
 }
+
+export const app = new App()

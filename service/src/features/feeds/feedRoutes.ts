@@ -1,5 +1,5 @@
 import express from 'express'
-import { getLogger } from '@/server/loggers'
+import { getLogger } from '../../server/loggers'
 import asyncHandler from 'express-async-handler'
 import { S3FeedStorage } from './S3FeedStorage'
 const router = express.Router()

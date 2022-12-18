@@ -1,5 +1,5 @@
-import { FeedStorage } from '@/epicast/FeedStorage'
-import { getLogger } from '@/server/loggers'
+import { FeedStorage } from '../../epicast/FeedStorage'
+import { getLogger } from '../../server/loggers'
 
 const logger = getLogger('RESET_STORAGE')
 

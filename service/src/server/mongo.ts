@@ -1,5 +1,5 @@
 import { MongoClient, Db } from 'mongodb'
-import { getLogger } from '@/server/loggers'
+import { getLogger } from './loggers'
 
 const logger = getLogger('MONGO')
 let client: MongoClient

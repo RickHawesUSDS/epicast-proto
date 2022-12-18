@@ -1,5 +1,5 @@
-import { AppState } from '@/server/AppState'
-import { getLogger } from '@/server/loggers'
+import { AppState } from '../../server/AppState'
+import { getLogger } from '../../server/loggers'
 import { Router } from 'express'
 import { Feature } from '../../server/Feature'
 import systemRoutes from './systemRoutes'

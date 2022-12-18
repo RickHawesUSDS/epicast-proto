@@ -1,5 +1,5 @@
 import YAML from 'yaml'
-import { getLogger } from '@/server/loggers'
+import { getLogger } from '../server/loggers'
 
 import { MutableTimeSeries } from './TimeSeries'
 import { FeedSummary } from './FeedSummary'

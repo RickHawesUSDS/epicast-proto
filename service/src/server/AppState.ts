@@ -1,6 +1,6 @@
 import { SystemFeature } from '../features/system/SystemFeature'
 import { FeedsFeature } from '../features/feeds/FeedsFeature'
-import { AgenciesFeature } from '@/features/agencies/AgenciesFeature'
+import { AgenciesFeature } from '../features/agencies/AgenciesFeature'
 import { Db } from 'mongodb'
 import { S3Client } from '@aws-sdk/client-s3'
 
