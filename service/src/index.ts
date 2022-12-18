@@ -8,6 +8,7 @@ const loaded = config()
 if (loaded.error !== undefined) {
   throw new Error('Unable to load .env file')
 }
+console.log(`Configured for the ${process.env.NODE_ENV ?? 'not set'} environment`)
 
 // Logger
 bootstrapLogger()

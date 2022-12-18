@@ -1,3 +1,4 @@
+import { AppState } from '@/server/AppState'
 import { getLogger } from '@/server/loggers'
 import { Router } from 'express'
 import { Feature } from '../../server/Feature'
@@ -9,21 +10,21 @@ export class SystemFeature implements Feature {
   otherFeatures: Feature[]
   name = 'system'
 
-  constructor(otherFeatures: Feature[]) {
+  constructor (otherFeatures: Feature[]) {
     this.otherFeatures = otherFeatures
   }
 
-  getRoutes(): [string, Router] {
+  getRoutes (): [string, Router] {
     return [this.name, systemRoutes]
   }
 
-  async init(): Promise<void> {
+  async init (): Promise<void> {
   }
 
-  async reset(): Promise<void> {
+  async reset (appState: AppState): Promise<void> {
     for (const feature of this.otherFeatures) {
       logger.info(`Resetting: ${feature.name}`)
-      await feature.reset()
+      await feature.reset(appState)
     }
   }
 }

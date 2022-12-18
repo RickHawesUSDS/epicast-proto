@@ -11,14 +11,14 @@ import { insertFakeCases } from './insertFakeCases'
 const router = express.Router()
 const logger = getLogger('AGENCIES_ROUTE')
 
-function getAgencyTimeSeries(req: Request): MongoTimeSeries | undefined {
+function getAgencyTimeSeries (req: Request): MongoTimeSeries | undefined {
   const agencyName = req.params.agency
   const agency = req.state.agenciesFeature.agencies[agencyName]
   if (agency === undefined) return
   return agency.timeSeries
 }
 
-function getAgencySubscriber(req: Request): FeedSubscriber | undefined {
+function getAgencySubscriber (req: Request): FeedSubscriber | undefined {
   const agencyName = req.params.agency
   const agency = req.state.agenciesFeature.agencies[agencyName]
   if (agency === undefined) return
@@ -26,15 +26,15 @@ function getAgencySubscriber(req: Request): FeedSubscriber | undefined {
   return agency.subscribers.find(s => s.model.name === subscriberName)
 }
 
-function getAgencySubscribers(req: Request): FeedSubscriber[] | undefined {
+function getAgencySubscribers (req: Request): FeedSubscriber[] | undefined {
   const agencyName = req.params.agency
   const agency = req.state.agenciesFeature.agencies[agencyName]
   if (agency === undefined) return
   return agency.subscribers
 }
 
-function getFeedStorage(req: Request): FeedStorage {
-  return req.state.feedsFeature.storage
+function getFeedStorage (req: Request): FeedStorage {
+  return req.state.feedsFeature.feedStorage
 }
 
 // DevNote: add topic to the paths when multiple topics are supported

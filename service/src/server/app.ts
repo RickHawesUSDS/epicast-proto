@@ -5,48 +5,41 @@ import http from 'http'
 import cookieParser from 'cookie-parser'
 import { getLogger } from './loggers'
 import { attachToDb } from './mongo'
-import indexRouter from './indexRoutes'
+import indexRouter from './indexRoute'
 import { SystemFeature } from '../features/system/SystemFeature'
 import { FeedsFeature } from '../features/feeds/FeedsFeature'
-import { Feature, InitEvent } from '@/server/Feature'
+import { Feature } from '@/server/Feature'
 import { AgenciesFeature } from '@/features/agencies/AgenciesFeature'
+import { AppState } from './AppState'
+import { S3Client } from '@aws-sdk/client-s3'
 import { Db } from 'mongodb'
+import { getS3Client } from './s3'
 
 const logger = getLogger('APP')
 
-// The application state is put into every request to share with the request
-export interface AppState {
-  db?: Db
-  systemFeature: SystemFeature
-  feedsFeature: FeedsFeature
-  agenciesFeature: AgenciesFeature
-}
-
 export class App {
   expressApp: express.Application
-  state: AppState
-  features: Feature[]
   port: string | number
 
-  constructor() {
-    const feedsFeature = new FeedsFeature()
-    const agenciesFeature = new AgenciesFeature()
-    const systemFeature = new SystemFeature([feedsFeature, agenciesFeature])
+  // App State
+  s3Client?: S3Client
+  db?: Db
+  feedsFeature: FeedsFeature
+  systemFeature: SystemFeature
+  agenciesFeature: AgenciesFeature
+  features: Feature[]
+
+  constructor () {
     this.port = this.normalizePort(process.env.PORT ?? '3000')
-
-    this.state = { systemFeature, feedsFeature, agenciesFeature }
-
-    this.features = [
-      this.state.systemFeature,
-      this.state.feedsFeature,
-      this.state.agenciesFeature
-    ]
-
+    this.feedsFeature = new FeedsFeature()
+    this.agenciesFeature = new AgenciesFeature()
+    this.systemFeature = new SystemFeature([this.feedsFeature, this.agenciesFeature])
+    this.features = [this.systemFeature, this.feedsFeature, this.agenciesFeature]
     this.expressApp = express()
     this.configExpress()
   }
 
-  public listen(): void {
+  public listen (): void {
     const server = http.createServer(this.expressApp)
     server.listen(this.port, () => {
       logger.info(`🚀 Server launch ~ port ${this.port} ~ ${process.env.NODE_ENV} environment`)
@@ -54,23 +47,22 @@ export class App {
     server.on('error', this.onError)
   }
 
-  public getServer(): express.Application {
-    return this.expressApp;
+  public getServer (): express.Application {
+    return this.expressApp
   }
 
-  async init(): Promise<void> {
+  async init (): Promise<void> {
     logger.info('Starting init sequence...')
-    this.state.db = await attachToDb()
+    this.db = await attachToDb()
+    this.s3Client = getS3Client()
+    const state = this.formAppState()
     for (const feature of this.features) {
-      await feature.init(InitEvent.AFTER_DB, this.state)
+      await feature.init(state)
     }
     this.routerSetup()
-    for (const feature of this.features) {
-      await feature.init(InitEvent.AFTER_ROUTES, this.state)
-    }
   }
 
-  private normalizePort(val: string): number | string  {
+  private normalizePort (val: string): number | string {
     const port = parseInt(val, 10)
     if (isNaN(port)) {
       // named pipe
@@ -83,16 +75,16 @@ export class App {
     throw new Error(`port is invalid: ${val}`)
   }
 
-  private configExpress(): void {
+  private configExpress (): void {
     this.expressApp.use(express.json())
     this.expressApp.use(express.urlencoded({ extended: false }))
     this.expressApp.use(cookieParser())
     this.expressApp.use(express.static(path.join(__dirname, 'public')))
   }
 
-  private routerSetup(): void {
+  private routerSetup (): void {
     this.expressApp.use((req, _res, next) => {
-      req.state = this.state
+      req.state = this.formAppState()
       next()
     })
     this.expressApp.use('/', indexRouter)
@@ -102,7 +94,12 @@ export class App {
     }
   }
 
-  private onError(error: { syscall: string, code: string }): void {
+  private formAppState (): AppState {
+    if (this.db === undefined || this.s3Client === undefined) throw new Error('App is not initialized')
+    return { db: this.db, s3Client: this.s3Client, systemFeature: this.systemFeature, feedsFeature: this.feedsFeature, agenciesFeature: this.agenciesFeature }
+  }
+
+  private onError (error: { syscall: string, code: string }): void {
     if (error.syscall !== 'listen') {
       throw new Error(error.code)
     }

@@ -1,5 +1,4 @@
 import { DeleteObjectCommand, GetObjectCommand, HeadBucketCommand, HeadObjectCommand, ListObjectsCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
-import { fromIni } from '@aws-sdk/credential-providers'
 import { getLogger } from '@/server/loggers'
 import { FeedStorage, StorageObject } from '@/epicast/FeedStorage'
 import { ReadStream } from 'fs'
@@ -10,24 +9,24 @@ import path from 'path/posix'
 
 const logger = getLogger('STORAGE')
 
-function getS3Client(): S3Client {
-  return new S3Client({
-    region: process.env.S3_REGION ?? '',
-    credentials: fromIni({ profile: process.env.S3_CREDS_PROFILE ?? '' })
-  })
-}
+export class S3FeedStorage implements FeedStorage {
+  private readonly s3Client: S3Client
+  readonly bucket: string
+  readonly uri: string
 
-export class S3Storage implements FeedStorage {
-  private readonly s3Client = getS3Client()
-  readonly bucket = process.env.S3_BUCKET_NAME ?? ''
-  readonly uri = `s3://${this.bucket}`
+  constructor (s3Client: S3Client, bucketName: string) {
+    if (bucketName.length === 0) throw Error('Invalid bucket name')
+    this.bucket = bucketName
+    this.s3Client = s3Client
+    this.uri = `s3://${this.bucket}`
+  }
 
-  private async handleError(description: string): Promise<never> {
+  private async handleError (description: string): Promise<never> {
     logger.error(description)
     return await Promise.reject(new Error(description))
   }
 
-  async checkConnection(): Promise<void> {
+  async checkConnection (): Promise<void> {
     logger.debug('about to connect to s3')
     const headResponse = await this.s3Client.send(new HeadBucketCommand({ Bucket: this.bucket }))
     if (headResponse.$metadata.httpStatusCode === 200) {
@@ -37,7 +36,7 @@ export class S3Storage implements FeedStorage {
     }
   }
 
-  async listObjects(prefix: string): Promise<StorageObject[]> {
+  async listObjects (prefix: string): Promise<StorageObject[]> {
     const listResponse = await this.s3Client.send(new ListObjectsCommand({
       Bucket: this.bucket,
       Prefix: prefix
@@ -53,7 +52,7 @@ export class S3Storage implements FeedStorage {
     }
   }
 
-  async putObject(name: string, body: string | ReadStream): Promise<StorageObject> {
+  async putObject (name: string, body: string | ReadStream): Promise<StorageObject> {
     logger.debug(`put object: ${name}`)
     const putResponse = await this.s3Client.send(new PutObjectCommand({
       Bucket: this.bucket,
@@ -66,7 +65,7 @@ export class S3Storage implements FeedStorage {
     return { key: name, versionId: putResponse.VersionId, lastModified: new Date() }
   }
 
-  async getObject(key: string, versionId?: string): Promise<string> {
+  async getObject (key: string, versionId?: string): Promise<string> {
     const getResponse = await this.s3Client.send(new GetObjectCommand({
       Bucket: this.bucket,
       Key: key,
@@ -84,7 +83,7 @@ export class S3Storage implements FeedStorage {
     }
   }
 
-  async doesObjectExist(key: string): Promise<boolean> {
+  async doesObjectExist (key: string): Promise<boolean> {
     try {
       const headResponse = await this.s3Client.send(new HeadObjectCommand({
         Bucket: this.bucket,
@@ -96,7 +95,7 @@ export class S3Storage implements FeedStorage {
     }
   }
 
-  async deleteObject(key: string): Promise<void> {
+  async deleteObject (key: string): Promise<void> {
     logger.debug(`delete object: ${key}`)
     const deleteResponse = await this.s3Client.send(new DeleteObjectCommand({
       Bucket: this.bucket,
@@ -107,11 +106,11 @@ export class S3Storage implements FeedStorage {
     }
   }
 
-  formUrl(name: string): string {
+  formUrl (name: string): string {
     return path.join(this.bucket, name)
   }
 
-  async getFileData(prefix: string): Promise<FileArray> {
+  async getFileData (prefix: string): Promise<FileArray> {
     const chonkyFiles: FileArray = []
     const fixedUpPrefix = prefix === '/' ? '' : prefix
     const listResponse = await this.s3Client.send(new ListObjectsCommand({

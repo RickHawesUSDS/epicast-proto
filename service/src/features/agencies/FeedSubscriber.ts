@@ -20,12 +20,13 @@ export interface FeedSubscriberModel {
 export class FeedSubscriber {
   model: FeedSubscriberModel
   fromFolder: string
-  storage?: FeedStorage
+  fromStorage: FeedStorage
   timeSeries: MutableTimeSeries<MongoTimeSeriesEvent>
   timer: NodeJS.Timeout | undefined
 
-  constructor(
+  constructor (
     fromFeed: FeedSummary,
+    fromStorage: FeedStorage,
     toTimeSeries: MutableTimeSeries<MongoTimeSeriesEvent>
   ) {
     this.model = {
@@ -34,21 +35,18 @@ export class FeedSubscriber {
       reading: false,
       publishedAt: undefined
     }
+    this.fromStorage = fromStorage
     this.fromFolder = formFolder(fromFeed)
     this.timeSeries = toTimeSeries
   }
 
-  setStorage(storage: FeedStorage): void {
-    this.storage = storage
-  }
-
-  startAutomatic(): FeedSubscriber {
+  startAutomatic (): FeedSubscriber {
     this.model = { ...this.model, automatic: true }
     this.timer = setTimeout(FeedSubscriber.backgroundReadFeed, FIRST_TIMEOUT, this)
     return this
   }
 
-  stopAutomatic(): FeedSubscriber {
+  stopAutomatic (): FeedSubscriber {
     if (this.timer !== undefined) {
       clearTimeout(this.timer)
     }
@@ -58,12 +56,12 @@ export class FeedSubscriber {
     return this
   }
 
-  continueAutomatic(): FeedSubscriber {
+  continueAutomatic (): FeedSubscriber {
     this.timer = setTimeout(FeedSubscriber.backgroundReadFeed, REPEAT_TIMEOUT, this)
     return this
   }
 
-  setReading(newReading: boolean, newPublishedAt?: Date): FeedSubscriber {
+  setReading (newReading: boolean, newPublishedAt?: Date): FeedSubscriber {
     if (newPublishedAt !== undefined) {
       this.model = { ...this.model, reading: newReading, publishedAt: newPublishedAt }
     } else {
@@ -72,7 +70,7 @@ export class FeedSubscriber {
     return this
   }
 
-  updateFeedSubscriber(newValue: FeedSubscriberModel): FeedSubscriberModel {
+  updateFeedSubscriber (newValue: FeedSubscriberModel): FeedSubscriberModel {
     if (newValue.automatic && !this.model.automatic) {
       this.startAutomatic()
     }
@@ -82,13 +80,11 @@ export class FeedSubscriber {
     return this.model
   }
 
-  async readOnce(): Promise<FeedSubscriberModel> {
-    if (this.storage === undefined) return this.model
-
+  async readOnce (): Promise<FeedSubscriberModel> {
     logger.info(`Reading ${this.model.name} timeSeries once`)
     this.setReading(true)
     const publishedAt = await readFeed(
-      this.storage,
+      this.fromStorage,
       this.fromFolder,
       this.timeSeries
     )
@@ -97,13 +93,11 @@ export class FeedSubscriber {
   }
 
   // Background reading of the feed uses this function
-  static backgroundReadFeed(feedSubscriber: FeedSubscriber): void {
-    if (feedSubscriber.storage === undefined) return
-
+  static backgroundReadFeed (feedSubscriber: FeedSubscriber): void {
     logger.info(`Reading feed ${feedSubscriber.model.name} in background`)
     feedSubscriber.setReading(true)
     const readFeedPromise = readFeed(
-      feedSubscriber.storage,
+      feedSubscriber.fromStorage,
       feedSubscriber.fromFolder,
       feedSubscriber.timeSeries
     )

@@ -8,7 +8,7 @@ export interface SummaryUpdates {
   sourceFeed?: FeedSummary
 }
 
-export function updateFeedSummary(
+export function updateFeedSummary (
   initial: FeedSummary,
   updates: SummaryUpdates
 ): FeedSummary {
@@ -32,6 +32,6 @@ export function updateFeedSummary(
   return result
 }
 
-function isSummaryMatch(a: FeedSummary, b: FeedSummary): boolean {
+function isSummaryMatch (a: FeedSummary, b: FeedSummary): boolean {
   return a.topicId === b.topicId && a.reporterId === b.reporterId
 }
