@@ -6,7 +6,8 @@
     "start": "export NODE_OPTIONS='--trace-deprecation --abort-on-uncaught-exception' && export NODE_ENV=dev && nodemon --exec ts-node ./src/index.ts",
     "debug": "export NODE_OPTIONS='--trace-deprecation --abort-on-uncaught-exception --inspect' && export NODE_ENV=dev && ts-node --files --transpile-only ./src/index.ts",
     "build": "sh etc/build.sh",
-    "test": "export NODE_ENV=test && jest --detectOpenHandles"
+    "test": "export NODE_ENV=test && jest --detectOpenHandles",
+    "test-watch": "export NODE_ENV=test && jest --watchAll"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.186.0",
