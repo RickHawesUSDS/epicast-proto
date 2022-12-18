@@ -1,84 +1,23 @@
-/**
- * Module dependencies.
- */
-
 import 'module-alias/register'
-import { app, expressApp } from '@/server/app'
-import http from 'http'
+import { config } from 'dotenv-flow'
 import { bootstrapLogger } from '@/server/loggers'
+import { App } from '@/server/app'
 
-// const debug = Debug('server:server')
+// Load the .env config file into process.env
+const loaded = config()
+if (loaded.error !== undefined) {
+  throw new Error('Unable to load .env file')
+}
+
+// Logger
 bootstrapLogger()
 
-/**
- * Get port from environment and store in Express.
- */
-const port = normalizePort(process.env.PORT ?? '3000')
-expressApp.set('port', port)
-
-initialize().catch((error) => console.log(error))
-
-async function initialize(): Promise<void> {
-  /**
-   * Initialize app
-   */
-  await app.init()
-
-  /**
-   * Create HTTP server.
-   */
-  const server = http.createServer(expressApp)
-
-  /**
-   * Listen on provided port, on all network interfaces.
-   */
-
-  server.listen(port, () => console.log('🚀 ~ server launch  ~ port', port))
-  server.on('error', onError)
-}
-
-/**
- * Normalize a port into a number, string, or false.
- */
-
-function normalizePort(val: string): number | string | boolean {
-  const port = parseInt(val, 10)
-
-  if (isNaN(port)) {
-    // named pipe
-    return val
-  }
-
-  if (port >= 0) {
-    // port number
-    return port
-  }
-
-  return false
-}
-
-/**
- * Event listener for HTTP server "error" event.
- */
-
-function onError(error: { syscall: string, code: string }): void {
-  if (error.syscall !== 'listen') {
-    throw new Error(error.code)
-  }
-
-  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port.toString()
-
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges')
-      process.exit(1)
-      break
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use')
-      process.exit(1)
-      break
-    default:
-      throw new Error(error.code)
-  }
-}
+// Now init the app
+const app = new App()
+app
+  .init()
+  .then(() => {
+    // Start the server after init
+    app.listen()
+  })
+  .catch(error => console.log(error))

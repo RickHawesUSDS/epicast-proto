@@ -1,15 +1,16 @@
 
 import express from 'express'
 import path from 'path'
-import { config } from 'dotenv-flow'
+import http from 'http'
 import cookieParser from 'cookie-parser'
 import { getLogger } from './loggers'
-import { attachToDb, Db } from '../features/agencies/mongo'
+import { attachToDb } from './mongo'
 import indexRouter from './indexRoutes'
 import { SystemFeature } from '../features/system/SystemFeature'
 import { FeedsFeature } from '../features/feeds/FeedsFeature'
 import { Feature, InitEvent } from '@/server/Feature'
 import { AgenciesFeature } from '@/features/agencies/AgenciesFeature'
+import { Db } from 'mongodb'
 
 const logger = getLogger('APP')
 
@@ -21,15 +22,17 @@ export interface AppState {
   agenciesFeature: AgenciesFeature
 }
 
-class App {
+export class App {
   expressApp: express.Application
   state: AppState
   features: Feature[]
+  port: string | number
 
   constructor() {
     const feedsFeature = new FeedsFeature()
     const agenciesFeature = new AgenciesFeature()
     const systemFeature = new SystemFeature([feedsFeature, agenciesFeature])
+    this.port = this.normalizePort(process.env.PORT ?? '3000')
 
     this.state = { systemFeature, feedsFeature, agenciesFeature }
 
@@ -41,6 +44,18 @@ class App {
 
     this.expressApp = express()
     this.configExpress()
+  }
+
+  public listen(): void {
+    const server = http.createServer(this.expressApp)
+    server.listen(this.port, () => {
+      logger.info(`🚀 Server launch ~ port ${this.port} ~ ${process.env.NODE_ENV} environment`)
+    })
+    server.on('error', this.onError)
+  }
+
+  public getServer(): express.Application {
+    return this.expressApp;
   }
 
   async init(): Promise<void> {
@@ -55,16 +70,17 @@ class App {
     }
   }
 
-  async connect(): Promise<void> {
-
-  }
-
-  async disconnect(): Promise<void> {
-
-  }
-
-  async clearState(): Promise<void> {
-
+  private normalizePort(val: string): number | string  {
+    const port = parseInt(val, 10)
+    if (isNaN(port)) {
+      // named pipe
+      return val
+    }
+    if (port >= 0) {
+      // port number
+      return port
+    }
+    throw new Error(`port is invalid: ${val}`)
   }
 
   private configExpress(): void {
@@ -85,13 +101,26 @@ class App {
       this.expressApp.use('/api/' + path, router)
     }
   }
-}
 
-// Load the .env config file into process.env
-const loaded = config()
-if (loaded.error !== undefined) {
-  throw new Error('Unable to load .env file')
-}
+  private onError(error: { syscall: string, code: string }): void {
+    if (error.syscall !== 'listen') {
+      throw new Error(error.code)
+    }
 
-export const app = new App()
-export const expressApp = app.expressApp
+    const bind = typeof this.port === 'string' ? 'Pipe ' + this.port : 'Port ' + this.port.toString()
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+      case 'EACCES':
+        console.error(bind + ' requires elevated privileges')
+        process.exit(1)
+        break
+      case 'EADDRINUSE':
+        console.error(bind + ' is already in use')
+        process.exit(1)
+        break
+      default:
+        throw new Error(error.code)
+    }
+  }
+}
