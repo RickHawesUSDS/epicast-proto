@@ -9,21 +9,17 @@ import { FileData, FileArray } from './FileArray'
 import path from 'path/posix'
 
 const logger = getLogger('STORAGE')
-export const REGION = 'us-west-2'
-export const BUCKET_NAME = 'epicast-demoserver'
-export const CREDS_PROFILE = 'epicast-demo'
-export const FEED_FOLDER = 'feed1'
 
 function getS3Client(): S3Client {
   return new S3Client({
-    region: REGION,
-    credentials: fromIni({ profile: CREDS_PROFILE })
+    region: process.env.S3_REGION ?? '',
+    credentials: fromIni({ profile: process.env.S3_CREDS_PROFILE ?? '' })
   })
 }
 
 export class S3Storage implements FeedStorage {
   private readonly s3Client = getS3Client()
-  readonly bucket = BUCKET_NAME
+  readonly bucket = process.env.S3_BUCKET_NAME ?? ''
   readonly uri = `s3://${this.bucket}`
 
   private async handleError(description: string): Promise<never> {

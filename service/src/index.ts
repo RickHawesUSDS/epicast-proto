@@ -3,12 +3,9 @@
  */
 
 import 'module-alias/register'
-import { config } from 'dotenv'
-
 import { app, expressApp } from '@/server/app'
 import http from 'http'
 import { bootstrapLogger } from '@/server/loggers'
-config()
 
 // const debug = Debug('server:server')
 bootstrapLogger()
@@ -16,8 +13,7 @@ bootstrapLogger()
 /**
  * Get port from environment and store in Express.
  */
-
-const port = normalizePort(process.env.PORT ?? '4001')
+const port = normalizePort(process.env.PORT ?? '3000')
 expressApp.set('port', port)
 
 initialize().catch((error) => console.log(error))

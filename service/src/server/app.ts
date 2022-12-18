@@ -1,6 +1,7 @@
 
 import express from 'express'
 import path from 'path'
+import { config } from 'dotenv-flow'
 import cookieParser from 'cookie-parser'
 import { getLogger } from './loggers'
 import { attachToDb, Db } from '../features/agencies/mongo'
@@ -39,7 +40,7 @@ class App {
     ]
 
     this.expressApp = express()
-    this.config()
+    this.configExpress()
   }
 
   async init(): Promise<void> {
@@ -54,7 +55,19 @@ class App {
     }
   }
 
-  private config(): void {
+  async connect(): Promise<void> {
+
+  }
+
+  async disconnect(): Promise<void> {
+
+  }
+
+  async clearState(): Promise<void> {
+
+  }
+
+  private configExpress(): void {
     this.expressApp.use(express.json())
     this.expressApp.use(express.urlencoded({ extended: false }))
     this.expressApp.use(cookieParser())
@@ -72,6 +85,12 @@ class App {
       this.expressApp.use('/api/' + path, router)
     }
   }
+}
+
+// Load the .env config file into process.env
+const loaded = config()
+if (loaded.error !== undefined) {
+  throw new Error('Unable to load .env file')
 }
 
 export const app = new App()
