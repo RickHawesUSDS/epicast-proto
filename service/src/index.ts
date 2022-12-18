@@ -8,17 +8,23 @@ const loaded = config()
 if (loaded.error !== undefined) {
   throw new Error('Unable to load .env file')
 }
-console.log(`Configured for the ${process.env.NODE_ENV ?? 'not set'} environment`)
+console.info(`Configured for the ${process.env.NODE_ENV ?? 'not set'} environment`)
 
 // Logger
 bootstrapLogger()
 
-// Now init the app
+// Startup the app for a demo
 const app = new App()
 app
-  .init()
+  .normalDemoStartup()
   .then(() => {
-    // Start the server after init
+    // Start listening
     app.listen()
   })
   .catch(error => console.log(error))
+
+// Handle the Ctrl-C to termininate the app
+process.on('SIGINT', () => {
+  console.info('SIGINT received.')
+  app.closeAndStop().then(() => process.exit()).catch(() => {})
+})

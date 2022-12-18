@@ -6,6 +6,6 @@ export function getS3Client (): S3Client {
   if (process.env.S3_CREDS_PROFILE === undefined) throw new Error('Missing S3_CREDS_PROFILE .env variable')
   return new S3Client({
     region: process.env.S3_REGION,
-    credentials: fromIni({ profile: process.env.S3_CREDS_PROFILE})
+    credentials: fromIni({ profile: process.env.S3_CREDS_PROFILE })
   })
 }

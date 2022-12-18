@@ -4,7 +4,7 @@ import path from 'path'
 import http from 'http'
 import cookieParser from 'cookie-parser'
 import { getLogger } from './loggers'
-import { attachToDb } from './mongo'
+import { attachToDb, disconnectToDb } from './mongo'
 import indexRouter from './indexRoute'
 import { SystemFeature } from '../features/system/SystemFeature'
 import { FeedsFeature } from '../features/feeds/FeedsFeature'
@@ -19,6 +19,7 @@ const logger = getLogger('APP')
 
 export class App {
   expressApp: express.Application
+  server: http.Server
   port: string | number
 
   // App State
@@ -37,29 +38,74 @@ export class App {
     this.features = [this.systemFeature, this.feedsFeature, this.agenciesFeature]
     this.expressApp = express()
     this.configExpress()
+    this.server = http.createServer(this.expressApp)
   }
 
   public listen (): void {
-    const server = http.createServer(this.expressApp)
-    server.listen(this.port, () => {
-      logger.info(`🚀 Server launch ~ port ${this.port} ~ ${process.env.NODE_ENV} environment`)
+    this.server.listen(this.port, () => {
+      logger.info(`🚀 Server launch ~ port ${this.port} ~ ${process.env.NODE_ENV ?? 'no'} environment`)
     })
-    server.on('error', this.onError)
+    this.server.on('error', this.onError)
+  }
+
+  public async close (): Promise<void> {
+    return await new Promise(resolve => {
+      this.server.close((error) => {
+        if (error !== undefined) logger.error(`Shutdown error: ${error.message}`)
+        resolve()
+      })
+    })
+  }
+
+  public async closeAndStop (): Promise<void> {
+    await this.close()
+    await this.stop()
   }
 
   public getServer (): express.Application {
     return this.expressApp
   }
 
-  async init (): Promise<void> {
-    logger.info('Starting init sequence...')
+  async normalDemoStartup (): Promise<void> {
+    await this.start()
+    await this.clearStores()
+    await this.initializeStores()
+  }
+
+  async start (): Promise<void> {
+    logger.info('Starting app...')
     this.db = await attachToDb()
     this.s3Client = getS3Client()
     const state = this.formAppState()
     for (const feature of this.features) {
-      await feature.init(state)
+      await feature.start(state)
     }
     this.routerSetup()
+  }
+
+  async stop (): Promise<void> {
+    logger.info('Stopping app...')
+    const state = this.formAppState()
+    for (const feature of this.features) {
+      await feature.stop(state)
+    }
+    await disconnectToDb()
+  }
+
+  async clearStores (): Promise<void> {
+    logger.info('Clearing stores...')
+    const state = this.formAppState()
+    for (const feature of this.features) {
+      await feature.clearStores(state)
+    }
+  }
+
+  async initializeStores (): Promise<void> {
+    logger.info('Initializing stores...')
+    const state = this.formAppState()
+    for (const feature of this.features) {
+      await feature.initializeStores(state)
+    }
   }
 
   private normalizePort (val: string): number | string {

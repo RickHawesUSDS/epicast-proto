@@ -18,13 +18,23 @@ export class SystemFeature implements Feature {
     return [this.name, systemRoutes]
   }
 
-  async init (): Promise<void> {
+  async start (): Promise<void> {
+  }
+
+  async stop (): Promise<void> {
+  }
+
+  async initializeStores (): Promise<void> {
+  }
+
+  async clearStores (): Promise<void> {
   }
 
   async reset (appState: AppState): Promise<void> {
     for (const feature of this.otherFeatures) {
       logger.info(`Resetting: ${feature.name}`)
-      await feature.reset(appState)
+      await feature.clearStores(appState)
+      await feature.initializeStores(appState)
     }
   }
 }

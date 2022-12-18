@@ -21,6 +21,8 @@ export class AgenciesFeature implements Feature {
   private readonly caTimeSeries = new MongoTimeSeries(initialCASummary, initialStateDictionary)
   private readonly azTimeSeries = new MongoTimeSeries(initialAZSummary, initialStateDictionary)
   private readonly cdcTimeSeries = new MongoTimeSeries(initialCDCSummary, initialCommonCaseDictionary)
+  private azSubscriber?: FeedSubscriber
+  private caSubscriber?: FeedSubscriber
 
   agencies: {
     [key: string]: {
@@ -50,10 +52,10 @@ export class AgenciesFeature implements Feature {
     return [this.name, agenciesRouter]
   }
 
-  async init (state: AppState): Promise<void> {
+  async start (state: AppState): Promise<void> {
     const storage = state.feedsFeature.feedStorage
-    const caSubscriber = new FeedSubscriber(initialCASummary, storage, this.cdcTimeSeries)
-    const azSubscriber = new FeedSubscriber(initialAZSummary, storage, this.cdcTimeSeries)
+    this.caSubscriber = new FeedSubscriber(initialCASummary, storage, this.cdcTimeSeries)
+    this.azSubscriber = new FeedSubscriber(initialAZSummary, storage, this.cdcTimeSeries)
 
     for (const agencyName in this.agencies) {
       const agency = this.agencies[agencyName]
@@ -61,19 +63,22 @@ export class AgenciesFeature implements Feature {
 
       // Setup subscribers for the CDC
       if (agencyName === initialCDCSummary.reporterId) {
-        agency.subscribers = [caSubscriber, azSubscriber]
+        agency.subscribers = [this.caSubscriber, this.azSubscriber]
       }
-    }
-
-    if (process.env.NODE_ENV === 'dev') {
-      // Initialize AZ
-      await insertFakeCases(this.azTimeSeries, 1, 5)
-      await publishFeed(storage, this.azTimeSeries, { excludePII: true })
-      azSubscriber.startAutomatic()
     }
   }
 
-  async reset (): Promise<void> {
+  async stop (): Promise<void> {
+  }
+
+  async initializeStores (state: AppState): Promise<void> {
+    const storage = state.feedsFeature.feedStorage
+    await insertFakeCases(this.azTimeSeries, 1, 5)
+    await publishFeed(storage, this.azTimeSeries, { excludePII: true })
+    this.azSubscriber?.startAutomatic()
+  }
+
+  async clearStores (): Promise<void> {
     for (const agencyName in this.agencies) {
       const agencyTimeSeries = this.agencies[agencyName].timeSeries
       await agencyTimeSeries.reset()

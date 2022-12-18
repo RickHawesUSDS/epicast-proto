@@ -14,12 +14,18 @@ export class FeedsFeature implements Feature {
     return [this.name, feedRouter]
   }
 
-  async init (state: AppState): Promise<void> {
-    if (process.env.S3_BUCKET_NAME === undefined) throw Error('Missing S3_BUCKET_NAME in .env file')
-    this.storage = new S3FeedStorage(state.s3Client, process.env.S3_BUCKET_NAME)
+  async start (state: AppState): Promise<void> {
+    if (process.env.S3_BUCKET === undefined) throw Error('Missing S3_BUCKET in .env file')
+    this.storage = new S3FeedStorage(state.s3Client, process.env.S3_BUCKET)
   }
 
-  async reset (): Promise<void> {
+  async stop (): Promise<void> {
+  }
+
+  async initializeStores (): Promise<void> {
+  }
+
+  async clearStores (): Promise<void> {
     await resetStorage(this.feedStorage)
   }
 
