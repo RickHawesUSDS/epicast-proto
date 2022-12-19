@@ -6,6 +6,7 @@ export interface TimeSeries {
   fetchMetadata: () => Promise<TimeSeriesMetadata | null>
   fetchEvents: (options: TimeSeriesFindOptions) => Promise<TimeSeriesEvent[]>
   countEvents: (options: TimeSeriesCountOptions) => Promise<number>
+  fetchOneEvent: (eventId: string) => Promise<TimeSeriesEvent | undefined>
 
   readonly dictionary: FeedDictionary
   readonly summary: FeedSummary

@@ -10,33 +10,32 @@ beforeAll(async () => {
   await app.listen()
 })
 
-beforeEach(async () => {
-  await app.clearStores()
-})
-
 afterAll(async () => {
   await app.close()
   await app.stop()
 })
 
 describe('agency tests', () => {
+  beforeAll(async () => {
+    await app.clearStores()
+  })
+
   test('add random case test', async () => {
     await spec()
       .post(`${baseUrl}/agencies/${caAgency}/random`)
       .expectStatus(200)
+      .stores('returnedId', 'eventId')
 
     await spec()
-      .get(`${baseUrl}/agencies/${caAgency}`)
+      .get(`${baseUrl}/agencies/${caAgency}/$S{returnedId}`)
       .expectStatus(200)
-      .expectJsonLength(1)
 
+    await spec()
+      .get(`${baseUrl}/agencies/${caAgency}/xxx`)
+      .expectStatus(404)
   })
 
   test('publish a random case test', async () => {
-    await spec()
-      .post(`${baseUrl}/agencies/${caAgency}/random`)
-      .expectStatus(200)
-
     await spec()
       .get(`${baseUrl}/agencies/${caAgency}`)
       .expectStatus(200)

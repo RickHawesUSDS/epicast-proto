@@ -6,6 +6,9 @@ POST http://localhost:4001/api/system/reset
 ### Get all cases
 GET http://localhost:4001/api/agencies/cphd.ca.gov/?sort=desc
 
+### Get a case
+GET http://localhost:4001/api/agencies/cphd.ca.gov/cphd.ca.gov.1
+
 ### Add a random case
 POST http://localhost:4001/api/agencies/cphd.ca.gov/random
 
