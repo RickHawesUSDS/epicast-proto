@@ -53,8 +53,6 @@ function App(props) {
             bgImage=''
             bgImageOpacity={1}
             copyright={`© ${new Date().getFullYear()} Rick Hawes`}
-            logo='transmitter.svg'
-            logoInverted='transmitter.svg'
             sticky
           />
         </>
