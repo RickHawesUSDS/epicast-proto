@@ -9,6 +9,7 @@ export const logger = getLogger('RESET_SYSTEM')
 export class SystemFeature implements Feature {
   otherFeatures: Feature[]
   name = 'system'
+  collectionsUsed = []
 
   constructor (otherFeatures: Feature[]) {
     this.otherFeatures = otherFeatures

@@ -2,7 +2,7 @@ import { describe, expect, test, beforeAll, beforeEach, afterAll } from '@jest/g
 import { spec } from 'pactum'
 import { app } from '../../server/app'
 
-const caAgency = 'cphd.ca.gov'
+const caAgency = 'cdph.ca.gov'
 const baseUrl = 'http://localhost:4001/api'
 
 beforeAll(async () => {

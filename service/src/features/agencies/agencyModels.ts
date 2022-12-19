@@ -9,7 +9,7 @@ export const commonTopicFullName = 'Demonstration cases'
 //
 export const initialCASummary: FeedSummary = {
   epicastVersion: '0.1',
-  reporterId: 'cphd.ca.gov',
+  reporterId: 'cdph.ca.gov',
   topicId: commonTopic,
   sourceUri: '',
   sourceFeeds: [],
@@ -20,7 +20,7 @@ export const initialCASummary: FeedSummary = {
     topic: commonTopicFullName,
     details: 'This a fake feed for demonstration purposes'
   }],
-  contacts: [{ email: 'fake@cphd.ca.gov' }]
+  contacts: [{ email: 'fake@cdph.ca.gov' }]
 }
 
 export const initialAZSummary: FeedSummary = {

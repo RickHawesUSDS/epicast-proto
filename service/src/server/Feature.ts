@@ -1,8 +1,13 @@
 import { AppState } from './AppState'
 import { Router } from 'express'
 
+
 export interface Feature {
+  // name the feature for debug purposes
   name: string
+
+  // Name the collections used by this feature
+  collectionsUsed: string []
 
   // Get the router for this feature
   getRoutes: () => [string, Router]

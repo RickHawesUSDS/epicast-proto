@@ -4,7 +4,7 @@ import path from 'path'
 import http from 'http'
 import cookieParser from 'cookie-parser'
 import { getLogger } from './loggers'
-import { attachToDb, disconnectToDb } from './mongo'
+import { attachToDb, disconnectToDb, dropCollections } from './mongo'
 import indexRouter from './indexRoute'
 import { SystemFeature } from '../features/system/SystemFeature'
 import { FeedsFeature } from '../features/feeds/FeedsFeature'
@@ -108,9 +108,13 @@ export class App {
   async clearStores (): Promise<void> {
     logger.info('Clearing stores...')
     const state = this.formAppState()
+    let collectionNames = []
     for (const feature of this.features) {
       await feature.clearStores(state)
+      collectionNames.push(...feature.collectionsUsed)
     }
+    // Collection names may have changed between builds. Clear unused collections
+    dropCollections(state.db, collectionNames)
   }
 
   async initializeStores (): Promise<void> {

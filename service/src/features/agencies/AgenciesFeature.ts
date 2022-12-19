@@ -17,6 +17,7 @@ export interface AgencyModel {
 
 export class AgenciesFeature implements Feature {
   name = 'agencies'
+  collectionsUsed: string[]
 
   private readonly caTimeSeries = new MongoTimeSeries(initialCASummary, initialStateDictionary)
   private readonly azTimeSeries = new MongoTimeSeries(initialAZSummary, initialStateDictionary)
@@ -47,6 +48,14 @@ export class AgenciesFeature implements Feature {
         subscribers: []
       }
     }
+
+  constructor() {
+    this.collectionsUsed = [
+      this.caTimeSeries.collectionName,
+      this.azTimeSeries.collectionName,
+      this.cdcTimeSeries.collectionName,
+    ]
+  }
 
   getRoutes (): [string, Router] {
     return [this.name, agenciesRouter]

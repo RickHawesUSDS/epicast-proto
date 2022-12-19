@@ -9,6 +9,7 @@ export class FeedsFeature implements Feature {
   private storage?: S3FeedStorage
 
   name = 'feeds'
+  collectionsUsed = []
 
   getRoutes (): [string, Router] {
     return [this.name, feedRouter]

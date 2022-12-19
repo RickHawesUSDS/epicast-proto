@@ -18,6 +18,15 @@ export async function attachToDb (): Promise<Db> {
   return client.db(process.env.MONGO_DB)
 }
 
+export async function dropCollections (db: Db, except?: string[]): Promise<void> {
+  for (const collection of await db.collections()) {
+    const name = collection.collectionName
+    if (except !== undefined && except.indexOf(name) !== -1) continue
+    logger.info(`Dropping collection: ${name}`)
+    await collection.drop()
+  }
+}
+
 export async function disconnectToDb (): Promise<void> {
   await client.close()
 }

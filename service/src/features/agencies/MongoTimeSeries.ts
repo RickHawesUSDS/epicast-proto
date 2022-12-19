@@ -44,7 +44,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
   collection?: Collection<MongoTimeSeriesEvent>
   dictionary: MutableFeedDictionary
   summary: FeedSummary
-  private readonly collectionName: string
+  readonly collectionName: string
   private readonly initialDictionary: FeedDictionary
   private subscriberDictionaries: FeedDictionary[] = []
   private readonly initialSummary: FeedSummary

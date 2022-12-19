@@ -20,8 +20,8 @@ export default function StatePage(props) {
         <Container align='center'>
           This is a simple state surveillance system. The table represents all the case of a particular disease in California.
         </Container>
-        <StateCasesTable agency='cphd.ca.gov'/>
-        <StateCasesButtons agency='cphd.ca.gov'/>
+        <StateCasesTable agency='cdph.ca.gov' />
+        <StateCasesButtons agency='cdph.ca.gov' />
       </HeroSection2>
     </>
   )
