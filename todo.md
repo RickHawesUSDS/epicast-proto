@@ -48,10 +48,15 @@
 
 ## Add tests tasks
 
-* [ ] Add Jest
+* [x] Add Jest
 * [ ] Add EpiCast package tests
-* [ ] Add unit tests for some
-* [ ] Add integrations tests
+* [x] Add unit tests for some
+* [ ] Add Summary unit tests
+* [ ] Add Dictionary unit tests
+* [x] Add API tests
+* [ ] Add subscriber API tests
+* [ ] Add dictionary API tests
+* [ ] Mongoose memory db to speedup tests?
 
 ## Concept mapping
 
@@ -62,7 +67,7 @@
 
 ## Draw an Epi Curve
 
-* [ ] Public bucket
+* [ ] Public bucket or a local proxy API
 * [ ] NextJS generates a dummy static site that is published to a bucket
 * [ ] NextJS generates a file explorer
 * [ ] NextJS generates a US design react
@@ -82,3 +87,9 @@
 
 * [ ] Mongo and SQL name approach support in the TimeSeries and Elements.
 * [ ] Multi-value column support.
+
+## GitHub WebSite
+
+* [ ] Make a CDC.GOV github website
+* [ ] Add styling
+* [ ] Make a MD document that
