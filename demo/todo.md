@@ -46,47 +46,7 @@
 * [ ] Support EpiCast name and column name? Allows people to define feeds with old names.
 * [ ] Define epiCast id as eventId + eventReporter?
 
-## Add tests tasks
 
-* [x] Add Jest
-* [ ] Add EpiCast package tests
-* [x] Add unit tests for some
-* [ ] Add Summary unit tests
-* [ ] Add Dictionary unit tests
-* [x] Add API tests
-* [ ] Add subscriber API tests
-* [ ] Add dictionary API tests
-* [ ] Mongoose memory db to speedup tests?
-
-## Concept mapping
-
-* [ ] Understand FHIR concept map and value sets. Use directly?
-* [ ] value set definition
-* [ ] concept map definition
-* [ ] age -> age_groups
-
-## Draw an Epi Curve
-
-* [ ] Public bucket or a local proxy API
-* [ ] NextJS generates a dummy static site that is published to a bucket
-* [ ] NextJS generates a file explorer
-* [ ] NextJS generates a US design react
-* [ ] Make stratifiers a PublishFeedOption
-* [ ] Stratifiers in data dictionary; JS functions
-* [ ] Improve aggregate use-case; age-group, gender, age-group+gender,
-* [ ] Draw an EpiCurve from aggregates
-
-## Add validation language
-
-* [ ] Validation language as JS functions
-* [ ] Simple language (booleans, if / else, comparison, built-in functions, empty values)
-* [ ] Random errors methods and fix button
-* [ ] Validator service. watcher domain to validate and provide webhooks.
-
-## Add mulit-valued column support
-
-* [ ] Mongo and SQL name approach support in the TimeSeries and Elements.
-* [ ] Multi-value column support.
 
 ## GitHub WebSite
 
