@@ -34,12 +34,14 @@
     "install-all": "yarn install && yarn install-service",
     "dev": "concurrently \"yarn run dev-service\" \"yarn run dev-demo\"",
     "start": "yarn run dev",
+    "upgrade-all": "yarn upgrade && yarn upgrade-service",
     "dev-demo": "export PORT=4000 && react-scripts start",
     "build-demo": "react-scripts build",
     "test-demo": "react-scripts test",
     "eject-demo": "react-scripts eject",
     "dev-service": "cd ../service && yarn dev",
-    "install-service": "cd ../service && yarn install"
+    "install-service": "cd ../service && yarn install",
+    "upgrade-service": "cd ../service && yarn upgrade"
   },
   "eslintConfig": {
     "extends": "react-app"
