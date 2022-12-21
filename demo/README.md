@@ -2,7 +2,7 @@
 ## 👉 Get Started
 Install dependencies
 ```
-yarn install
+yarn install-all
 ```
 Update your `.env` file with values for each environment variable
 ```
@@ -12,9 +12,9 @@ etc ...
 
 Run the development server
 ```
-yarn start
+yarn dev
 ```
-When the above command completes you'll be able to view your website at `http://localhost:3000`
+When the above command completes you'll be able to view your website at `http://localhost:4000`
 
 ## 🥞 Stack
 This project uses the following libraries and services:
@@ -24,66 +24,25 @@ This project uses the following libraries and services:
 
 
 ## 📚 Guide
+## A demo script
 
+The prototype should be support a demonstration of these concepts.
 
-
-<details>
-<summary><b>Routing</b></summary>
-<p>
-  This project uses <a target="_blank" href="https://reacttraining.com/react-router/web/guides/quick-start">React Router</a> and includes a convenient <code>useRouter</code> hook (located in <code><a href="src/util/router.js">src/util/router.js</a></code>) that wraps React Router and gives all the route methods and data you need.
-
-```js
-import { Link, useRouter } from "./../util/router.js";
-
-function MyComponent() {
-  // Get the router object
-  const router = useRouter();
-
-  // Get value from query string (?postId=123) or route param (/:postId)
-  console.log(router.query.postId);
-
-  // Get current pathname
-  console.log(router.pathname);
-
-  // Navigate with the <Link> component or with router.push()
-  return (
-    <div>
-      <Link to="/about">About</Link>
-      <button onClick={(e) => router.push("/about")}>About</button>
-    </div>
-  );
-}
-```
-</p>
-</details>
-
-
-
-
-
-<details>
-<summary><b>Deployment</b></summary>
-<p>
-Build your front-end for deployment
-
-```
-yarn build
-```
-
-Then upload or deploy to your host. Exact details depend on your chosen host.
-
-Your host may automatically read your environment variables from your `.env` file. If not, be sure to add each variable from `.env` to your host through their own UI. You can skip the ones in the lower section of `.env` (prepended with "REACT_APP\_") because those were already bundled into your front-end when you ran `yarn build`.
-
-Have your host run `node api` to serve your web app. This will run a Node server that handles both your API endpoints and front-end. By default your server will be listening on port `8080`, but if your host expects a different port then you can set that by specifying a `PORT` environment variable. Some hosts will automatically set this environment variable to their desired port.
-
-You can find extended information and host-specific details in the Create React App <a href="https://create-react-app.dev/docs/deployment">deployment docs</a>.
-</p>
-</details>
-
-<details>
-<summary><b>Other</b></summary>
-<p>
-  This project was created using <a href="https://divjoy.com?ref=readme_other">Divjoy</a>, the React codebase generator. You can find more info in the <a href="https://docs.divjoy.com">Divjoy Docs</a>.
-</p>
-</details>
-  
+1. Simple case
+    1. Add cases
+    2. Publish is controlled by the publisher
+    3. Show published folder and timeseries
+    4. Receive is automatic
+2. Pandemic spike
+    1. Add 15000 cases
+    2. Look at logs
+    3. Show published folder and the higher partitioning
+3. Show a schema change
+    1. Reset to remove all the pandemic records
+    2. Explain column colors (common, cdc, local)
+    3. Add a cdc and local elements
+    4. Show the schema change
+    5. Show the receive table
+4. Show special features
+    1. Aggregates table
+    2. Validation markers

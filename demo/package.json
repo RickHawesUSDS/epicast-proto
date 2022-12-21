@@ -32,13 +32,13 @@
   },
   "scripts": {
     "install-all": "yarn install && yarn install-service",
-    "dev": "concurrently \"yarn run dev-demo\" \"yarn run dev-service\"",
+    "dev": "concurrently \"yarn run dev-service\" \"yarn run dev-demo\"",
     "start": "yarn run dev",
     "dev-demo": "export PORT=4000 && react-scripts start",
     "build-demo": "react-scripts build",
     "test-demo": "react-scripts test",
     "eject-demo": "react-scripts eject",
-    "dev-service": "cd ../service && yarn start",
+    "dev-service": "cd ../service && yarn dev",
     "install-service": "cd ../service && yarn install"
   },
   "eslintConfig": {

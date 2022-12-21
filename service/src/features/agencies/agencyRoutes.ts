@@ -57,31 +57,6 @@ router.get('/:agency', asyncHandler(async (req, res, _next) => {
   res.send(cases)
 }))
 
-/* GET get a single case. */
-router.get('/:agency/:eventId', asyncHandler(async (req, res, _next) => {
-  logger.info(`Get a single event ${req.params.eventId} for ${req.params.agency}`)
-
-  const eventId = req.params.eventId
-  if (eventId === undefined || eventId.length === 0) {
-    res.status(404).send()
-    return
-  }
-
-  const timeSeries = getAgencyTimeSeries(req)
-  if (timeSeries === undefined) {
-    res.status(404).send()
-    return
-  }
-
-  const event = await timeSeries.fetchOneEvent(eventId)
-  if (event === undefined) {
-    res.status(404).send()
-    return
-  }
-
-  res.status(200).send(event)
-}))
-
 /* POST add a random new cases */
 router.post('/:agency/random', asyncHandler(async (req, res, _next) => {
   let numPerDay = parseInt(req.query.numPerDay as string)
@@ -266,5 +241,30 @@ router.post('/:agency/subscribers/:subscriber', (req, res, _next) => {
   const subcriberModel = feedSubscriber.updateFeedSubscriber(req.body)
   res.send(subcriberModel)
 })
+
+/* GET get a single case. */
+router.get('/:agency/:eventId', asyncHandler(async (req, res, _next) => {
+  logger.info(`Get a single event ${req.params.eventId} for ${req.params.agency}`)
+
+  const eventId = req.params.eventId
+  if (eventId === undefined || eventId.length === 0) {
+    res.status(404).send()
+    return
+  }
+
+  const timeSeries = getAgencyTimeSeries(req)
+  if (timeSeries === undefined) {
+    res.status(404).send()
+    return
+  }
+
+  const event = await timeSeries.fetchOneEvent(eventId)
+  if (event === undefined) {
+    res.status(404).send()
+    return
+  }
+
+  res.status(200).send(event)
+}))
 
 export default router
