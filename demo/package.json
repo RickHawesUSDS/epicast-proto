@@ -31,10 +31,15 @@
     "use-local-storage-state": "9.0.2"
   },
   "scripts": {
-    "start": "export PORT=4000 && react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "install-all": "yarn install && yarn install-service",
+    "dev": "concurrently \"yarn run dev-demo\" \"yarn run dev-service\"",
+    "start": "yarn run dev",
+    "dev-demo": "export PORT=4000 && react-scripts start",
+    "build-demo": "react-scripts build",
+    "test-demo": "react-scripts test",
+    "eject-demo": "react-scripts eject",
+    "dev-service": "cd ../service && yarn start",
+    "install-service": "cd ../service && yarn install"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -53,6 +58,7 @@
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.3",
+    "concurrently": "^7.6.0",
     "standard": "^17.0.0"
   }
 }

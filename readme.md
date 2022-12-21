@@ -36,6 +36,10 @@ In broad sense, EpiCast supports the CDC's NorthStar architecture, the open data
 * Logging of events in the feed.
 * Use S3 Buckets and Azure Blobs as the base protocol because all cloud vendors can support these protocols
 
+## Getting Started
+
+
+
 ## A demo script
 
 The prototype should be support a demonstration of these concepts.
