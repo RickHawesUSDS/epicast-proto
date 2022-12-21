@@ -13,6 +13,7 @@ import NotFoundPage from './404'
 import Footer from './../components/Footer'
 import { ThemeProvider } from './../util/theme'
 import CentralPage from './central'
+import VocabPage from './vocab'
 
 function App(props) {
   return (
@@ -43,6 +44,8 @@ function App(props) {
             <Route exact path='/cdc' component={CdcPage} />
 
             <Route exact path='/central' component={CentralPage} />
+
+            <Route exact path='/vocab' component={VocabPage} />
 
             <Route component={NotFoundPage} />
           </Switch>
