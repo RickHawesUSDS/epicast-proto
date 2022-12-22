@@ -22,5 +22,11 @@
   },
   "include": [
     "src"
-  ]
+  ],
+  "ts-standard": {
+    "ignore": [
+      "build",
+      "src/**/*.js"
+    ]
+  }
 }
