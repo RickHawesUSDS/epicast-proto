@@ -4,8 +4,6 @@ import { FeedStorage, StorageObject } from '../../epicast/FeedStorage'
 import { ReadStream } from 'fs'
 import { Readable } from 'stream'
 import { parseISO } from 'date-fns'
-import { FileData, FileArray } from './FileArray'
-import path from 'path/posix'
 
 const logger = getLogger('STORAGE')
 
@@ -36,19 +34,33 @@ export class S3FeedStorage implements FeedStorage {
     }
   }
 
-  async listObjects (prefix: string): Promise<StorageObject[]> {
+  async listObjects (prefix: string, onlyOneLevel?: boolean): Promise<StorageObject[]> {
     const listResponse = await this.s3Client.send(new ListObjectsCommand({
       Bucket: this.bucket,
-      Prefix: prefix
+      Prefix: prefix,
+      Delimiter: onlyOneLevel === true ? '/' : undefined
     }))
     if (listResponse.$metadata.httpStatusCode === 200) {
       return listResponse.Contents?.map(obj => {
         const lastModified = (obj.LastModified != null) ? parseISO(obj.LastModified.toISOString()) : new Date()
         const key = obj.Key ?? ''
-        return { key, lastModified }
+        return { key, lastModified, size: obj.Size ?? 0 }
       }) ?? []
     } else {
       return await this.handleError(`List objects for: ${prefix}, ${listResponse.$metadata.httpStatusCode ?? 0}`)
+    }
+  }
+
+  async listFolders (prefix: string): Promise<string[]> {
+    const listResponse = await this.s3Client.send(new ListObjectsCommand({
+      Bucket: this.bucket,
+      Prefix: prefix,
+      Delimiter: '/'
+    }))
+    if (listResponse.$metadata.httpStatusCode === 200) {
+      return listResponse.CommonPrefixes?.map(prefix => prefix.Prefix ?? '') ?? []
+    } else {
+      return await this.handleError(`list folders for: ${prefix}, ${listResponse.$metadata.httpStatusCode ?? 0}`)
     }
   }
 
@@ -104,50 +116,5 @@ export class S3FeedStorage implements FeedStorage {
     if (deleteResponse.$metadata.httpStatusCode !== 204) {
       return await this.handleError(`delete error: ${key}, ${deleteResponse.$metadata.httpStatusCode ?? 0}`)
     }
-  }
-
-  formUrl (name: string): string {
-    return path.join(this.bucket, name)
-  }
-
-  async getFileData (prefix: string): Promise<FileArray> {
-    const chonkyFiles: FileArray = []
-    const fixedUpPrefix = prefix === '/' ? '' : prefix
-    const listResponse = await this.s3Client.send(new ListObjectsCommand({
-      Bucket: this.bucket,
-      Prefix: fixedUpPrefix,
-      Delimiter: '/'
-    }))
-
-    if (listResponse.$metadata.httpStatusCode !== 200) return chonkyFiles
-
-    const s3Objects = listResponse.Contents
-    const s3Prefixes = listResponse.CommonPrefixes
-
-    if (s3Objects != null) {
-      chonkyFiles.push(
-        ...s3Objects.map(
-          (object): FileData => ({
-            id: object.Key ?? '',
-            name: path.basename(object.Key ?? ''),
-            modDate: object.LastModified,
-            size: object.Size
-          })
-        )
-      )
-    }
-
-    if (s3Prefixes != null) {
-      chonkyFiles.push(
-        ...s3Prefixes.map(
-          (prefix): FileData => ({
-            id: prefix.Prefix ?? '',
-            name: path.basename(prefix.Prefix ?? ''),
-            isDir: true
-          })
-        )
-      )
-    }
-    return chonkyFiles
   }
 }

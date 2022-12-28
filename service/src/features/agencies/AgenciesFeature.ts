@@ -49,11 +49,11 @@ export class AgenciesFeature implements Feature {
       }
     }
 
-  constructor() {
+  constructor () {
     this.collectionsUsed = [
       this.caTimeSeries.collectionName,
       this.azTimeSeries.collectionName,
-      this.cdcTimeSeries.collectionName,
+      this.cdcTimeSeries.collectionName
     ]
   }
 

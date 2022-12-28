@@ -21,7 +21,7 @@ export async function attachToDb (): Promise<Db> {
 export async function dropCollections (db: Db, except?: string[]): Promise<void> {
   for (const collection of await db.collections()) {
     const name = collection.collectionName
-    if (except !== undefined && except.indexOf(name) !== -1) continue
+    if (except?.includes(name) ?? false) continue
     logger.info(`Dropping collection: ${name}`)
     await collection.drop()
   }

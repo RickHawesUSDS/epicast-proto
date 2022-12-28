@@ -1,7 +1,6 @@
 import { AppState } from './AppState'
 import { Router } from 'express'
 
-
 export interface Feature {
   // name the feature for debug purposes
   name: string

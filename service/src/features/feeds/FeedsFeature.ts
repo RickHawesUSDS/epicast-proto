@@ -4,9 +4,10 @@ import { AppState } from '@/server/AppState'
 import feedRouter from './feedRoutes'
 import { resetStorage } from './resetStorage'
 import { S3FeedStorage } from './S3FeedStorage'
+import { FeedStorage } from '@/epicast/FeedStorage'
 
 export class FeedsFeature implements Feature {
-  private storage?: S3FeedStorage
+  private storage?: FeedStorage
 
   name = 'feeds'
   collectionsUsed = []
@@ -30,7 +31,7 @@ export class FeedsFeature implements Feature {
     await resetStorage(this.feedStorage)
   }
 
-  get feedStorage (): S3FeedStorage {
+  get feedStorage (): FeedStorage {
     if (this.storage === undefined) throw Error('FeedsFeature is uninitialized')
     return this.storage
   }

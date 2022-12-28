@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeAll, beforeEach, afterAll } from '@jest/globals'
+import { describe, test, beforeAll, afterAll } from '@jest/globals'
 import { spec } from 'pactum'
 import { app } from '../../server/app'
 
@@ -52,5 +52,18 @@ describe('agency tests', () => {
       .expectBodyContains('topicId: cases')
       .expectBodyContains(`reporterId: ${caAgency}`)
   })
-})
 
+  test('check that all the files have been published', async () => {
+    await spec()
+      .get(`${baseUrl}/feeds/content?file=${caAgency}/cases/summary.yaml`)
+      .expectStatus(200)
+      .expectBodyContains('eventCount: 1')
+      .expectBodyContains('topicId: cases')
+      .expectBodyContains(`reporterId: ${caAgency}`)
+
+    await spec()
+      .get(`${baseUrl}/feeds/metadata?prefix=${caAgency}/cases/`)
+      .expectStatus(200)
+      .expectJsonLength(5)
+  })
+})

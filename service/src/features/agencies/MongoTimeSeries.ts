@@ -114,7 +114,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
     return rawEvents.map(e => new MongoTimeSeriesEvent(e))
   }
 
-  async fetchOneEvent(eventId: string): Promise<TimeSeriesEvent | undefined> {
+  async fetchOneEvent (eventId: string): Promise<TimeSeriesEvent | undefined> {
     if (this.collection === undefined) return undefined
 
     const rawEvent = await this.collection

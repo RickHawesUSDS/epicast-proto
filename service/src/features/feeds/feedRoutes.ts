@@ -1,11 +1,12 @@
 import express from 'express'
 import { getLogger } from '../../server/loggers'
 import asyncHandler from 'express-async-handler'
-import { S3FeedStorage } from './S3FeedStorage'
+import { getFileData } from './getFileData'
+import { FeedStorage } from '@/epicast/FeedStorage'
 const router = express.Router()
 const logger = getLogger('FEED_ROUTE')
 
-function getFeedStorage (req: express.Request): S3FeedStorage {
+function getFeedStorage (req: express.Request): FeedStorage {
   return req.state.feedsFeature.feedStorage
 }
 
@@ -15,7 +16,7 @@ router.get('/metadata', asyncHandler(async (req, res, _next) => {
   logger.info(`list feed: ${prefix}`)
   const storage = getFeedStorage(req)
 
-  const fileArray = await storage.getFileData(prefix)
+  const fileArray = await getFileData(storage, prefix)
   res.status(200).send(fileArray)
 }))
 

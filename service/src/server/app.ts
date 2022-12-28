@@ -3,7 +3,7 @@ import express from 'express'
 import path from 'path'
 import http from 'http'
 import cookieParser from 'cookie-parser'
-import { getLogger } from './loggers'
+import { getLogger, bootstrapLogger } from './loggers'
 import { attachToDb, disconnectToDb, dropCollections } from './mongo'
 import indexRouter from './indexRoute'
 import { SystemFeature } from '../features/system/SystemFeature'
@@ -15,8 +15,6 @@ import { S3Client } from '@aws-sdk/client-s3'
 import { Db } from 'mongodb'
 import { getS3Client } from './s3'
 import { config } from 'dotenv-flow'
-import { bootstrapLogger } from './loggers'
-
 
 // Load the .env config file into process.env
 const loaded = config()
@@ -108,13 +106,13 @@ export class App {
   async clearStores (): Promise<void> {
     logger.info('Clearing stores...')
     const state = this.formAppState()
-    let collectionNames = []
+    const collectionNames = []
     for (const feature of this.features) {
       await feature.clearStores(state)
       collectionNames.push(...feature.collectionsUsed)
     }
     // Collection names may have changed between builds. Clear unused collections
-    dropCollections(state.db, collectionNames)
+    await dropCollections(state.db, collectionNames)
   }
 
   async initializeStores (): Promise<void> {
