@@ -8,7 +8,7 @@ import {
 } from 'chonky';
 import { ChonkyIconFA } from 'chonky-icon-fontawesome';
 import { useCallback, useEffect, useState, useMemo } from 'react';
-import { listFeedMetadata, getFeedContent } from '../features/api/api'
+import { listFeedFiles, getFeedContent } from '../features/api/api'
 import fileDownload from 'js-file-download'
 
 // DevNote this code comes from the Chonky example page
@@ -21,7 +21,7 @@ export default function FeedBrowser(props) {
   const [files, setFiles] = useState([]);
 
   useEffect(() => {
-    listFeedMetadata(folderPrefix)
+    listFeedFiles(folderPrefix)
       .then(setFiles)
       .catch((error) => setError(error.message))
   }, [folderPrefix, setFiles]);

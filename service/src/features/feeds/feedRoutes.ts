@@ -11,7 +11,7 @@ function getFeedStorage (req: express.Request): FeedStorage {
 }
 
 /* List the feed. */
-router.get('/metadata', asyncHandler(async (req, res, _next) => {
+router.get('/files', asyncHandler(async (req, res, _next) => {
   const prefix = req.query.prefix as string ?? ''
   logger.info(`list feed: ${prefix}`)
   const storage = getFeedStorage(req)

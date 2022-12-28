@@ -62,7 +62,7 @@ describe('agency tests', () => {
       .expectBodyContains(`reporterId: ${caAgency}`)
 
     await spec()
-      .get(`${baseUrl}/feeds/metadata?prefix=${caAgency}/cases/`)
+      .get(`${baseUrl}/feeds/files?prefix=${caAgency}/cases/`)
       .expectStatus(200)
       .expectJsonLength(5)
   })

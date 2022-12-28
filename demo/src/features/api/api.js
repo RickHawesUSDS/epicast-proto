@@ -74,8 +74,8 @@ export async function publishCDCCases() {
   return response.data
 }
 
-export async function listFeedMetadata(prefix) {
-  const response = await axios.get(`/api/feeds/metadata?prefix=${prefix}`)
+export async function listFeedFiles(prefix) {
+  const response = await axios.get(`/api/feeds/files?prefix=${prefix}`)
   return response.data
 }
 

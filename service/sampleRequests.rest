@@ -80,10 +80,10 @@ content-type: application/json
 POST http://localhost:4001/api/agencies/cdph.ca.gov/deduplicate
 
 ### List feed
-GET http://localhost:4001/api/feeds/metadata?prefix=cdph.ca.gov/cases/
+GET http://localhost:4001/api/feeds/files?prefix=cdph.ca.gov/cases/
 
 ### List feed
-GET http://localhost:4001/api/feeds/metadata?prefix=cdph.ca.gov/cases/snapshots/
+GET http://localhost:4001/api/feeds/files?prefix=cdph.ca.gov/cases/snapshots/
 
 ### Get feed snapshot
 GET http://localhost:4001/api/feeds/content?file=cdph.ca.gov/cases/snapshots/1.csv
