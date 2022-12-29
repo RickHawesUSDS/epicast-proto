@@ -3,24 +3,28 @@ import { isAfter, isSameSecond, parseISO } from 'date-fns'
 import { getLogger } from '../server/loggers'
 
 import { MutableTimeSeries } from './TimeSeries'
-import { FeedDictionaryYaml, fromYaml } from './FeedDictionary'
+import { FeedDictionary, FeedDictionaryYaml, fromYaml } from './FeedDictionary'
 import { DICTIONARY_FOLDER, splitDictionaryKey } from './feedStorageKeys'
 import { Snapshot } from './Snapshot'
 
 const logger = getLogger('READ_DICTIONARY_SERVICE')
 
-export async function readDictionary<T> (fromSnapshot: Snapshot, mutatingTimeSeries: MutableTimeSeries<T>): Promise<void> {
+export async function readDictionary<T> (
+  fromSnapshot: Snapshot,
+  mutatingTimeSeries: MutableTimeSeries<T>
+): Promise<FeedDictionary | null> {
   const publishedBlobKey = findLastDictionaryKey(fromSnapshot, mutatingTimeSeries.dictionary.validFrom)
-  if (publishedBlobKey === null) return
+  if (publishedBlobKey === null) return null
   const [, publishedValidFromRaw] = splitDictionaryKey(publishedBlobKey)
   const publishedValidFrom = parseISO(publishedValidFromRaw)
-  if (isSameSecond(mutatingTimeSeries.dictionary.validFrom, publishedValidFrom)) return
+  if (isSameSecond(mutatingTimeSeries.dictionary.validFrom, publishedValidFrom)) return null
   logger.info(`Reading dictionary: ${publishedBlobKey}`)
 
   const publishedBlob = await fromSnapshot.getObject(publishedBlobKey)
   const newDictionary = fromYaml(YAML.parse(publishedBlob) as FeedDictionaryYaml)
 
   mutatingTimeSeries.updateSubscriberDictionary(newDictionary)
+  return newDictionary
 }
 
 function findLastDictionaryKey (fromSnapshot: Snapshot, afterDate: Date | null): string | null {

@@ -12,17 +12,23 @@ import { Snapshot } from './Snapshot'
 
 const logger = getLogger('READ_TIME_SERIES_CONTROLLER')
 
-export async function readTimeSeries<T> (fromSnapshot: Snapshot, toTimeSeries: MutableTimeSeries<T>): Promise<Date | undefined> {
-  const reader = new TimeSeriesReader(fromSnapshot, toTimeSeries)
+export async function readTimeSeries<T> (
+  fromSnapshot: Snapshot,
+  fromReporterId: string,
+  toTimeSeries: MutableTimeSeries<T>
+): Promise<Date | undefined> {
+  const reader = new TimeSeriesReader(fromSnapshot, fromReporterId, toTimeSeries)
   return await reader.read()
 }
 
 class TimeSeriesReader<T> {
   snapshot: Snapshot
   timeSeries: MutableTimeSeries<T>
+  reporterId: string
 
-  constructor (fromSnapshot: Snapshot, toTimeSeries: MutableTimeSeries<T>) {
+  constructor (fromSnapshot: Snapshot, fromReporterId: string, toTimeSeries: MutableTimeSeries<T>) {
     this.snapshot = fromSnapshot
+    this.reporterId = fromReporterId
     this.timeSeries = toTimeSeries
   }
 
@@ -32,9 +38,9 @@ class TimeSeriesReader<T> {
     let publishedObjects = await this.snapshot.listObjects(TIMESERIES_FOLDER)
     if (publishedObjects.length === 0) return
     const lastPublished = this.lastModifiedOf(publishedObjects)
-    const metadata = await this.timeSeries.fetchMetadata()
-    if (metadata !== null) {
-      publishedObjects = publishedObjects.filter((object) => isAfter(object.lastModified, metadata.updatedAt))
+    const lastEvent = await this.timeSeries.fetchOneEvent({ reporterId: this.reporterId, for: 'updateAt', order: 'last' })
+    if (lastEvent !== null) {
+      publishedObjects = publishedObjects.filter((object) => isAfter(object.lastModified, lastEvent.eventUpdatedAt))
     }
     logger.debug(`Snapshot ${snapshotVersion} has ${publishedObjects.length} files to read`)
 

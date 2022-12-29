@@ -41,5 +41,3 @@ export class FeedsFeature implements Feature {
     return this.storage
   }
 }
-
-

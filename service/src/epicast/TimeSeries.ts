@@ -4,15 +4,15 @@ import { FeedSummary } from './FeedSummary'
 
 export interface TimeSeries {
   fetchMetadata: () => Promise<TimeSeriesMetadata | null>
-  fetchEvents: (options: TimeSeriesFindOptions) => Promise<TimeSeriesEvent[]>
-  countEvents: (options: TimeSeriesCountOptions) => Promise<number>
-  fetchOneEvent: (eventId: string) => Promise<TimeSeriesEvent | undefined>
+  fetchEvents: (options: FetchOptions) => Promise<TimeSeriesEvent[]>
+  countEvents: (options: CountOptions) => Promise<number>
+  fetchOneEvent: (options: FetchOneOptions) => Promise<TimeSeriesEvent | null>
 
   readonly dictionary: FeedDictionary
   readonly summary: FeedSummary
 }
 
-export interface TimeSeriesFindOptions {
+export interface FetchOptions {
   interval?: Interval
   after?: Date
   before?: Date
@@ -21,12 +21,19 @@ export interface TimeSeriesFindOptions {
   sortDescending?: boolean
 }
 
-export interface TimeSeriesCountOptions {
+export interface CountOptions {
   interval?: Interval
   after?: Date
   before?: Date
   isDeleted?: boolean
   updatedAfter?: Date
+}
+
+export interface FetchOneOptions {
+  eventId?: string
+  reporterId?: string
+  order?: 'first' | 'last'
+  for?: 'at' | 'updateAt'
 }
 
 export const eventElementNames = ['eventId', 'eventAt', 'eventSubject', 'eventReporterId', 'eventTopicId', 'eventUpdatedAt', 'eventIsDeleted', 'eventReplacedBy']

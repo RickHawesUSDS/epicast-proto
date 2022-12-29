@@ -1,6 +1,6 @@
 import { Db, Collection } from 'mongodb'
 
-import { EventElementName, MutableTimeSeries, TimeSeriesCountOptions, TimeSeriesDeletedEvent, TimeSeriesEvent, TimeSeriesFindOptions, TimeSeriesMetadata } from '@/epicast/TimeSeries'
+import { EventElementName, MutableTimeSeries, CountOptions, TimeSeriesDeletedEvent, TimeSeriesEvent, FetchOptions, TimeSeriesMetadata, FetchOneOptions } from '@/epicast/TimeSeries'
 import { FeedDictionary } from '../../epicast/FeedDictionary'
 import { MutableFeedDictionary } from '../../epicast/MutableFeedDictionary'
 import { FeedSummary } from '../../epicast/FeedSummary'
@@ -79,7 +79,7 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
 
   /// TimeSeries Methods
 
-  async fetchEvents (options: TimeSeriesFindOptions): Promise<TimeSeriesEvent[]> {
+  async fetchEvents (options: FetchOptions): Promise<TimeSeriesEvent[]> {
     if (this.collection === undefined) return []
     const whereClause: any = {
     }
@@ -114,18 +114,33 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
     return rawEvents.map(e => new MongoTimeSeriesEvent(e))
   }
 
-  async fetchOneEvent (eventId: string): Promise<TimeSeriesEvent | undefined> {
-    if (this.collection === undefined) return undefined
+  async fetchOneEvent (options: FetchOneOptions): Promise<TimeSeriesEvent | null> {
+    if (this.collection === undefined) return null
 
-    const rawEvent = await this.collection
-      .findOne({ _id: eventId })
-
-    if (rawEvent === null) return undefined
+    let rawEvent = null
+    if (options.eventId !== undefined) {
+      rawEvent = await this.collection.findOne({ _id: options.eventId })
+    } else {
+      const whereClause: any = {
+      }
+      if (options.reporterId !== undefined) {
+        whereClause.eventReporterId = options.reporterId
+      }
+      whereClause.eventIsDeleted = { $ne: true }
+      const order: number = options.order === 'last' ? -1 : 1
+      const sortClause: any = options.for === 'at' ? { eventAt: order } : { eventUpdatedAt: order }
+      rawEvent = await this.collection
+        .find(whereClause)
+        .sort(sortClause)
+        .limit(1)
+        .next()
+    }
+    if (rawEvent === null) return null
 
     return new MongoTimeSeriesEvent(rawEvent)
   }
 
-  async countEvents (options: TimeSeriesCountOptions): Promise<number> {
+  async countEvents (options: CountOptions): Promise<number> {
     if (this.collection === undefined) return 0
     const whereClause: any = {
     }

@@ -2,7 +2,7 @@ import express, { Request } from 'express'
 import asyncHandler from 'express-async-handler'
 import { getLogger } from '../../server/loggers'
 import { MongoTimeSeries } from './MongoTimeSeries'
-import { FeedSubscriber } from './FeedSubscriber'
+import { FeedSubscriber, FeedSubscriberModel } from './FeedSubscriber'
 import { publishFeed } from '../../epicast/publishFeed'
 import { FeedStorage } from '../../epicast/FeedStorage'
 import { deduplicateCases } from './deduplicateCases'
@@ -193,11 +193,11 @@ router.post('/:agency/subscribers/read', asyncHandler(async (req, res, _next) =>
     res.status(404).send()
     return
   }
-  const models = await Promise.all(
-    feedSubscribers.map(
-      async (f) => await f.readOnce()
-    )
-  )
+  const models: FeedSubscriberModel[] = []
+  for (const subscriber of feedSubscribers) {
+    const model = await subscriber.readOnce()
+    models.push(model)
+  }
   res.status(200).send(models)
 }))
 
@@ -258,8 +258,8 @@ router.get('/:agency/:eventId', asyncHandler(async (req, res, _next) => {
     return
   }
 
-  const event = await timeSeries.fetchOneEvent(eventId)
-  if (event === undefined) {
+  const event = await timeSeries.fetchOneEvent({ eventId })
+  if (event === null) {
     res.status(404).send()
     return
   }

@@ -59,7 +59,10 @@ GET http://localhost:4001/api/agencies/cdc.gov/summary
 GET http://localhost:4001/api/agencies/cdc.gov/subscribers/cases.cdph.ca.gov
 
 ### Read the feed once
-POST http://localhost:4001/api/agencies/cdc.gov/subscribers/cases.cdph.ca.gov/read
+POST http://localhost:4001/api/agencies/cdc.gov/subscribers/cases.azphs.gov/read
+
+### Read all feeds once
+POST http://localhost:4001/api/agencies/cdc.gov/subscribers/read
 
 ### Publish the CDC feed
 POST http://localhost:4001/api/agencies/cdc.gov/publish
