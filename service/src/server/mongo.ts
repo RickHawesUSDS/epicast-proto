@@ -1,21 +1,33 @@
 import { MongoClient, Db } from 'mongodb'
+import { MongoMemoryServer } from 'mongodb-memory-server'
 import { getLogger } from './loggers'
 
 const logger = getLogger('MONGO')
 let client: MongoClient
+let mongod: MongoMemoryServer | undefined
 
 export async function attachToDb (): Promise<Db> {
-  if (process.env.MONGO_URI === undefined) throw new Error('No MONGO_URI environment')
-  if (process.env.MONGO_DB === undefined) throw new Error('No MONGO_DB environment')
-  client = new MongoClient(process.env.MONGO_URI)
+  let mongoUri: string
+  if (process.env.MONGO_URI === undefined || process.env.MONGO_URI.length === 0) {
+    mongod = await MongoMemoryServer.create();
+    mongoUri = mongod.getUri()
+  } else {
+    mongoUri = process.env.MONGO_URI
+  }
+  client = new MongoClient(mongoUri)
   client.on('commandStarted', (event) => logger.debug(event))
   client.on('commandSucceeded', (event) => logger.debug(event))
   client.on('commandFailed', (event) => logger.debug(event))
 
-  logger.info('Connecting to Mongo...')
+  const dbName = process.env.MONGO_DB ?? 'epicast_demo'
+  logger.info(`Connecting to Mongo ${mongoUri} and db ${dbName}`)
+
   await client.connect()
+  // This is another connection check
   await client.db('admin').command({ ping: 1 })
-  return client.db(process.env.MONGO_DB)
+
+  // 
+  return client.db(dbName)
 }
 
 export async function dropCollections (db: Db, except?: string[]): Promise<void> {
@@ -29,4 +41,7 @@ export async function dropCollections (db: Db, except?: string[]): Promise<void>
 
 export async function disconnectToDb (): Promise<void> {
   await client.close()
+  if (mongod !== undefined) {
+    mongod.stop()
+  }
 }

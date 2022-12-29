@@ -2,7 +2,7 @@ import { describe, test, beforeAll, afterAll } from '@jest/globals'
 import { spec } from 'pactum'
 import { app } from '../../server/app'
 
-const caAgency = 'cdph.ca.gov'
+const caAgency = 'azphs.gov'
 const baseUrl = 'http://localhost:4001/api'
 
 beforeAll(async () => {
