@@ -9,16 +9,17 @@ const logger = getLogger('LOCAL_STORAGE')
 // Use a local folder for feed storage. Good for testing and demos. Configured by environment variables.
 // Assume a posix os
 export class LocalFeedStorage implements FeedStorage {
-  uri: string = 'file://./storage'
+  uri: string
   folderBase: string
 
   constructor() {
+    const storageFolder = process.env.LOCAL_STORAGE ?? './storage'
     const cwd = process.cwd()
-    this.folderBase = path.join(cwd, './storage')
+    this.folderBase = path.join(cwd, storageFolder)
+    this.uri = `file://${this.folderBase}`
   }
 
   async checkConnection(): Promise<void> {
-
   }
 
   async listObjects(prefix: string, onlyOneLevel?: boolean): Promise<StorageObject[]> {
