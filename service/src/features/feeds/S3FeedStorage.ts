@@ -117,4 +117,11 @@ export class S3FeedStorage implements FeedStorage {
       return await this.handleError(`delete error: ${key}, ${deleteResponse.$metadata.httpStatusCode ?? 0}`)
     }
   }
+
+  async clearAll (): Promise<void> {
+    const storageObjects = await this.listObjects('')
+    for (const storageObject of storageObjects) {
+      await this.deleteObject(storageObject.key)
+    }
+  }
 }

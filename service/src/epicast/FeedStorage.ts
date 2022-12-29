@@ -7,6 +7,7 @@ export interface FeedStorage {
   doesObjectExist: (name: string) => Promise<boolean>
   getObject: (name: string, versionId?: string) => Promise<string>
   deleteObject: (name: string) => Promise<void>
+  clearAll: () => Promise<void>
 }
 
 export interface StorageObject {

@@ -4,6 +4,7 @@ import { AppState } from '@/server/AppState'
 import feedRouter from './feedRoutes'
 import { resetStorage } from './resetStorage'
 import { S3FeedStorage } from './S3FeedStorage'
+import { LocalFeedStorage } from './LocalFeedStorage'
 import { FeedStorage } from '@/epicast/FeedStorage'
 
 export class FeedsFeature implements Feature {
@@ -17,8 +18,12 @@ export class FeedsFeature implements Feature {
   }
 
   async start (state: AppState): Promise<void> {
-    if (process.env.S3_BUCKET === undefined) throw Error('Missing S3_BUCKET in .env file')
-    this.storage = new S3FeedStorage(state.s3Client, process.env.S3_BUCKET)
+    if ('local'.localeCompare(process.env.FEED_STORAGE ?? 'local', 'en', { sensitivity: 'accent' }) === 0) {
+      this.storage = new LocalFeedStorage()
+    } else {
+      if (process.env.S3_BUCKET === undefined) throw Error('Missing S3_BUCKET in .env file')
+      this.storage = new S3FeedStorage(state.s3Client, process.env.S3_BUCKET)
+    }
   }
 
   async stop (): Promise<void> {
@@ -36,3 +41,5 @@ export class FeedsFeature implements Feature {
     return this.storage
   }
 }
+
+

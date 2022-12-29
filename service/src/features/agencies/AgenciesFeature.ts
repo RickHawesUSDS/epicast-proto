@@ -84,7 +84,7 @@ export class AgenciesFeature implements Feature {
     const storage = state.feedsFeature.feedStorage
     await insertFakeCases(this.azTimeSeries, 1, 5)
     await publishFeed(storage, this.azTimeSeries, { excludePII: true })
-    this.azSubscriber?.startAutomatic()
+    // this.azSubscriber?.startAutomatic()
   }
 
   async clearStores (): Promise<void> {
