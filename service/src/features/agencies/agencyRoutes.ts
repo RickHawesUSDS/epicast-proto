@@ -34,7 +34,7 @@ function getAgencySubscribers (req: Request): FeedSubscriber[] | undefined {
 }
 
 function getFeedStorage (req: Request): FeedStorage {
-  return req.state.feedsFeature.feedStorage
+  return req.state.feedStorage
 }
 
 // DevNote: add topic to the paths when multiple topics are supported

@@ -32,6 +32,7 @@ export class SystemFeature implements Feature {
   }
 
   async reset (appState: AppState): Promise<void> {
+    await appState.feedStorage.clearAll()
     for (const feature of this.otherFeatures) {
       logger.info(`Resetting: ${feature.name}`)
       await feature.clearStores(appState)

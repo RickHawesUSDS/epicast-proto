@@ -62,7 +62,7 @@ export class AgenciesFeature implements Feature {
   }
 
   async start (state: AppState): Promise<void> {
-    const storage = state.feedsFeature.feedStorage
+    const storage = state.feedStorage
     this.caSubscriber = new FeedSubscriber(initialCASummary, storage, this.cdcTimeSeries)
     this.azSubscriber = new FeedSubscriber(initialAZSummary, storage, this.cdcTimeSeries)
 
@@ -81,7 +81,7 @@ export class AgenciesFeature implements Feature {
   }
 
   async initializeStores (state: AppState): Promise<void> {
-    const storage = state.feedsFeature.feedStorage
+    const storage = state.feedStorage
     await insertFakeCases(this.azTimeSeries, 1, 5)
     await publishFeed(storage, this.azTimeSeries, { excludePII: true })
     // this.azSubscriber?.startAutomatic()

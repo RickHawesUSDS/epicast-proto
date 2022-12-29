@@ -11,10 +11,11 @@ import { FeedsFeature } from '../features/feeds/FeedsFeature'
 import { Feature } from '../server/Feature'
 import { AgenciesFeature } from '../features/agencies/AgenciesFeature'
 import { AppState } from './AppState'
-import { S3Client } from '@aws-sdk/client-s3'
 import { Db } from 'mongodb'
-import { getS3Client } from './s3'
 import { config } from 'dotenv-flow'
+import { FeedStorage } from '@/epicast/FeedStorage'
+import { S3FeedStorage } from './S3FeedStorage'
+import { LocalFeedStorage } from './LocalFeedStorage'
 
 // Load the .env config file into process.env
 const loaded = config()
@@ -34,7 +35,7 @@ export class App {
   port: string | number
 
   // App State
-  s3Client?: S3Client
+  feedStorage?: FeedStorage
   db?: Db
   feedsFeature: FeedsFeature
   systemFeature: SystemFeature
@@ -86,7 +87,7 @@ export class App {
   async start (): Promise<void> {
     logger.info('Starting app...')
     this.db = await attachToDb()
-    this.s3Client = getS3Client()
+    this.feedStorage = this.getFeedStorage()
     const state = this.formAppState()
     for (const feature of this.features) {
       await feature.start(state)
@@ -155,9 +156,18 @@ export class App {
     }
   }
 
+  private getFeedStorage (): FeedStorage {
+    if ('local'.localeCompare(process.env.FEED_STORAGE ?? 'local', 'en', { sensitivity: 'accent' }) === 0) {
+      return new LocalFeedStorage()
+    } else {
+      if (process.env.S3_BUCKET === undefined) throw Error('Missing S3_BUCKET in .env file')
+      return new S3FeedStorage(process.env.S3_BUCKET)
+    }
+  }
+
   private formAppState (): AppState {
-    if (this.db === undefined || this.s3Client === undefined) throw new Error('App is not started')
-    return { db: this.db, s3Client: this.s3Client, systemFeature: this.systemFeature, feedsFeature: this.feedsFeature, agenciesFeature: this.agenciesFeature }
+    if (this.db === undefined || this.feedStorage === undefined) throw new Error('App is not started')
+    return { db: this.db, feedStorage: this.feedStorage, systemFeature: this.systemFeature, feedsFeature: this.feedsFeature, agenciesFeature: this.agenciesFeature }
   }
 
   private onError (error: { syscall: string, code: string }): void {

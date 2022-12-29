@@ -7,7 +7,7 @@ const router = express.Router()
 const logger = getLogger('FEED_ROUTE')
 
 function getFeedStorage (req: express.Request): FeedStorage {
-  return req.state.feedsFeature.feedStorage
+  return req.state.feedStorage
 }
 
 /* List the feed. */

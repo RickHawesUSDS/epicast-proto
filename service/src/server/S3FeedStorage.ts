@@ -1,9 +1,10 @@
 import { DeleteObjectCommand, GetObjectCommand, HeadBucketCommand, HeadObjectCommand, ListObjectsCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
-import { getLogger } from '../../server/loggers'
-import { FeedStorage, StorageObject } from '../../epicast/FeedStorage'
+import { getLogger } from './loggers'
+import { FeedStorage, StorageObject } from '../epicast/FeedStorage'
 import { ReadStream } from 'fs'
 import { Readable } from 'stream'
 import { parseISO } from 'date-fns'
+import { fromIni } from '@aws-sdk/credential-providers'
 
 const logger = getLogger('STORAGE')
 
@@ -12,10 +13,10 @@ export class S3FeedStorage implements FeedStorage {
   readonly bucket: string
   readonly uri: string
 
-  constructor (s3Client: S3Client, bucketName: string) {
+  constructor (bucketName: string) {
     if (bucketName.length === 0) throw Error('Invalid bucket name')
     this.bucket = bucketName
-    this.s3Client = s3Client
+    this.s3Client = S3FeedStorage.getS3Client()
     this.uri = `s3://${this.bucket}`
   }
 
@@ -123,5 +124,14 @@ export class S3FeedStorage implements FeedStorage {
     for (const storageObject of storageObjects) {
       await this.deleteObject(storageObject.key)
     }
+  }
+
+  static getS3Client (): S3Client {
+    if (process.env.S3_REGION === undefined) throw new Error('Missing S3_REGION .env variable')
+    if (process.env.S3_CREDS_PROFILE === undefined) throw new Error('Missing S3_CREDS_PROFILE .env variable')
+    return new S3Client({
+      region: process.env.S3_REGION,
+      credentials: fromIni({ profile: process.env.S3_CREDS_PROFILE })
+    })
   }
 }
