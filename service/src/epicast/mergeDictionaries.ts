@@ -1,3 +1,4 @@
+import { max } from 'date-fns'
 import { FeedDictionary } from './FeedDictionary'
 import { MutableFeedDictionary } from './MutableFeedDictionary'
 
@@ -14,5 +15,6 @@ export function mergeDictionaries (reporter: string, dictionaries: FeedDictionar
     }
   }
   result.reporterId = reporter
+  result.validFrom = max(dictionaries.map(d => d.validFrom))
   return result
 }

@@ -30,3 +30,7 @@
 
 * [ ] Mongo and SQL name approach support in the TimeSeries and Elements.
 * [ ] Multi-value column support.
+
+## Improved partitioning
+
+* [ ] Experiment with current month in days, last month in months as default

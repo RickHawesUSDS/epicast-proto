@@ -13,7 +13,6 @@ export async function readFeed<T> (
   const fromSnapshot = new SnapshotReader(fromStorage, folder)
   await fromSnapshot.load()
   if (fromSnapshot.feedVersion === undefined) return
-
   const summary = await readSummary(fromSnapshot, timeSeries)
   if (summary === undefined) return
 

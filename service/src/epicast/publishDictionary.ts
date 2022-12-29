@@ -34,7 +34,8 @@ function formTemplateContext (dictionary: FeedDictionary, publishOptions: Publis
     : dictionary.elements
   // format stuff in the way that the YAML file wants
   return {
-    topic: dictionary.topicId,
+    topicId: dictionary.topicId,
+    reporterId: dictionary.reporterId,
     validFrom: formatISO(dictionary.validFrom),
     namespaces: dictionary.namespaces,
     elements: publishedElements

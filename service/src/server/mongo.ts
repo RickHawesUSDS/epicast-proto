@@ -9,7 +9,7 @@ let mongod: MongoMemoryServer | undefined
 export async function attachToDb (): Promise<Db> {
   let mongoUri: string
   if (process.env.MONGO_URI === undefined || process.env.MONGO_URI.length === 0) {
-    mongod = await MongoMemoryServer.create();
+    mongod = await MongoMemoryServer.create()
     mongoUri = mongod.getUri()
   } else {
     mongoUri = process.env.MONGO_URI
@@ -26,7 +26,7 @@ export async function attachToDb (): Promise<Db> {
   // This is another connection check
   await client.db('admin').command({ ping: 1 })
 
-  // 
+  //
   return client.db(dbName)
 }
 
@@ -42,6 +42,6 @@ export async function dropCollections (db: Db, except?: string[]): Promise<void>
 export async function disconnectToDb (): Promise<void> {
   await client.close()
   if (mongod !== undefined) {
-    mongod.stop()
+    await mongod.stop()
   }
 }

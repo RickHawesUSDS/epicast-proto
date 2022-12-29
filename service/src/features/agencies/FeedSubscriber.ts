@@ -88,6 +88,9 @@ export class FeedSubscriber {
       this.fromFolder,
       this.timeSeries
     )
+    if (publishedAt === undefined) {
+      logger.debug(`Unsuccessful read of ${this.model.name}`)
+    }
     this.setReading(false, publishedAt)
     return this.model
   }

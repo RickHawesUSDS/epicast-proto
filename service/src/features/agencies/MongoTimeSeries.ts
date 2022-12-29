@@ -9,6 +9,7 @@ import { FeedElement } from '../../epicast/FeedElement'
 import { getLogger } from '../../server/loggers'
 import { mergeDictionaries } from '../../epicast/mergeDictionaries'
 import { upsert } from '../../collection/upsert'
+import { isSameSecond } from 'date-fns'
 
 const logger = getLogger('MONGO_TIME_SERIES')
 
@@ -278,9 +279,16 @@ export class MongoTimeSeries implements MutableTimeSeries<MongoTimeSeriesEvent> 
   }
 
   updateSubscriberDictionary (subscriberDictionary: FeedDictionary): void {
+    const existingDictionary = this.subscriberDictionaries.find(d => d.reporterId === subscriberDictionary.reporterId)
+    if (existingDictionary !== undefined &&
+      isSameSecond(existingDictionary.validFrom, subscriberDictionary.validFrom)) {
+      // Already have this update
+      return
+    }
     upsert(this.subscriberDictionaries, subscriberDictionary, d => d.reporterId === subscriberDictionary.reporterId)
     const mergedDictionary = mergeDictionaries(this.summary.reporterId, [this.dictionary, subscriberDictionary])
     this.dictionary = new MutableFeedDictionary(mergedDictionary)
+    logger.debug(`Updated dictionary ${this.dictionary.reporterId} with new ${subscriberDictionary.reporterId}`)
   }
 
   resetDictionary (): void {

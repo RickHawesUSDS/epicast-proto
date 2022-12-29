@@ -16,6 +16,6 @@ export async function readSummary<T> (
   const publishedBlob = await fromSnapshot.getObject(SUMMARY_KEY)
   const newSummary = YAML.parse(publishedBlob) as FeedSummary
   toTimeSeries.updateSubscriberSummary(newSummary)
-  logger.info(`Read ${newSummary.reporterId} summary`)
+  logger.info(`Successful read of ${newSummary.reporterId} summary`)
   return newSummary
 }

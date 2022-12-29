@@ -1,10 +1,10 @@
 import YAML from 'yaml'
-import { isAfter, isSameSecond, parseISO } from 'date-fns'
+import { isAfter } from 'date-fns'
 import { getLogger } from '../server/loggers'
 
 import { MutableTimeSeries } from './TimeSeries'
 import { FeedDictionary, FeedDictionaryYaml, fromYaml } from './FeedDictionary'
-import { DICTIONARY_FOLDER, splitDictionaryKey } from './feedStorageKeys'
+import { DICTIONARY_FOLDER } from './feedStorageKeys'
 import { Snapshot } from './Snapshot'
 
 const logger = getLogger('READ_DICTIONARY_SERVICE')
@@ -14,14 +14,18 @@ export async function readDictionary<T> (
   mutatingTimeSeries: MutableTimeSeries<T>
 ): Promise<FeedDictionary | null> {
   const publishedBlobKey = findLastDictionaryKey(fromSnapshot, mutatingTimeSeries.dictionary.validFrom)
-  if (publishedBlobKey === null) return null
-  const [, publishedValidFromRaw] = splitDictionaryKey(publishedBlobKey)
-  const publishedValidFrom = parseISO(publishedValidFromRaw)
-  if (isSameSecond(mutatingTimeSeries.dictionary.validFrom, publishedValidFrom)) return null
-  logger.info(`Reading dictionary: ${publishedBlobKey}`)
+  if (publishedBlobKey === null) {
+    logger.debug('No dictionary found')
+    return null
+  }
 
+  logger.info(`Reading dictionary: ${publishedBlobKey}`)
   const publishedBlob = await fromSnapshot.getObject(publishedBlobKey)
   const newDictionary = fromYaml(YAML.parse(publishedBlob) as FeedDictionaryYaml)
+  if (!isValidDictionary(newDictionary, mutatingTimeSeries.dictionary.topicId)) {
+    logger.debug('Invalid dictionary')
+    return null
+  }
 
   mutatingTimeSeries.updateSubscriberDictionary(newDictionary)
   return newDictionary
@@ -42,4 +46,12 @@ function findLastDictionaryKey (fromSnapshot: Snapshot, afterDate: Date | null):
   if (objects.length === 0) return null
   const lastDictionary = objects.reduce((a, b) => isAfter(a.lastModified, b.lastModified) ? a : b)
   return lastDictionary.key
+}
+
+function isValidDictionary (dictionary: FeedDictionary, expectedTopic: string): boolean {
+  if (dictionary.reporterId.length === 0) return false
+  if (dictionary.elements.length === 0) return false
+  if (dictionary.namespaces.length === 0) return false
+  if (dictionary.topicId !== expectedTopic) return false
+  return true
 }
