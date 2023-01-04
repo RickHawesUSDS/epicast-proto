@@ -5,7 +5,7 @@
 * [x] Create a portal project
 * [x] Make a bare EpiCast project
 * [x] USWDS React and CSS
-* [ ] Header, Footer and bare Home, Files, Graphs, About pages
+* [x] Header, Footer and bare Home, Files, Graphs, About pages
 * [ ] Summary component
 * [ ] build and publish work
 
