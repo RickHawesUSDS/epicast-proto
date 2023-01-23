@@ -1,0 +1,21 @@
+{
+  "folders": [
+    {
+      "name": "service",
+      "path": "service"
+    },
+    {
+      "name": "explorer",
+      "path": "explorer"
+    },
+    {
+      "name": "demo",
+      "path": "demo"
+    }
+  ],
+  "settings": {
+    "jest.disabledWorkspaceFolders": [
+      "demo"
+    ]
+  }
+}
