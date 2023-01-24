@@ -2,15 +2,15 @@
   "folders": [
     {
       "name": "service",
-      "path": "service"
+      "path": "apps/demo-service"
     },
     {
       "name": "explorer",
-      "path": "explorer"
+      "path": "apps/explorer"
     },
     {
       "name": "demo",
-      "path": "demo"
+      "path": "apps/demo"
     }
   ],
   "settings": {

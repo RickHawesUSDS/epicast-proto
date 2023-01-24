@@ -41,9 +41,9 @@
     "build-demo": "react-scripts build",
     "test-demo": "react-scripts test",
     "eject-demo": "react-scripts eject",
-    "dev-service": "cd ../service && yarn dev",
-    "install-service": "cd ../service && yarn install",
-    "upgrade-service": "cd ../service && yarn upgrade"
+    "dev-service": "cd ../demo-service && yarn dev",
+    "install-service": "cd ../demo-service && yarn install",
+    "upgrade-service": "cd ../demo-service && yarn upgrade"
   },
   "eslintConfig": {
     "extends": "react-app"
