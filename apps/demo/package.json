@@ -64,5 +64,6 @@
     "@tsconfig/node16": "^1.0.3",
     "concurrently": "^7.6.0",
     "standard": "^17.0.0"
-  }
+  },
+  "packageManager": "yarn@1.22.19"
 }
